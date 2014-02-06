@@ -1,0 +1,95 @@
+body {font: 12px 'Lucida Grande', Geneva, Verdana, Arial, Helvetica, sans-serif}
+body.main {background: url(bgimage.gif)}
+body.util {background-color: #CCCCFF}
+body.note {background-color: #FFFF99}
+body.fmgt, html {background-color: #E0E0FF}
+
+span.pathbread {
+	font-size: 1.3em;
+}
+
+#ftbl {
+	border: none;
+}
+
+#ftbl th, #ftbl td {
+	white-space: nowrap;
+}
+#ftbl td a {
+	text-decoration: none;
+}
+
+th.left {
+	text-align: left;
+}
+
+th.right, td.right {
+	text-align: right;
+}
+
+LABEL.inputLabel {
+	width: 90em;
+	text-align: right;
+	//float: left;
+}
+
+.clearBoth {
+	clear: both;
+}
+
+div#fmnu a {
+	margin-left: 8px;
+}
+
+td.filicon {
+	background-image: url(../icons/document.png);
+	background-repeat: no-repeat;
+	background-position: center center;
+	width: 16px;
+}
+
+td.filedticon {
+	background-image: url(../icons/document_edit.png);
+	background-repeat: no-repeat;
+	background-position: center center;
+	width: 16px;
+	cursor: pointer;
+}
+
+td.diricon {
+	background-image: url(../icons/folder-hor.png);
+	background-repeat: no-repeat;
+	background-position: center center;
+	width: 16px;
+}
+
+div.dnldprg {
+	display: none;
+}
+
+#ftbl img {
+	border: none;
+}
+
+#cmdRsp {
+	font: 11px Monaco, Courier;
+	width: 99%;
+}
+
+#util-view {
+	position: fixed;
+	top: 180px;
+	left: 200px;
+	background-color: white;
+	border: 1px solid #bbb;
+	padding: 4px;
+}
+
+#util-view div {
+	margin: 2px;
+}
+
+#util-view div:hover {
+	background-color: #BCE;
+	cursor: pointer;
+}
