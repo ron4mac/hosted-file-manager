@@ -121,6 +121,11 @@ else {
 		<li><a href="#" data-mnu="fmxi" data-req="0">?</a></li>
 	</ul>
 	</nav>
+	<nav style="float:right">
+	<ul>
+		<li><a href="#" data-mnu="updt" data-req="0">update</a></li>
+	</ul>
+	</nav>
 </div>
 <br /><hr />
 <form name="filst">

@@ -346,6 +346,22 @@ function doMenuAction(cmd,evt) {
 				if (data) { alert(data) }
 				});
 		break;
+	case 'updt':
+		parms = {act: 'updt'};
+		$.post("fmxjx.php", parms, function(data,textStatus,jqXHR) {
+				if (data) {
+					if (confirm('Update available: ' + data + "\n\n" + 'Perform update?')) {
+						parms = {act: 'updt', nver: data};
+						$.post("fmxjx.php", parms, function(data,textStatus,jqXHR) {
+								if (data) { alert(data) }
+								else refreshFilst();
+								});
+					}
+				} else {
+					alert('No updates available.');
+				}
+				});
+		break;
 	case 'cmcs':
 		console.log(evt);
 		var utilview = document.createElement('div');
