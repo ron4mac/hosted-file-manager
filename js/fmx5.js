@@ -1,9 +1,7 @@
-//$(document).ready(function() {
 $(function() {
 $("#fmnu [data-mnu]").click(function(e) {e.preventDefault(); doMenuAction($(this).attr('data-mnu'),e); });
 $("#trmfrm [data-mnu]").click(function(e) {e.preventDefault(); doMenuAction($(this).attr('data-mnu'),e); });
 $("#ftbl [data-act]").click(function(e) {e.preventDefault(); doFileAction($(this).attr('data-act'),this,e); });
-//$(".fsel").change(function() { handleFileSelect(); });
 $('#aMsgDlg').dialog({
 	autoOpen: false,
 	width: 600,
@@ -62,9 +60,6 @@ $('#fCpyDlg').dialog({
 			$(this).dialog("close");
 			},
 		Copy: function() {
-			//cpyfnam = $('#cpyfnm').val();
-			//cpy2nam = $('#cpy2nam').val();
-			//parms = 'act=copy&fref='+cpyfnam+'&tonm='+cpy2nam; //alert(parms);
 			parms = {
 				act: 'copy',
 				fref: $('#cpyfnm').val(),
@@ -87,9 +82,6 @@ $('#fMovDlg').dialog({
 			$(this).dialog("close");
 			},
 		Move: function() {
-			//movfnam = $('#movfnm').val();
-			//mov2nam = $('#mov2nam').val();
-			//parms = 'act=move&fref='+movfnam+'&tonm='+mov2nam; //alert(parms);
 			parms = {
 				act: 'move',
 				fref: $('#movfnm').val(),
@@ -130,7 +122,7 @@ $('nav li').hover(function () {
 	$('ul', this).stop(true,true).fadeToggle(100);
 });
 	
-});	//end document ready
+});
 
 
 function refreshFilst() {
@@ -163,7 +155,6 @@ function doMenuAction(cmd,evt) {
 		}
 		else {
 			parms = 'act=cppa&todr='+encodeURIComponent(curDir)+'&'+sessionStorage.fmx_cppa;
-			//alert(parms);
 			$.post("fmxjx.php", parms, function(data,textStatus,jqXHR) {
 					if (data) { alert(data) }
 					else refreshFilst();
@@ -203,15 +194,12 @@ function doMenuAction(cmd,evt) {
 			}
 		break;
 	case 'mark':
-		//console.log(evt);
 		parms = sessionStorage.fmx_mrkd ? (sessionStorage.fmx_mrkd+"\0") : '';
 		if (scnt) {
 			sessionStorage.fmx_mrkd = parms + $("form[name='filst']").serialize();
 		} else {
 			$('#fMrk').html(sessionStorage.fmx_mrkd ? makeFileList(sessionStorage.fmx_mrkd, true) : '&lt;empty&gt;');
 			$('#fMrkDlg').dialog('open');
-			//alert(sessionStorage.fmx_mrkd ? makeFileList(sessionStorage.fmx_mrkd) : 'empty');
-			//if (evt.altKey) sessionStorage.removeItem('fmx_mrkd');
 		}
 		break;
 	case 'move':
@@ -279,11 +267,6 @@ function doMenuAction(cmd,evt) {
 		break;
 	case 'upld':
 		if (doesSupportAjaxUploadWithProgress()) {
-			//popUp('filupld5.php?path='+curDir);
-
-			//popUp('filupld5s.php?path='+curDir);
-			sessionStorage.fmx_curD = curDir;
-			//popUp('filupld5d.php?path='+curDir);
 			popUp('filupld5d.php');
 			}
 		else popUp('filupld.php?path='+curDir);
@@ -294,7 +277,6 @@ function doMenuAction(cmd,evt) {
 	case 'utrz':
 		if (oneItem()) {
 			curfn = /*curDir+*/$(slctd[0]).parents('tr').attr('data-fref');
-			//console.log(document.forms.cliterm);
 			trmFrm = document.forms.cliterm;
 			if (cmd=='zip') {
 				destfn = curfn.replace(/\s/g,'_');
@@ -319,7 +301,6 @@ function doMenuAction(cmd,evt) {
 				else break;
 			}
 			var wPath = curDir.slice(curDir.search("/"));
-			//alert(wPath+curfn);
 			pop(wPath+curfn,screen.availHeight,1200);
 			}
 		break;
@@ -335,7 +316,6 @@ function doMenuAction(cmd,evt) {
 					};
 				$.post("fmxjx.php", parms, function(data,textStatus,jqXHR) {
 						if (data) { alert(data) }
-						//else refreshFilst();
 						});
 			} else alert('Must be an XML file');
 			}
@@ -405,7 +385,6 @@ function doFileAction(act,elem,evt) {
 	var parms;
 	switch (act) {
 		case 'finf':
-			//parms = 'act='+act+'&fref='+fileoi;
 			parms = {
 				act: act,
 				fref: fileoi
@@ -435,7 +414,6 @@ function doFillCLI(cmd) {
 
 function downloadFile(A, cdl, asf) {
 	var dlURL = 'fildnld.php?fle=' + escape(A) + (cdl ? '&tcdl=1&rad=Y' : '') + (asf ? ('&asf='+asf) : ''); //alert(dlURL);
-	//dlframe.location.href = dlURL;
 	var dlframe = document.createElement("iframe");
 	// set source to desired file
 	dlframe.src = dlURL;
@@ -497,13 +475,13 @@ function fils2up() {
 
 function makeFileList(fstr, htm) {
 	var sep = htm ? '<br />' : ' ';
-	var rslt = '';	//return fstr;
-	var itms = fstr.split("\0");	//console.log(itms);
+	var rslt = '';
+	var itms = fstr.split("\0");
 	for (var itm in itms) {
-		var fpts = itms[itm].split("&");	//console.log(fpts);
+		var fpts = itms[itm].split("&");
 		var fdr = '';
 		for (var fpt in fpts) {
-			var fpa = fpts[fpt].split("=");	//console.log(fpa);
+			var fpa = fpts[fpt].split("=");
 			if (fpt==0) { fdr = '/'+fpa[1] }
 			else { rslt += fdr + '%2F' + fpa[1] + sep }
 		}
@@ -521,7 +499,6 @@ function selectionAction(fedt) {
 		}
 	}
 	var fpth = curDir+sel;
-	//var fedt = confirm("Edit this file? (otherwise will just view)");
 	if (fedt) { doEditFile(fpth); }
 	else { doViewFile(fpth); }
 }

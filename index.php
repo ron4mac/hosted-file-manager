@@ -52,7 +52,7 @@ if (isset($_POST['cmdlin'])) {
 <link rel="stylesheet" type="text/css" href="css/nav.css" />
 <script src="js/jquery-1.8.0.min.js" type="text/javascript"></script>
 <script src="js/jquery-ui-1.8.23.custom.min.js" type="text/javascript"></script>
-<script src="js/fmx5.js" type="text/javascript"></script>
+<script src="js/fmx.min.js" type="text/javascript"></script>
 <script type="text/javascript">//<![CDATA[
 var curDir='<?php echo $pDir;?>/';
 //]]></script>
