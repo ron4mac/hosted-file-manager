@@ -120,20 +120,6 @@ switch ($_POST['act']) {
 		if ($newver) {
 			echo $newver;
 		}
-		//performUpdate($newver);
-/*
-		$cmds = 'cd ../;
-git --version;';
-		system($cmds,$rslt);
-		if ($rslt !== 0) {
-			echo 'It seems that "git" is not available.';
-			break;
-		}
-		$cmds = 'cd ../;
-git clone git://github.com/ron4mac/hosted-file-manager.git newfmx 2>&1;';
-		system($cmds,$rslt);
-		if ($rslt) echo $rslt;
-*/
 		break;
 	case 'CLIC':
 		echo file_get_contents('cliref.htm');
