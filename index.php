@@ -48,7 +48,7 @@ if (isset($_POST['cmdlin'])) {
 <title>Files :: <?php echo $rootD?></title>
 <meta charset="UTF-8">
 <link rel="stylesheet" type="text/css" href="css/custom-theme/jquery-ui-1.8.5.custom.css" />
-<link rel="stylesheet" type="text/css" href="css/admin.css" />
+<link rel="stylesheet" type="text/css" href="css/fmx.css" />
 <link rel="stylesheet" type="text/css" href="css/nav.css" />
 <script src="js/jquery-1.8.0.min.js" type="text/javascript"></script>
 <script src="js/jquery-ui-1.8.23.custom.min.js" type="text/javascript"></script>
