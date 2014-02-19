@@ -49,11 +49,21 @@ switch ($y) {
 		if ($mtyp==='0x') {
 			$mtyp = 'text/plain';
 			$gc = 4;
+			$lin = '';
 			$fhan = fopen($fref,'r');
 			while (!feof($fhan)) {
-				$fcon .= bin2hex(fread($fhan,8)) . ' ';
-				if (!--$gc) { $fcon .= "\n"; }
+				$cnk = fread($fhan,8);
+				$lin .= preg_replace('/[\x00-\x1F\x7F]/',' ',$cnk);
+//				$lin .= htmlentities($cnk);
+				$fcon .= bin2hex($cnk) . ' ';
+				if (!--$gc) {
+					$fcon .= '  ' . $lin . "\n";
+					//$fcon .= "\n";
+					$lin = '';
+					$gc = 4;
+					}
 				}
+			if ($lin) $fcon .= '  ' . $lin . "\n";
 			fclose($fhan);
 			}
 		elseif (pathinfo($fref, PATHINFO_EXTENSION) == 'md' && $mtyp_arg !== 'text/plain') {
