@@ -1,6 +1,5 @@
 <?php
 require_once('functions.php');
-$fpath = escapeshellcmd($_GET['path']);
 $uploadMaxFilesize = ini_get('upload_max_filesize');
 $uploadMaxFilesizeBytes = return_bytes($uploadMaxFilesize);
 ?>
@@ -38,11 +37,10 @@ $uploadMaxFilesizeBytes = return_bytes($uploadMaxFilesize);
 		<div id="server_response"></div>
 	</div>
 	<script type="text/javascript">
-		//var filesPath = "<?php echo $fpath; ?>";
 		var filesPath = sessionStorage.fmx_curD;
 		var uploadMaxFilesize = <?php echo $uploadMaxFilesizeBytes; ?>;
+		// optional array of allowed mime types
 		//var fup_ftypes = ['image/jpeg'];
-		//var fup_payload = {'fpath':'<?php echo $fpath; ?>'};
 		var fup_payload = {'fpath':sessionStorage.fmx_curD};
 		function fup_done() { parent.opener.refreshFilst(); }
 	</script>

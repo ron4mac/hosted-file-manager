@@ -267,6 +267,7 @@ function doMenuAction(cmd,evt) {
 		break;
 	case 'upld':
 		if (doesSupportAjaxUploadWithProgress()) {
+			sessionStorage.fmx_curD = curDir;
 			popUp('filupld5d.php');
 			}
 		else popUp('filupld.php?path='+curDir);
