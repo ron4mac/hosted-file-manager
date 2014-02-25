@@ -49,8 +49,10 @@ $scrptFilPrts = explode('/',__FILE__);
 <head>
 <title><?php echo $fref; ?></title>
 <link rel="stylesheet" type="text/css" href="css/sdrop.css" />
-<script src="js/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/ace/ace.js" data-ace-base="js/ace" type="text/javascript" charset="utf-8"></script>
+<script src="js/ace/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
+ace.require("ace/ext/language_tools");
 function pop(url, h1, w1) {
 	var h2 = (screen.height-h1)/2;
 	var w2 = (screen.width-w1)/2;
@@ -116,12 +118,15 @@ div.cntrl {float:left;margin-right:10px;}
 <script type="text/javascript">
 var eData = document.getElementById('editBox');
 var editor = ace.edit("editor");
-//editor.setShowInvisibles(true);
 editor.setShowPrintMargin(false);
 editor.getSession().setUseSoftTabs(false);
 editor.getSession().setValue(eData.value);
 editor.setTheme("ace/theme/rjcode");
 editor.getSession().setMode("ace/mode/<?=$mode?>");
+editor.setOptions({
+	enableBasicAutocompletion: true,
+	enableSnippets: true
+});
 editor.focus();
 </script>
 </body>
