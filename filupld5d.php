@@ -41,7 +41,7 @@ $uploadMaxFilesizeBytes = return_bytes($uploadMaxFilesize);
 		var uploadMaxFilesize = <?php echo $uploadMaxFilesizeBytes; ?>;
 		// optional array of allowed mime types
 		//var fup_ftypes = ['image/jpeg'];
-		var fup_payload = {'fpath':sessionStorage.fmx_curD};
+		var fup_payload = {'fpath':sessionStorage.fmx_curD, 'oefile':'1'};
 		function fup_done() { parent.opener.refreshFilst(); }
 	</script>
 	<script src="js/upload5d.js" type="text/javascript"></script>

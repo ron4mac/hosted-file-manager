@@ -47,15 +47,19 @@ if (isset($_POST['cmdlin'])) {
 <head>
 <title>Files :: <?php echo $rootD?></title>
 <meta charset="UTF-8">
-<link rel="stylesheet" type="text/css" href="css/custom-theme/jquery-ui-1.8.5.custom.css" />
+<meta http-equiv="Content-Language" content="en" />
+<meta name="google" content="notranslate">
+<link rel="stylesheet" type="text/css" href="css/jqModal.css" />
 <link rel="stylesheet" type="text/css" href="css/fmx.css" />
+<link rel="stylesheet" type="text/css" href="css/fmxui.css" />
 <link rel="stylesheet" type="text/css" href="css/nav.css" />
-<script src="js/jquery-1.8.0.min.js" type="text/javascript"></script>
-<script src="js/jquery-ui-1.8.23.custom.min.js" type="text/javascript"></script>
-<script src="js/fmx.min.js" type="text/javascript"></script>
-<script type="text/javascript">//<![CDATA[
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="js/js.php" type="text/javascript"></script>
+<script type="text/javascript">
 var curDir='<?php echo $pDir;?>/';
-//]]></script>
+try { sessionStorage.fmx_ok = 1; }
+catch(err) { alert("Your browser 'sessionStorage' is not functioning. (private browsing?) Not all functions of FMX will work successfully."); }
+</script>
 </head>
 <body class="fmgt">
 <span class="pathbread">
@@ -245,12 +249,25 @@ Command: <input type="text" id="cmdlin" name="cmdlin" size="80" maxlength="200" 
 <?php endif; ?>
 </div>
 <div style="display:none">
-<div id="aMsgDlg" title="Message:"><span id="aMsg"></span></div>
-<div id="fMrkDlg" title="Marked files:"><span id="fMrk"></span></div>
-<div id="fRenDlg" title="Rename:"><input type="hidden" id="oldnm" value="old" /><input type="text" id="nunam" name="nunam" size="55" maxlength="80" /></div>
-<div id="fNamDlg" title="Name:"><input type="hidden" id="ffact" value="new" /><input type="text" id="ffnam" name="ffnam" size="55" maxlength="80" /></div>
-<div id="fCpyDlg" title="Copy:"><input type="hidden" id="cpyfnm" value="old" /><p id="cpyfnam"></p>To: <input type="text" id="cpy2nam" name="nunam" size="70" maxlength="100" /></div>
-<div id="fMovDlg" title="Move:"><input type="hidden" id="movfnm" value="old" /><p id="movfnam"></p>To: <input type="text" id="mov2nam" name="nunam" size="70" maxlength="100" /></div>
+<!-- <div id="aMsgDlg" title="Message:"><span id="aMsg"></span></div> -->
+<!-- <div id="fMrkDlg" title="Marked files:"><span id="fMrk"></span></div> -->
+<!-- <div id="fRenDlg" title="Rename:"><input type="hidden" id="oldnm" value="old" /><input type="text" id="nunam" name="nunam" size="55" maxlength="80" /></div> -->
+<!-- <div id="fNamDlg" title="Name:"><input type="hidden" id="ffact" value="new" /><input type="text" id="ffnam" name="ffnam" size="55" maxlength="80" /></div> -->
+<!-- <div id="fCpyDlg" title="Copy:"><input type="hidden" id="cpyfnm" value="old" /><p id="cpyfnam"></p>To: <input type="text" id="cpy2nam" name="nunam" size="70" maxlength="100" /></div> -->
+<!-- <div id="fMovDlg" title="Move:"><input type="hidden" id="movfnm" value="old" /><p id="movfnam"></p>To: <input type="text" id="mov2nam" name="nunam" size="70" maxlength="100" /></div> -->
+<!-- <div id="fCpyDlog" title="Copy:"><input type="hidden" name="cpyfnm" value="{cpy}" /><p>From: {cpy}</p>To: <input type="text" name="cpy2nam" value="{cpy}" size="70" maxlength="100" /></div> -->
+<!-- <div id="fMovDlog" title="Move:"><input type="hidden" name="movfnm" value="{mov}" /><p>From: {mov}</p>To: <input type="text" name="mov2nam" value="{mov}" size="70" maxlength="100" /></div> -->
+<div id="aMsgDlog" title="Message:"><span class="aMsg">{msg}</span></div>
+<div id="aSchDlog" title="Search:"><input type="hidden" name="cmd" value="{cmd}" /><input type="text" name="sterm" value="{trm}" size="55" maxlength="80" /></div>
+<div id="fRenDlog" title="Rename:"><input type="hidden" name="oldnm" value="{old}" /><input type="text" name="nunam" value="{new}" size="55" maxlength="80" /></div>
+<div id="fNamDlog" title="{ttl}"><input type="hidden" name="act" value="{act}" /><input type="text" name="fref" size="55" maxlength="80" /></div>
+<div id="fCpmDlog" title="CopMov:"><input type="hidden" name="act" value="{act}" /><input type="hidden" name="cpmfnm" value="{cpm}" /><p>From: {cpm}</p>To: <input type="text" name="cpm2nam" value="{cpm}" size="70" maxlength="100" /></div>
+</div>
+<div class="jqmWindow" id="upload"><div class="upldr"></div><span class="button jqmClose"><img src="css/closex.png" alt="close" /></span></div>
+<div id="element_to_pop_up" class="jqmWindow">
+	<div class="bpDlgHdr"><span class="bpDlgTtl">TITLE</span><span class="button jqmClose"><img src="css/closex.png" alt="close" /></span></div>
+	<div class="bpDlgCtn"><form class="bp-dctnt" name="myUIform" onsubmit="return false"></form></div>
+	<div class="bpDlgFtr"><div class="bp-bttns"></div></div>
 </div>
 </body>
 </html>

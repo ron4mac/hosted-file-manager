@@ -1,0 +1,60 @@
+.popdlg {
+	display:none;
+	min-width:250px;
+	min-height:100px;
+	max-width:40%;
+	background-color:#E1F7F5;
+	border:1px solid #666;
+	border-radius:5px;
+	padding:22px 12px;
+	/*box-shadow:4px 4px 4px #888;*/
+	box-shadow:0 5px 15px rgba(0,0,0,0.5);
+	}
+.button.b-close, .button.jqmClose {
+	position:absolute;
+	right:0;
+	top:0;
+	cursor:pointer;
+	}
+.bpDlgHdr {
+	padding:1px 0;
+	margin-bottom:6px;
+}
+.bpDlgCtn {
+	padding:10px;
+}
+.bpDlgFtr {
+	padding:10px;
+}
+.bpDlgTtl {
+/*	position:absolute;
+	left:0;
+	top:0;*/
+	padding:1px 0 0 4px;
+	color:#222;
+	font-weight:bold;
+	}
+.bp-bttns {
+/*	position:absolute;
+	bottom:0;
+	margin-bottom:4px;
+	width:92%;*/
+	height:20px;
+	}
+.bp-bttns button {
+	float:right;
+	margin-left:8px;
+	cursor:pointer;
+	}
+.btn-scd, .btn-prm {
+	opacity: 0.7;
+}
+.btn-scd:hover, .btn-prm:hover {
+	opacity: 1;
+}
+.btn-scd {
+	background-color:#F0F8FF;
+}
+.btn-prm {
+	background-color:#C2E7FC;
+}

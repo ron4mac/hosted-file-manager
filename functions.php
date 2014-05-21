@@ -4,7 +4,7 @@ $cooknam = 'fil_vew' . ($rmtuser ? "_$rmtuser" : '');
 $cookie = $_COOKIE[$cooknam];
 if (!$cookie) { exit; }
 $baseDir = convert_uudecode($cookie).'/';
-$fmxVersion = '2.9.5 - 16 Feb 2014';
+$fmxVersion = '2.9.6 - 18 May 2014';
 
 function FileMimeType ($fpath) {
 	$mtyp = 'text/plain';
