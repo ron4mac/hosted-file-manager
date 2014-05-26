@@ -4,4 +4,3 @@
 	readfile('jqModal'.$vers.'.js'); echo"\n";
 	readfile('fmx'.$vers.'.js'); echo"\n";
 	readfile('fmxui'.$vers.'.js'); echo"\n";
-?>

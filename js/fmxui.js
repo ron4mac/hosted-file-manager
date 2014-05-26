@@ -10,24 +10,7 @@ $(function() {
 	});
 });
 
-
-function MyDlg (dObj) {
-
-	// do a selfie
-	var self = this;
-	// save our dialog object
-	this.dObj = dObj;
-
-	// create the dialog
-	this.dlg = document.createElement("DIV");
-	this.dlg.className = "jqmWindow";
-	this.dlg.innerHTML = '<div class="mdlg_hdr">HEADER</div><div class="mdlg_ctn">CONTENT<input type="text" name="ttxt" value="XYZ123" /></div><div class="mdlg_ftr">FOOTER</div>';
-	document.body.appendChild(this.dlg);
-	$(this.dlg).jqm({onHide:function(h){h.w.hide() && h.o && h.o.remove();document.body.removeChild(self.dlg);return false}}).jqmShow();
-}
-
-
-function myOpenDlg (e, dId, fVals, titl) {	console.log(dId);
+function myOpenDlg (e, dId, fVals, titl) {
 	e.preventDefault();
 	// get the dialog
 	var dlg = $('#element_to_pop_up');
@@ -82,17 +65,9 @@ function myOpenDlg (e, dId, fVals, titl) {	console.log(dId);
 		$('form.bp-dctnt', dlg).html(fhtm);
 		// display the dialog
 		$(dlg).jqm({overlay:20,modal:dId.modal}).jqmShow();
-		// fill in fields as provided
-//		if (fVals) {
-//			var frm = $('form.bp-dctnt', dlg).get(0);	console.log(frm);
-//			for (var f in fVals) {	alert(f+':'+fVals[f]);
-//				//frm.f.value = fVals[f];
-//				document.myUIform.f.value = fVals[f];
-//			}
-//		}
 	}
 }
-
+/*
 function myProcessDlg (elem, action) {
 	var clos = true;
 	if (action) {
@@ -102,7 +77,7 @@ function myProcessDlg (elem, action) {
 	}
 	if (clos) myCloseDlg(elem);
 }
-
+*/
 function myCloseDlg (elem) {
 	// close the elements dialog container
 	$(elem).closest('.jqmWindow').jqmHide();

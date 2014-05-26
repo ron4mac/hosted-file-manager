@@ -1,4 +1,5 @@
 <?php
+include('fmx.cfg');
 require_once('functions.php');
 
 $fref = isset($_POST['fref']) ? $baseDir.doUnescape($_POST['fref']) : '';
@@ -115,9 +116,20 @@ switch ($_POST['act']) {
 		$joomext->pull(escapeshellcmd($_POST['dir']));
 		break;
 	case 'fmxi':
-		echo 'FMX Version: ' . $fmxVersion;
-		echo "\nPHP Version: " . phpversion();
-		echo "\nSQLite3 Version: " . SQLite3::version()['versionString'];
+		require_once('updater.php');
+		$newver = checkForUpdate();
+		$msg = 'FMX Version: ' . $fmxVersion;
+		$msg .= '<br />PHP Version: ' . phpversion();
+		$msg .= '<br />MySql(i) Client Version: ' . mysqli_get_client_info();
+		$msg .= '<br />SQLite3 Version: ' . SQLite3::version()['versionString'];
+		$msg .= '<br /><br />';
+		if ($newver) {
+			$vinf = explode('|', $newver);
+			$msg .= '<span class="notify">There is an FMX update: '.$vinf[0].'</span>';
+		} else {
+			$msg .= 'There is no available FMX update.';
+		}
+		echo json_encode(array('updt'=>$newver,'msg'=>$msg));
 		break;
 	case 'updt':
 		$newver = escapeshellcmd($_POST['nver']);

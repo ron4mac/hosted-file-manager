@@ -1,13 +1,27 @@
-function refreshFilst() {
-	window.location.reload();
-}
-
-function postAndRefresh(parms) {
-	$.post("fmxjx.php", parms, function(data,textStatus,jqXHR) {
-			if (data) { alert(data); }
-			else { refreshFilst(); }
-			});
-}
+$(function() {
+$("#fmnu [data-mnu]").click(function(e) {e.preventDefault(); doMenuAction($(this).attr('data-mnu'),e); });
+$("#trmfrm [data-mnu]").click(function(e) {e.preventDefault(); doMenuAction($(this).attr('data-mnu'),e); });
+$("#ftbl [data-act]").click(function(e) {e.preventDefault(); doFileAction($(this).attr('data-act'),this,e); });
+/*$('#fMrkDlg').dialog({
+	autoOpen: false,
+	width: 600,
+	position: [200,100],
+	buttons: {
+		Okay: function() {
+			$(this).dialog("close");
+			},
+		Clear: function() {
+			sessionStorage.removeItem('fmx_mrkd');
+			$(this).dialog("close");
+			}
+		}
+	});*/
+$('nav li ul').hide().removeClass('fallback');
+$('nav li').hover(function () {
+	$('ul', this).stop(true,true).fadeToggle(100);
+});
+	
+});
 
 var aMsgDlg = {
 	cselect: '#aMsgDlog',
@@ -94,60 +108,15 @@ var fCpmDlg = {
 		}
 	};
 
-function downloadFile(A, cdl, asf) {
-	var dlURL = 'fildnld.php?fle=' + escape(A) + (cdl ? '&tcdl=1&rad=Y' : '') + (asf ? ('&asf='+asf) : ''); //alert(dlURL);
-	var dlframe = document.createElement("iframe");
-	// set source to desired file
-	dlframe.src = dlURL;
-	// This makes the IFRAME invisible to the user.
-	dlframe.style.display = "none";
-	// Add the IFRAME to the page.  This will trigger the download
-	document.body.appendChild(dlframe);
+function postAndRefresh(parms) {
+	$.post("fmxjx.php", parms, function(data,textStatus,jqXHR) {
+			if (data) { alert(data); }
+			else { refreshFilst(); }
+			});
 }
 
-function makeFileList(fstr, htm) {
-	var sep = htm ? '<br />' : ' ';
-	var rslt = '';
-	var itm, itms = fstr.split("\u0000");
-	var fpts, fdr, fpt, fpa;
-	for (itm in itms) {
-		fpts = itms[itm].split("&");
-		fdr = '';
-		for (fpt in fpts) {
-			fpa = fpts[fpt].split("=");
-			if (fpt==0) { fdr = '/'+fpa[1]; }
-			else { rslt += fdr + '%2F' + fpa[1] + sep; }
-		}
-	}
-	return rslt.replace(/%2F/g,'/');
-}
-
-function doesSupportAjaxUploadWithProgress() {
-
-	function supportFileAPI() {
-		var fi = document.createElement('INPUT');
-		fi.type = 'file';
-		return fi.hasOwnProperty('files');
-	}
-
-	function supportAjaxUploadProgressEvents() {
-		var xhr = new XMLHttpRequest();
-		return !! (xhr && (xhr.hasOwnProperty('upload')) && (xhr.upload.hasOwnProperty('onprogress')));
-	}
-
-	//return false;
-	return supportFileAPI() && supportAjaxUploadProgressEvents();
-}
-
-function pop(url, h1, w1) {
-	var h2 = (screen.height-h1)/2;
-	var w2 = (screen.width-w1)/2;
-	var wcon="toolbar=no,status=no,location=no,menubar=no,resizable=0,scrollbars=1,width="+w1+",height="+h1+",left="+w2+",top="+h2;
-	return window.open(url, "", wcon);
-}
-
-function popUp(url) {
-	pop(url,240,416);
+function refreshFilst() {
+	window.location.reload();
 }
 
 function doMenuAction(cmd,evt) {
@@ -170,7 +139,8 @@ function doMenuAction(cmd,evt) {
 		}
 		if (scnt) {
 			sessionStorage.fmx_cppa = $("form[name='filst']").serialize();
-		} else {
+		}
+		else {
 			parms = 'act=cppa&todr='+encodeURIComponent(curDir)+'&'+sessionStorage.fmx_cppa;
 			$.post("fmxjx.php", parms, function(data,textStatus,jqXHR) {
 					if (data) { alert(data); }
@@ -179,25 +149,24 @@ function doMenuAction(cmd,evt) {
 				}
 		break;
 	case 'delf':
-		if (hasSome() && ((scnt==1) || confirm('You have multiple files selected. Are you sure you want to delete ALL the selected files?'))) {
-			parms = 'act=delf&'+$("form[name='filst']").serialize();
-			$.post("fmxjx.php", parms, function(data,textStatus,jqXHR) {
-					if (data) { alert(data); }
-					else { refreshFilst(); }
-					});
-		}
+		if (!hasSome()) break;
+		if ((scnt>1) && !confirm('You have multiple files selected. Are you sure you want to delete ALL the selected files?')) break;
+		parms = 'act=delf&'+$("form[name='filst']").serialize();
+		$.post("fmxjx.php", parms, function(data,textStatus,jqXHR) {
+				if (data) { alert(data); }
+				else { refreshFilst(); }
+				});
 		break;
 	case 'dnld':
-		if (hasSome()) {
-			parms = 'act=dnld&'+$("form[name='filst']").serialize();
-			$('div.dnldprg').css('display','inline');
-			$.post("fmxjx.php", parms, function(data,textStatus,jqXHR) {
-					$('div.dnldprg').css('display','none');
-					if (data) { downloadFile(data.fpth,data.rad=='Y',false); }
-					else { alert('download not available'); }
-					}
-					,'json');
-		}
+		if (!hasSome()) break;
+		parms = 'act=dnld&'+$("form[name='filst']").serialize();
+		$('div.dnldprg').css('display','inline');
+		$.post("fmxjx.php", parms, function(data,textStatus,jqXHR) {
+				$('div.dnldprg').css('display','none');
+				if (data) { downloadFile(data.fpth,data.rad=='Y',false); }
+				else alert('download not available');
+				}
+				,'json');
 		break;
 	case 'dupl':
 		if (oneItem()) {
@@ -212,7 +181,7 @@ function doMenuAction(cmd,evt) {
 			}
 		break;
 	case 'mark':
-		parms = sessionStorage.fmx_mrkd ? (sessionStorage.fmx_mrkd+"\u0000") : '';
+		parms = sessionStorage.fmx_mrkd ? (sessionStorage.fmx_mrkd+"\0") : '';
 		if (scnt) {
 			sessionStorage.fmx_mrkd = parms + $("form[name='filst']").serialize();
 		} else {
@@ -251,10 +220,9 @@ function doMenuAction(cmd,evt) {
 		refreshFilst();
 		break;
 	case 'rnam':
-		if (oneItem())  {
-			curfn = $(slctd[0]).parents('tr').attr('data-fref');
-			myOpenDlg(evt,fRenDlg,{'old':curfn,'new':curfn});
-		}
+		if (!oneItem())  break;
+		curfn = $(slctd[0]).parents('tr').attr('data-fref');
+		myOpenDlg(evt,fRenDlg,{'old':curfn,'new':curfn});
 		break;
 	case 'srhf':
 	case 'srhc':
@@ -271,7 +239,7 @@ function doMenuAction(cmd,evt) {
 			sessionStorage.fmx_curD = curDir;
 			$('#upload').jqm({ajax:'filupld5dm.php', ajaxText:'Loading...', target:'.upldr',overlay:5}).jqmShow();	//popUp('filupld5d.php');
 			}
-		else { popUp('filupld.php?path='+curDir); }
+		else popUp('filupld.php?path='+curDir);
 		break;
 	case 'uzip':
 	case 'zip':
@@ -299,7 +267,7 @@ function doMenuAction(cmd,evt) {
 			curfn = $(slctd[0]).parents('tr').attr('data-fref');
 			if (evt.shiftKey) {
 				var xyz = prompt('URL:',curfn);
-				if (xyz) { curfn = xyz; }
+				if (xyz) curfn = xyz;
 				else break;
 			}
 			var wPath = curDir.slice(curDir.search("/"));
@@ -346,7 +314,7 @@ function doMenuAction(cmd,evt) {
 				}
 				},'json');
 		break;
-/*	case 'updt':
+	case 'updt':
 		parms = {act: 'updt'};
 		$.post("fmxjx.php", parms, function(data,textStatus,jqXHR) {
 				if (data) {
@@ -366,7 +334,7 @@ function doMenuAction(cmd,evt) {
 					alert('No updates available.');
 				}
 				});
-		break;*/
+		break;
 	case 'cmcs':
 		var utilview = document.createElement('div');
 		utilview.id = 'util-view';
@@ -435,12 +403,51 @@ function doFillCLI(cmd) {
 	$('#cmdlin').val(cmd);
 }
 
+function downloadFile(A, cdl, asf) {
+	var dlURL = 'fildnld.php?fle=' + escape(A) + (cdl ? '&tcdl=1&rad=Y' : '') + (asf ? ('&asf='+asf) : ''); //alert(dlURL);
+	var dlframe = document.createElement("iframe");
+	// set source to desired file
+	dlframe.src = dlURL;
+	// This makes the IFRAME invisible to the user.
+	dlframe.style.display = "none";
+	// Add the IFRAME to the page.  This will trigger the download
+	document.body.appendChild(dlframe);
+}
+
+function pop(url, h1, w1) {
+	var h2 = (screen.height-h1)/2;
+	var w2 = (screen.width-w1)/2;
+	var wcon="toolbar=no,status=no,location=no,menubar=no,resizable=0,scrollbars=1,width="+w1+",height="+h1+",left="+w2+",top="+h2;
+	return open(url, "", wcon);
+}
+
+function popUp(url) {
+	var win = pop(url,240,416);
+}
+
 function allSelect(evt, elem) {
 	if (elem.checked) {
-		$('.fsel').prop('checked',true);
+		$('.fsel').attr('checked',true);
 	} else {
-		$('.fsel').prop('checked',false);
+		$('.fsel').removeAttr('checked');
 	}
+}
+
+function doesSupportAjaxUploadWithProgress() {
+
+	function supportFileAPI() {
+		var fi = document.createElement('INPUT');
+		fi.type = 'file';
+		return fi.hasOwnProperty('files');
+	}
+
+	function supportAjaxUploadProgressEvents() {
+		var xhr = new XMLHttpRequest();
+		return !! (xhr && (xhr.hasOwnProperty('upload')) && (xhr.upload.hasOwnProperty('onprogress')));
+	}
+
+	//return false;
+	return supportFileAPI() && supportAjaxUploadProgressEvents();
 }
 
 function fils2up() {
@@ -457,6 +464,22 @@ function fils2up() {
 	}
 }
 
+function makeFileList(fstr, htm) {
+	var sep = htm ? '<br />' : ' ';
+	var rslt = '';
+	var itms = fstr.split("\0");
+	for (var itm in itms) {
+		var fpts = itms[itm].split("&");
+		var fdr = '';
+		for (var fpt in fpts) {
+			var fpa = fpts[fpt].split("=");
+			if (fpt==0) { fdr = '/'+fpa[1] }
+			else { rslt += fdr + '%2F' + fpa[1] + sep }
+		}
+	}
+	return rslt.replace(/%2F/g,'/');
+}
+
 function selectionAction(fedt) {
 	var sel = "";
 	if (window.getSelection !== 'undefined') {
@@ -470,27 +493,3 @@ function selectionAction(fedt) {
 	if (fedt) { doEditFile(fpth); }
 	else { doViewFile(fpth); }
 }
-
-$(function() {
-	$("#fmnu [data-mnu]").click(function(e) {e.preventDefault(); doMenuAction($(this).attr('data-mnu'),e); });
-	$("#trmfrm [data-mnu]").click(function(e) {e.preventDefault(); doMenuAction($(this).attr('data-mnu'),e); });
-	$("#ftbl [data-act]").click(function(e) {e.preventDefault(); doFileAction($(this).attr('data-act'),this,e); });
-	/*$('#fMrkDlg').dialog({
-		autoOpen: false,
-		width: 600,
-		position: [200,100],
-		buttons: {
-			Okay: function() {
-				$(this).dialog("close");
-				},
-			Clear: function() {
-				sessionStorage.removeItem('fmx_mrkd');
-				$(this).dialog("close");
-				}
-			}
-		});*/
-	$('nav li ul').hide().removeClass('fallback');
-	$('nav li').hover(function () {
-		$('ul', this).stop(true,true).fadeToggle(100);
-	});
-});

@@ -1,4 +1,5 @@
 <?php
+include('fmx.cfg');
 $rmtuser = getenv('REMOTE_USER');
 $cooknam = 'fil_vew' . ($rmtuser ? "_$rmtuser" : '');
 
@@ -49,10 +50,11 @@ if (isset($_POST['cmdlin'])) {
 <meta charset="UTF-8">
 <meta http-equiv="Content-Language" content="en" />
 <meta name="google" content="notranslate">
-<link rel="stylesheet" type="text/css" href="css/jqModal.css" />
+<link rel="stylesheet" type="text/css" href="css/css.php" />
+<!-- <link rel="stylesheet" type="text/css" href="css/jqModal.css" />
 <link rel="stylesheet" type="text/css" href="css/fmx.css" />
 <link rel="stylesheet" type="text/css" href="css/fmxui.css" />
-<link rel="stylesheet" type="text/css" href="css/nav.css" />
+<link rel="stylesheet" type="text/css" href="css/nav.css" /> -->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script src="js/js.php" type="text/javascript"></script>
 <script type="text/javascript">
@@ -123,11 +125,6 @@ else {
 		<li>&nbsp;&nbsp;&nbsp;||&nbsp;</li>
 		<li><a href="#" data-mnu="jxtr" data-req="1">jextract</a></li>
 		<li><a href="#" data-mnu="fmxi" data-req="0">?</a></li>
-	</ul>
-	</nav>
-	<nav style="float:right">
-	<ul>
-		<li><a href="#" data-mnu="updt" data-req="0">update</a></li>
 	</ul>
 	</nav>
 </div>

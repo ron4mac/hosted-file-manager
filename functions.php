@@ -2,9 +2,9 @@
 $rmtuser = getenv('REMOTE_USER');
 $cooknam = 'fil_vew' . ($rmtuser ? "_$rmtuser" : '');
 $cookie = $_COOKIE[$cooknam];
-if (!$cookie) { exit; }
+if (!$cookie) { exit('Unauthorized'); }
 $baseDir = convert_uudecode($cookie).'/';
-$fmxVersion = '2.9.6 - 18 May 2014';
+$fmxVersion = '2.9.7 - May 2014';
 
 function FileMimeType ($fpath) {
 	$mtyp = 'text/plain';
