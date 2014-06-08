@@ -1,5 +1,5 @@
 <?php
-include('fmx.cfg');
+include('fmx.ini');
 $rmtuser = getenv('REMOTE_USER');
 $cooknam = 'fil_vew' . ($rmtuser ? "_$rmtuser" : '');
 
@@ -51,14 +51,11 @@ if (isset($_POST['cmdlin'])) {
 <meta http-equiv="Content-Language" content="en" />
 <meta name="google" content="notranslate">
 <link rel="stylesheet" type="text/css" href="css/css.php" />
-<!-- <link rel="stylesheet" type="text/css" href="css/jqModal.css" />
-<link rel="stylesheet" type="text/css" href="css/fmx.css" />
-<link rel="stylesheet" type="text/css" href="css/fmxui.css" />
-<link rel="stylesheet" type="text/css" href="css/nav.css" /> -->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script src="js/js.php" type="text/javascript"></script>
 <script type="text/javascript">
-var curDir='<?php echo $pDir;?>/';
+var curDir='<?php echo $pDir; ?>/';
+var upload_winpop = <?php echo isset($fmx_upload_winpop)?'true':'false' ?>;
 try { sessionStorage.fmx_ok = 1; }
 catch(err) { alert("Your browser 'sessionStorage' is not functioning. (private browsing?) Not all functions of FMX will work successfully."); }
 </script>
@@ -97,7 +94,7 @@ else {
 			</ul>
 		</li>
 		<li><a href="#" data-mnu="copy" data-req="2">copy</a></li>
-		<li><a href="#" data-mnu="cppa" data-req="2">copy/paste</a></li>
+		<li><a href="#" data-mnu="cppa" data-req="2" class="cppaMenu">copy/paste</a></li>
 		<li><a href="#" data-mnu="delf" data-req="2">delete</a></li>
 		<li><a href="#" data-mnu="dnld" data-req="2">download</a><div class="dnldprg"> rr</div></li>
 		<li><a href="#" data-mnu="dupl" data-req="2">duplicate</a></li>
@@ -120,7 +117,7 @@ else {
 				<li><a href="#" data-mnu="srhc" data-req="0">content</a></li>
 			</ul>
 		</li>
-		<li><a href="#" data-mnu="upld" data-req="0">upload</a></li>
+		<li><a href="#" data-mnu="upld" data-req="0" class="upldMenu">upload</a></li>
 		<li><a href="#" data-mnu="webv" data-req="0">webview</a><!-- <span style="padding-left:8px"> || </span> --></li>
 		<li>&nbsp;&nbsp;&nbsp;||&nbsp;</li>
 		<li><a href="#" data-mnu="jxtr" data-req="1">jextract</a></li>
@@ -200,7 +197,9 @@ foreach ($dFiles as $fle) {
 		$ufle = htmlspecialchars($fle);
 		$fnp = explode('.',$ufle);
 		$ufle = str_replace(' ','&nbsp;',$ufle);
-		$canedt = preg_match('/php|js|html|htm|pl|cgi|css|ini|xml|sql|txt|csv|htaccess/', array_pop($fnp));
+		$flext = array_pop($fnp);
+		$filedt = preg_match('/php|js|html|htm|pl|cgi|css|ini|xml|sql|txt|csv|htaccess/i', $flext);
+		$imgedt = preg_match('/jpg|jpeg|png|gif|bmp/i', $flext);
 		$sz = $fs[7];
 		if ($sz > 1048576) {$sz = sprintf('%.1f', ($sz / 1048576)) . 'm';}
 		elseif ($sz > 1024) {$sz = sprintf('%.1f', ($sz / 1024)) . 'k';}
@@ -210,8 +209,10 @@ foreach ($dFiles as $fle) {
 		} else {
 			echo '<td>&nbsp;</td>';
 		}
-		if ($canedt) {
+		if ($filedt) {
 			echo '<td class="filedticon" onclick="doFileAction(\'fedt\',this,event)">&nbsp;</td>';
+		} elseif ($imgedt) {
+			echo '<td class="imgedticon" onclick="doFileAction(\'iedt\',this,event)">&nbsp;</td>';
 		} else {
 			echo '<td class="filicon">&nbsp;</td>';
 		}
@@ -266,5 +267,47 @@ Command: <input type="text" id="cmdlin" name="cmdlin" size="80" maxlength="200" 
 	<div class="bpDlgCtn"><form class="bp-dctnt" name="myUIform" onsubmit="return false"></form></div>
 	<div class="bpDlgFtr"><div class="bp-bttns"></div></div>
 </div>
+<div class="contextMenu" id="cppaMenu">
+	<ul>
+		<li id="cppaClr">Clear</li>
+		<li id="cppaDsp">Display</li>
+	</ul>
+</div>
+<div class="contextMenu" id="upldMenu">
+	<ul>
+		<li id="H5w">H5win</li>
+		<li id="H5o">H5ovr</li>
+		<li id="L4w">L4win</li>
+		<li id="L4o">L4ovr</li>
+	</ul>
+</div>
+<script>
+	$('a.cppaMenu').contextMenu('cppaMenu', {
+		bindings: {
+			'cppaClr': function(t) {
+				sessionStorage.fmx_cppa = undefined;
+			},
+			'cppaDsp': function(t) {
+				alert(sessionStorage.fmx_cppa);
+			}
+		}
+	});
+	$('a.upldMenu').contextMenu('upldMenu', {
+		bindings: {
+			'H5w': function(t) {
+				upldAction.H5w();
+			},
+			'H5o': function(t) {
+				upldAction.H5o();
+			},
+			'L4w': function(t) {
+				upldAction.L4w();
+			},
+			'L4o': function(t) {
+				upldAction.L4o();
+			}
+		}
+	});
+</script>
 </body>
 </html>

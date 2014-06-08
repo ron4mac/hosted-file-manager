@@ -1,6 +1,20 @@
 <?php
 require_once('functions.php');
 $fref = $baseDir . doUnescape($_GET['fle']);
+if (file_exists($fref)) {
+	header('Content-Description: File Transfer');
+	header('Content-Type: application/octet-stream');
+	header('Content-Disposition: attachment; filename='.basename($fref));
+	header('Expires: 0');
+	header('Cache-Control: must-revalidate');
+	header('Pragma: public');
+	header('Content-Length: ' . filesize($fref));
+	ob_clean();
+	flush();
+	readfile($fref);
+	exit;
+}
+
 if ($fd = fopen($fref, 'r')) {
 	$fsize = filesize($fref);
 	$path_parts = pathinfo($fref);

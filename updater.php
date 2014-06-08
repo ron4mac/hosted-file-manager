@@ -17,7 +17,7 @@ function curly ($url,$agent) {
 }
 
 function getUrlData ($url) {
-	global $github_credential;	// optional and set in 'fmx.cfg' file
+	global $github_credential;	// optional and set in 'fmx.ini' file as <username>:<password>
 	if ($github_credential) {
 		$url = str_replace('//','//'.$github_credential.'@',$url);
 	}
@@ -35,7 +35,8 @@ function getUrlData ($url) {
 function checkForUpdate () {
 	global $fmxVersion;
 	$fv = substr($fmxVersion, 0, strpos($fmxVersion,' '));
-	$fmx_releases = json_decode(getUrlData('https://api.github.com/repos/ron4mac/hosted-file-manager/releases'));
+	// get release list from github (ignore errors in case of refused access)
+	$fmx_releases = json_decode(@getUrlData('https://api.github.com/repos/ron4mac/hosted-file-manager/releases'));
 	if (!$fmx_releases) { echo 'Release of FMX not found at Github'; exit(); }
 	$fmx_ball = $fmx_releases[0]->zipball_url;
 	$fmx_name = $fmx_releases[0]->name;

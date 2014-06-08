@@ -4,13 +4,14 @@ $cooknam = 'fil_vew' . ($rmtuser ? "_$rmtuser" : '');
 $cookie = $_COOKIE[$cooknam];
 if (!$cookie) { exit('Unauthorized'); }
 $baseDir = convert_uudecode($cookie).'/';
-$fmxVersion = '2.9.7 - May 2014';
+$fmxVersion = '2.9.8 - June 2014';
 
 function FileMimeType ($fpath) {
 	$mtyp = 'text/plain';
-	if (function_exists('finfo_open')) {
+	if (function_exists('finfo_file')) {
 		$finfo = finfo_open(FILEINFO_MIME_TYPE);
 		$mtyp = finfo_file($finfo, $fpath);
+		finfo_close($finfo);
 	} elseif (function_exists('mime_content_type')) { 
 		$mtyp = mime_content_type($fpath);
 	} else {

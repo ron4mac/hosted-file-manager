@@ -1,14 +1,16 @@
 (function() {
 
-	var totProgressDiv;
-	var progressDiv;
-	var totalProgressElem;
+	var totProgressDiv,
+		totProgressDivW,
+		progressDiv,
+		totalProgressElem,
+		countSpan,
 
-	var upQueue = [];
-	var maxXfer = 3;
-	var inPrg = 0;
-	var total2do = 0;
-	var totalDone = 0;
+		upQueue = [],
+		maxXfer = 3,
+		inPrg = 0,
+		total2do = 0,
+		totalDone = 0;
 
 	// getElementById
 	function $id(id) {
@@ -25,6 +27,9 @@
 	// file selection
 	function FileSelectHandler(e) {
 
+		// here is a good spot to get the tot progress div width
+		totProgressDivW = totProgressDiv.offsetWidth;
+
 		// cancel event and hover styling
 		FileDragHover(e);
 
@@ -35,6 +40,7 @@
 		for (var i = 0, f; (f = files[i]); i++) {
 			total2do += f.size;
 			upQueue.push(f);
+			countSpan.innerHTML = upQueue.length;
 			NextInQueue(false,'fsel');
 		}
 	}
@@ -48,14 +54,16 @@
 		if (upQueue.length && (!maxXfer || inPrg < maxXfer)) {
 			var ufo = new UploadFileObj(upQueue.shift());
 			inPrg++;
+			countSpan.innerHTML = upQueue.length;
 		}
 	}
 
 	function UpdateTotalProgress(adsz) {
 		if (!totProgressDiv) return;
 		totalDone += adsz;
-		var pc = Math.max(parseInt(100 - (totalDone / total2do * 100), 10), 0);
-		totProgressDiv.style.backgroundPosition = pc + "% 0";
+//		var pc = Math.max(parseInt(100 - (totalDone / total2do * 100), 10), 0);
+		var p = Math.floor(totProgressDivW * totalDone / total2do) - 800;
+		totProgressDiv.style.backgroundPosition = p + "px 0";
 	}
 
 	function UploadFileObj (file) {
@@ -80,9 +88,12 @@
 			this.xhr.upload.onloadstart = function(evt) {
 				this.onprogress = function(e) {
 					if (!e.lengthComputable) return;
-					var pc = parseInt(100 - (e.loaded / e.total * 100), 10);
-					self.progress.style.backgroundPosition = pc + "% 0";
-					if (pc === 0) {
+					//var pc = parseInt(100 - (e.loaded / e.total * 100), 10);
+//					var pc = e.loaded / e.total;
+					var p = Math.floor(self.progressW * e.loaded / e.total) - 800;
+					self.progress.style.backgroundPosition = p + "px 0";
+//					if (pc === 0) {
+					if (e.loaded == e.total) {
 						self.progress.innerHTML = file.name;
 						self.progress.className = 'indeterm';
 					}
@@ -101,6 +112,7 @@
 			this.progress = progressDiv.appendChild(document.createElement("p"));
 			this.progress.appendChild(document.createTextNode(file.name));
 			this.progress.innerHTML = this.progress.innerHTML + '<img src="css/redX.png" class="abortX" onclick="AbortUpload(this);" />';
+			this.progressW = this.progress.offsetWidth;
 			this.progress._upld = this;
 
 			if (errM) {
@@ -167,6 +179,7 @@
 			// progress display area
 			totProgressDiv = $id("totprogress");
 			progressDiv = $id("fprogress");
+			countSpan = $id("qCount");
 		}
 		xhr = null;
 

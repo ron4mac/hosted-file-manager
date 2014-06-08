@@ -1,5 +1,5 @@
 <?php
-include('fmx.cfg');
+include('fmx.ini');
 require_once('functions.php');
 
 $fref = isset($_POST['fref']) ? $baseDir.doUnescape($_POST['fref']) : '';
@@ -121,7 +121,8 @@ switch ($_POST['act']) {
 		$msg = 'FMX Version: ' . $fmxVersion;
 		$msg .= '<br />PHP Version: ' . phpversion();
 		$msg .= '<br />MySql(i) Client Version: ' . mysqli_get_client_info();
-		$msg .= '<br />SQLite3 Version: ' . SQLite3::version()['versionString'];
+		$sql3v = SQLite3::version();
+		$msg .= '<br />SQLite3 Version: ' . $sql3v['versionString'];
 		$msg .= '<br /><br />';
 		if ($newver) {
 			$vinf = explode('|', $newver);

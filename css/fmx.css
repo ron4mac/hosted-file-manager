@@ -4,6 +4,8 @@ body.util {background-color: #CCCCFF}
 body.note {background-color: #FFFF99}
 body.fmgt, html {background-color: #E0E0FF}
 
+.upld-body {background-color:#E7FFFF}
+
 span.pathbread {
 	font-size: 1.3em;
 }
@@ -30,7 +32,7 @@ th.right, td.right {
 LABEL.inputLabel {
 	width: 90em;
 	text-align: right;
-	//float: left;
+	/*float: left;*/
 }
 
 .clearBoth {
@@ -47,9 +49,15 @@ td.filicon {
 	background-position: center center;
 	width: 16px;
 }
-
 td.filedticon {
 	background-image: url(../icons/document_edit.png);
+	background-repeat: no-repeat;
+	background-position: center center;
+	width: 16px;
+	cursor: pointer;
+}
+td.imgedticon {
+	background-image: url(../icons/image_edit.png);
 	background-repeat: no-repeat;
 	background-position: center center;
 	width: 16px;
