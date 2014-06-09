@@ -64,6 +64,7 @@ function logIt ($msg) {
 }
 
 function installUpdate ($fpath) {	// NEED TO GET PATH TO INSTALL
+	$f2p = array('.user.ini','fmx.ini');	//files to preserve if they already exist
 	$zip = new ZipArchive;
 	$res = $zip->open($fpath);
 	if ($res === TRUE) {
@@ -75,6 +76,7 @@ function installUpdate ($fpath) {	// NEED TO GET PATH TO INSTALL
 				@mkdir($fp);
 				//logIt("DIR: {$fp}");
 			} elseif ($fp) {
+				if (in_array($fp, $f2p) && file_exists($fp)) continue;
 				$fc = $zip->getFromIndex($i);
 				file_put_contents($fp, $fc);
 				//logIt("PUT: {$fp}");
