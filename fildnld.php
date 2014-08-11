@@ -9,9 +9,10 @@ if (file_exists($fref)) {
 	header('Cache-Control: must-revalidate');
 	header('Pragma: public');
 	header('Content-Length: ' . filesize($fref));
-	ob_clean();
-	flush();
+	@ob_clean();
+	@flush();
 	readfile($fref);
+	if (isset($_GET['rad']) && $_GET['rad']=='Y') unlink($fref);
 	exit;
 }
 

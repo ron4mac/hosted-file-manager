@@ -1,20 +1,55 @@
-(function() {
+(function(w) {
 
 	var totProgressDiv,
 		totProgressDivW,
 		progressDiv,
 		totalProgressElem,
-		countSpan,
+		qCountSpan,
 
 		upQueue = [],
 		maxXfer = 3,
+		qStopt = false,
 		inPrg = 0,
 		total2do = 0,
-		totalDone = 0;
+		totalDone = 0,
+		errCount = 0,
+		e_st, e_gc,
+		s_hd = 'none',
+		s_vu = 'inline-block',
+		queueCtrl = {
+			stop: function () {
+				qStopt = true;
+				e_st.style.display = s_hd;
+				e_gc.style.display = s_vu;
+				},
+			go: function () {
+				qStopt = false;
+				e_st.style.display = s_vu;
+				e_gc.style.display = s_hd;
+				while (upQueue.length && (inPrg < maxXfer)) NextInQueue(false,'go');
+				},
+			cancel: function () {
+				upQueue.length = 0;
+				qStopt = false;
+				e_gc.style.display = s_hd;
+				qCountSpan.innerHTML = 0;
+				if (!inPrg) _endUp();
+				}
+			}
+		;
 
 	// getElementById
 	function $id(id) {
 		return document.getElementById(id);
+	}
+
+	// insert message in progress element
+	function insertElemMsg(elem,msg,asErr) {
+		elem.innerHTML += msg;
+		if (asErr) {
+			elem.className = 'failure';
+			errCount++;
+		}
 	}
 
 	// file drag hover
@@ -40,28 +75,37 @@
 		for (var i = 0, f; (f = files[i]); i++) {
 			total2do += f.size;
 			upQueue.push(f);
-			countSpan.innerHTML = upQueue.length;
+			qCountSpan.innerHTML = upQueue.length;
 			NextInQueue(false,'fsel');
+		}
+		if (upQueue.length) e_st.style.display = s_vu;
+	}
+
+	function _endUp() {
+		if (!qStopt) {
+			allDone = 1;
+			if (typeof(fup_done == 'function')) fup_done(errCount);
 		}
 	}
 
 	function NextInQueue(decr,tag) {
 		if (decr) {
-			if (! --inPrg) {
-				if (typeof(fup_done == 'function')) fup_done();
-			}
+			if (! --inPrg) { _endUp(); }
 		}
-		if (upQueue.length && (!maxXfer || inPrg < maxXfer)) {
-			var ufo = new UploadFileObj(upQueue.shift());
+		if (!qStopt && upQueue.length && (!maxXfer || inPrg < maxXfer)) {
+			new UploadFileObj(upQueue.shift());
 			inPrg++;
-			countSpan.innerHTML = upQueue.length;
+			qCountSpan.innerHTML = upQueue.length;
+		}
+		if (upQueue.length <= 0) {
+			e_st.style.display = s_hd;
+			e_gc.style.display = s_hd;
 		}
 	}
 
 	function UpdateTotalProgress(adsz) {
 		if (!totProgressDiv) return;
 		totalDone += adsz;
-//		var pc = Math.max(parseInt(100 - (totalDone / total2do * 100), 10), 0);
 		var p = Math.floor(totProgressDivW * totalDone / total2do) - 800;
 		totProgressDiv.style.backgroundPosition = p + "px 0";
 	}
@@ -88,14 +132,12 @@
 			this.xhr.upload.onloadstart = function(evt) {
 				this.onprogress = function(e) {
 					if (!e.lengthComputable) return;
-					//var pc = parseInt(100 - (e.loaded / e.total * 100), 10);
-//					var pc = e.loaded / e.total;
 					var p = Math.floor(self.progressW * e.loaded / e.total) - 800;
-					self.progress.style.backgroundPosition = p + "px 0";
-//					if (pc === 0) {
+					self.progress.style.backgroundPosition = p + "px -20px";
 					if (e.loaded == e.total) {
 						self.progress.innerHTML = file.name;
 						self.progress.className = 'indeterm';
+						self.progress.style.backgroundPosition = "";
 					}
 					UpdateTotalProgress(e.loaded - self.lastsz);
 					self.lastsz = e.loaded;
@@ -111,13 +153,12 @@
 			// create progress bar
 			this.progress = progressDiv.appendChild(document.createElement("p"));
 			this.progress.appendChild(document.createTextNode(file.name));
-			this.progress.innerHTML = this.progress.innerHTML + '<img src="css/redX.png" class="abortX" onclick="AbortUpload(this);" />';
+			this.progress.innerHTML = this.progress.innerHTML + '<img src="'+ fmx_appPath +'css/redX.png" class="abortX" onclick="AbortUpload(this);" />';
 			this.progressW = this.progress.offsetWidth;
 			this.progress._upld = this;
 
 			if (errM) {
-				this.progress.innerHTML = this.progress.innerHTML + '<br />' +errM;
-				this.progress.className = "failure";
+				insertElemMsg(this.progress, '<br />'+errM, true);
 				UpdateTotalProgress(file.size);
 				NextInQueue(true,'errM');
 				return;
@@ -125,19 +166,24 @@
 
 			// file received/failed
 			this.xhr.onreadystatechange = function(e) {
+				var msg = '', rp;
 				if (self.xhr.readyState == 4) {
-					self.progress.className = (self.xhr.status == 200 ? "success" : "failure");
-					// on good result, remove progress bar
-					if (self.xhr.status == 200) progressDiv.removeChild(self.progress);
-					else if (self.xhr.status === 0) self.progress.innerHTML = self.progress.innerHTML + '<br />-- aborted';
-					else self.progress.innerHTML = self.progress.innerHTML + '<br />' + self.xhr.status + ': ' + self.xhr.statusText;
-					//self.xhr = null;
+					// check result
+					if (self.xhr.status == 200) {
+						rp = self.xhr.responseText;
+						msg = rp == 'Ok' ? '' : ('<br />'+rp);
+					}
+					else if (self.xhr.status === 0) msg += '<br />-- aborted';
+					else msg += '<br />' + self.xhr.status + ': ' + self.xhr.statusText;
+
+					if (msg) {insertElemMsg(self.progress,msg,true)}
+					else {progressDiv.removeChild(self.progress)}
 					NextInQueue(true,'rst');	//console.log(e);
 				}
 			};
 
 			// start upload
-			this.xhr.open("POST", 'upload5.php'/*$id("upload").action*/, true);
+			this.xhr.open("POST", fmx_appPath+'upload5.php', true);
 			if (fup_payload) {
 				var formData = new FormData();
 				formData.append('user_file[]', file);
@@ -158,13 +204,18 @@
 
 		var fileselect = $id("upload_field"),
 			filedrag = $id("dropArea"),
-			submitbutton = $id("submitbutton");
+			submitbutton = $id("submitbutton"),
+			xhr;
+
+		qCountSpan = $id("qCount");
+		e_st = $id('qstop');
+		e_gc = $id('qgocan');
 
 		// file select
 		if (fileselect) fileselect.addEventListener("change", FileSelectHandler, false);
 
 		// is XHR2 available?
-		var xhr = new XMLHttpRequest();
+		xhr = new XMLHttpRequest();
 		if (xhr.upload) {
 
 			// file drop
@@ -179,7 +230,6 @@
 			// progress display area
 			totProgressDiv = $id("totprogress");
 			progressDiv = $id("fprogress");
-			countSpan = $id("qCount");
 		}
 		xhr = null;
 
@@ -190,7 +240,9 @@
 		Init();
 	}
 
-})();
+	w.fupQctrl = queueCtrl;
+
+})(window);
 
 function AbortUpload (node) {
 	node.parentNode._upld.doAbort();

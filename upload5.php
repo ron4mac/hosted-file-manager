@@ -1,4 +1,5 @@
 <?php
+error_reporting(-1);
 require_once('functions.php');
 
 if ($_FILES['user_file'] && isset($_POST['fpath'])) {

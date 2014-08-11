@@ -1,4 +1,5 @@
 <?php
+error_reporting(-1);
 require_once('functions.php');
 $error_types = array(
 	1=>'The uploaded file exceeds the upload_max_filesize directive in php.ini.',
@@ -39,7 +40,7 @@ if ($_FILES['user_file'] && isset($_POST['fpath'])) {
 <?php endif; ?>
 </script>
 </head>
-<body onload="window.parent.window.refreshFilst();">
+<body>
 	<p style="width:100%;text-align:center"><br /><br /><big>UPLOADING COMPLETE</big></p>
 </body>
 </html>

@@ -51,6 +51,9 @@ $scrptFilPrts = explode('/',__FILE__);
 <link rel="stylesheet" type="text/css" href="css/sdrop.css" />
 <script src="js/ace/ace.js" data-ace-base="js/ace" type="text/javascript" charset="utf-8"></script>
 <script src="js/ace/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
+<?php if(!$mode): ?>
+<script src="js/ace/ext-modelist.js" type="text/javascript" charset="utf-8"></script>
+<?php endif; ?>
 <script type="text/javascript">
 ace.require("ace/ext/language_tools");
 function pop(url, h1, w1) {
@@ -122,7 +125,13 @@ editor.setShowPrintMargin(false);
 editor.getSession().setUseSoftTabs(false);
 editor.getSession().setValue(eData.value);
 editor.setTheme("ace/theme/rjcode");
-editor.getSession().setMode("ace/mode/<?=$mode?>");
+<?php if ($mode): ?>
+	editor.getSession().setMode("ace/mode/<?=$mode?>");
+<?php else: ?>
+	var modelist = ace.require("ace/ext/modelist");
+	var mobj = modelist.getModeForPath("<?php echo $fref; ?>");
+	editor.getSession().setMode(mobj.mode);
+<?php endif; ?>
 editor.setOptions({
 	enableBasicAutocompletion: true,
 	enableSnippets: true

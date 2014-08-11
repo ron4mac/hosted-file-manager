@@ -1,5 +1,6 @@
 <?php
 require_once('functions.php');
+include 'cfg.php';
 $uploadMaxFilesize = ini_get('upload_max_filesize');
 $uploadMaxFilesizeBytes = return_bytes($uploadMaxFilesize);
 ?>
@@ -9,9 +10,7 @@ $uploadMaxFilesizeBytes = return_bytes($uploadMaxFilesize);
 	<title>HTML5 Multi-file Upload</title>
 	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
 	<link rel="stylesheet" type="text/css" href="css/fmx.css" />
-	<style>
-<?php readfile('css/upload.inc.css'); ?>
-	</style>
+	<link rel="stylesheet" type="text/css" href="css/upload.css" />
 </head>
 <body>
 	<p style="color:red">Maximum file size: <?php echo $uploadMaxFilesize; ?></p>
@@ -26,18 +25,19 @@ $uploadMaxFilesizeBytes = return_bytes($uploadMaxFilesize);
 		<div id="totprogress">
 			<div id="progress_report_bar" style="background-color: blue; width: 0; height: 100%;"></div>
 		</div>
-		<div>Files in queue: <span id="qCount">0</span></div>
+		Files in queue: <span id="qCount">0</span><div class="acti" id="qstop"><img src="css/stop.png" title="stop queue" onclick="fupQctrl.stop()" /></div><div class="acti" id="qgocan"><img src="css/play-green.png" title="resume queue" onclick="fupQctrl.go()" /><img src="css/cross.png" title="cancel queue" onclick="fupQctrl.cancel()" /></div>
 		<div id="fprogress"></div>
 		<div id="server_response"></div>
 	</div>
 	<script type="text/javascript">
+		var fmx_appPath = '';
 		var filesPath = sessionStorage.fmx_curD;
 		var uploadMaxFilesize = <?php echo $uploadMaxFilesizeBytes; ?>;
 		// optional array of allowed mime types
 		//var fup_ftypes = ['image/jpeg'];
 		var fup_payload = {'fpath':sessionStorage.fmx_curD, 'oefile':'1'};
-		function fup_done() { parent.opener.refreshFilst(); }
-<?php readfile('js/upload5d.js'); ?>
+		function fup_done(errcnt) { parent.opener.refreshFilst(); if (!errcnt) window.close(); }
+<?php readfile('js/upload5d'.$jsver.'.js'); ?>
 	</script>
 </body>
 </html>

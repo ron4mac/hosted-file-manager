@@ -6,14 +6,14 @@ class DirCheck
 	protected $dirray = array();
 	protected $pfx = '';
 
-	public function __construct($dirPath) {
+	public function __construct ($dirPath) {
 		if ($dirPath[strlen($dirPath)-1] != DS)
 			$dirPath .= DS;
 		$this->pfx = $dirPath;
 		$this->dirray = $this->getDirTree($dirPath);
 	}
 
-	public function remPath($path) {
+	public function remPath ($path) {
 		$path = substr($path, strlen($this->pfx));
 		$parts = explode(DS, $path);
 		$cnt = count($parts);
@@ -27,13 +27,13 @@ class DirCheck
 		unset($last[array_pop($parts)]);
 	}
 
-	public function dirDump($htm=false) {
+	public function dirDump ($htm=false) {
 		//var_dump($this->pfx,$this->dirray);
 		if (!$this->dirray) return;
 		$this->traverse($this->dirray, $htm);
 	}
 
-	private function traverse($node, $htm=false, $lvl=0) {
+	private function traverse ($node, $htm=false, $lvl=0) {
 		$lc = $htm ? '$nbsp;$nbsp;' : '  ';
 		$l = str_repeat($lc, $lvl);
 		while ($val = current($node)) {
@@ -43,7 +43,7 @@ class DirCheck
 		}
 	}
 
-	private function getDirTree($dir) {
+	private function getDirTree ($dir) {
 		$d = dir($dir);
 		$x = array();
 		while (false !== ($r = $d->read())) {
@@ -79,7 +79,8 @@ class Joomext
 	protected $asdchk;
 	protected $log = '';
 
-	public function __construct($fref) {
+	public function __construct ($fref)
+	{
 		global $baseDir;
 		$this->instXmlRef = $fref;
 		$this->fbase = $baseDir.'tmp'.DS.'joomext';
@@ -87,7 +88,8 @@ class Joomext
 		$this->mfest = $this->instXml->getName();
 	}
 
-	public function pull($curdir) {
+	public function pull ($curdir)
+	{
 		if (!in_array($this->mfest, array('extension','install'))) {
 			echo 'Invalid manifest';
 			return;
@@ -149,7 +151,8 @@ class Joomext
 		}
 	}
 
-	private function traverse($elem) {
+	private function traverse ($elem)
+	{
 		foreach ($elem->children() as $kid) {
 			$nam = $kid->getName();
 			switch ($nam) {
@@ -164,6 +167,9 @@ class Joomext
 					break;
 				case 'languages':
 					$this->processLangs($kid);
+					break;
+				case 'media':
+					$this->processMedia($kid);
 					break;
 				case 'install':
 					$this->doStall($kid);
@@ -182,8 +188,9 @@ class Joomext
 		}
 	}
 
-	private function processFiles($elem) {
-		foreach($elem->attributes() as $a => $b) {
+	private function processFiles ($elem)
+	{
+		foreach ($elem->attributes() as $a => $b) {
 			switch ($a) {
 				case 'folder':
 					$this->foldPath = $b;
@@ -211,7 +218,8 @@ class Joomext
 		$this->foldPath = '';
 	}
 
-	private function processLangs($elem) {
+	private function processLangs ($elem)
+	{
 		foreach($elem->attributes() as $a => $b) {
 			switch ($a) {
 				case 'folder':
@@ -239,16 +247,54 @@ class Joomext
 		$this->foldPath = '';
 	}
 
-	private function doStall($elem, $in=true) {
+	private function processMedia ($elem)
+	{
+		global $baseDir;
+		$media_base = $baseDir.$this->jbase.DS.'media'.DS;
+		foreach ($elem->attributes() as $a => $b) {
+			switch ($a) {
+				case 'folder':
+					$this->foldPath = $b;
+					break;
+				case 'destination':
+					$media_base .= $b;
+					break;
+				default:
+					echo $a,'="',$b,"\"\n";
+					break;
+			}
+		}
+		foreach ($elem->children() as $kid) {
+			$nam = $kid->getName();
+			switch ($nam) {
+				case 'file':
+				case 'filename':
+					$this->copyFile($kid, false, false, $media_base);
+					break;
+				case 'folder':
+					$this->copyFolder($kid, $media_base);
+					break;
+				default:
+					echo 'The file is ' . $nam . "\n";
+					break;
+			}
+		}
+		$this->foldPath = '';
+	}
+
+	private function doStall ($elem, $in=true)
+	{
 		$this->traverse($elem);
 	}
 
-	private function processAdmin($elem) {
+	private function processAdmin ($elem)
+	{
 		$this->inAdmin = true;
 		$this->traverse($elem);
 	}
 
-	private function copyLangFile($elem, $fradm=false, $islng=true) {
+	private function copyLangFile ($elem, $fradm=false, $islng=true)
+	{
 		$tag = '';
 		foreach($elem->attributes() as $a => $b) {
 			switch ($a) {
@@ -281,7 +327,8 @@ class Joomext
 		else $this->sdchk->remPath($fr);
 	}
 
-	private function copyFile($elem, $fradm=false, $islng=false) {
+	private function copyFile ($elem, $fradm=false, $islng=false, $fBase=false)
+	{
 		$dpath = $this->fbase;
 		if ($this->foldPath) $dpath .= DS.$this->foldPath;
 		// create any intermediate folders
@@ -292,9 +339,9 @@ class Joomext
 			@mkdir($dpath,0777,true);
 		}
 		if ($islng) {
-			$fr = $this->resolvedLangSource($fradm).DS.$elem;
+			$fr = ($fBase ? $fBase : $this->resolvedLangSource($fradm)) .DS.$elem;
 		} else {
-			$fr = $this->resolvedSource($fradm).DS.$elem;
+			$fr = ($fBase ? $fBase : $this->resolvedSource($fradm)) .DS.$elem;
 		}
 		$to = $dpath.DS;
 		//echo $fr.' -> '.$to."\n";
@@ -305,7 +352,8 @@ class Joomext
 		else $this->sdchk->remPath($fr);
 	}
 
-	private function copyFolder($elem) {
+	private function copyFolder ($elem, $fBase=false)
+	{
 		$dpath = $this->fbase;
 		if ($this->foldPath) $dpath .= DS.$this->foldPath;
 		$ddir = $dpath.DS.$elem;
@@ -315,7 +363,7 @@ class Joomext
 			mkdir($dn,0777,true);
 			$this->log .= 'mkdir: '.$dn."\n";
 		}
-		$fr = $this->resolvedSource().DS.$elem;
+		$fr = ($fBase ? $fBase : $this->resolvedSource()) .DS.$elem;
 		$to = $ddir;
 		//echo $fr.' -> '.$to."\n";
 		$this->log .= $fr.' -> '.$to."\n"; //return;
@@ -325,7 +373,8 @@ class Joomext
 		else $this->sdchk->remPath($fr);
 	}
 
-	private function resolvedSource($fradm=false) {
+	private function resolvedSource ($fradm=false)
+	{
 		global $baseDir;
 		$spath = $baseDir.$this->jbase;
 		$xpath = '';
@@ -346,7 +395,8 @@ class Joomext
 		return $spath.DS.$this->extdir.$xpath;
 	}
 
-	private function resolvedLangSource($fradm=false) {
+	private function resolvedLangSource ($fradm=false)
+	{
 		global $baseDir;
 		$spath = $baseDir.$this->jbase;
 		switch ($this->extype) {
@@ -362,7 +412,8 @@ class Joomext
 		return $spath.DS.'language';
 	}
 
-	private function recursiveDelete($pstr) {
+	private function recursiveDelete ($pstr)
+	{
 	//echo "$pstr\n";
 	if (is_file($pstr)) { @unlink($pstr); }
 	elseif (is_dir($pstr)) {

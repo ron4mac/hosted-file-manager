@@ -11,7 +11,7 @@ $(function() {
 });
 
 function myOpenDlg (e, dId, fVals, titl) {
-	e.preventDefault();
+	if (e) { e.preventDefault(); }
 	// get the dialog
 	var dlg = $('#element_to_pop_up');
 	// clean out any previous data

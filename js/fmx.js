@@ -3,7 +3,7 @@ function refreshFilst() {
 }
 
 function postAndRefresh(parms) {
-	$.post("fmxjx.php", parms, function(data,textStatus,jqXHR) {
+	$.post(fmx_AJ, parms, function(data,textStatus,jqXHR) {
 			if (data) { alert(data); }
 			else { refreshFilst(); }
 			});
@@ -97,17 +97,17 @@ var fCpmDlg = {
 // file upload methods
 var upldAction = {
 	// HTML5 w/progress in a popup window
-	H5w: function(){ popUp('filupld5d.php'); },
+	H5w: function(){ popUp(fmx_appPath+'filupld5d.php'); },
 	// HTML5 w/progress in a div overlay
-	H5o: function(){ $('#upload').jqm({ajax:'filupld5dm.php', ajaxText:'Loading...', target:'.upldr',overlay:5}).jqmShow(); },
+	H5o: function(){ $('#upload').jqm({ajax:fmx_appPath+'filupld5dm.php', ajaxText:'Loading...', target:'.upldr',overlay:5}).jqmShow(); },
 	// legacy HTML in a popup window
-	L4w: function(){ popUp('filupld.php'); },
+	L4w: function(){ popUp(fmx_appPath+'filupld.php'); },
 	// legact HTML in a div overlay
-	L4o: function(){ $('#upload').jqm({ajax:'filupldm.php', ajaxText:'Loading...', target:'.upldr',overlay:5}).jqmShow(); }
+	L4o: function(){ $('#upload').jqm({ajax:fmx_appPath+'filupldm.php', ajaxText:'Loading...', target:'.upldr',overlay:5}).jqmShow(); }
 	};
 
 function downloadFile(A, cdl, asf) {
-	var dlURL = 'fildnld.php?fle=' + escape(A) + (cdl ? '&tcdl=1&rad=Y' : '') + (asf ? ('&asf='+asf) : ''); //alert(dlURL);
+	var dlURL = fmx_appPath+'fildnld.php?fle=' + escape(A) + (cdl ? '&tcdl=1&rad=Y' : '') + (asf ? ('&asf='+asf) : ''); //alert(dlURL);
 	var dlframe = document.createElement("iframe");
 	// set source to desired file
 	dlframe.src = dlURL;
@@ -127,7 +127,7 @@ function makeFileList(fstr, htm) {
 		fdr = '';
 		for (fpt in fpts) {
 			fpa = fpts[fpt].split("=");
-			if (fpt==0) { fdr = '/'+fpa[1]; }
+			if (fpt*1===0) { fdr = fpa[1]; }
 			else { rslt += fdr + '%2F' + fpa[1] + sep; }
 		}
 	}
@@ -190,27 +190,19 @@ function doMenuAction(cmd,evt) {
 		if (scnt) {
 			sessionStorage.fmx_cppa = $("form[name='filst']").serialize();
 		} else if (sessionStorage.fmx_cppa) {
-			parms = 'act=cppa&todr='+encodeURIComponent(curDir)+'&'+sessionStorage.fmx_cppa;
-			$.post("fmxjx.php", parms, function(data,textStatus,jqXHR) {
-				if (data) { alert(data); }
-				else { refreshFilst(); }
-			});
+			postAndRefresh('act=cppa&todr='+encodeURIComponent(curDir)+'&'+sessionStorage.fmx_cppa);
 		}
 		break;
 	case 'delf':
 		if (hasSome() && ((scnt==1) || confirm('You have multiple files selected. Are you sure you want to delete ALL the selected files?'))) {
-			parms = 'act=delf&'+$("form[name='filst']").serialize();
-			$.post("fmxjx.php", parms, function(data,textStatus,jqXHR) {
-				if (data) { alert(data); }
-				else { refreshFilst(); }
-			});
+			postAndRefresh('act=delf&'+$("form[name='filst']").serialize());
 		}
 		break;
 	case 'dnld':
 		if (hasSome()) {
 			parms = 'act=dnld&'+$("form[name='filst']").serialize();
 			$('div.dnldprg').css('display','inline');
-			$.post("fmxjx.php", parms, function(data,textStatus,jqXHR) {
+			$.post(fmx_AJ, parms, function(data,textStatus,jqXHR) {
 				$('div.dnldprg').css('display','none');
 				if (data) { downloadFile(data.fpth,data.rad=='Y',false); }
 				else { alert('download not available'); }
@@ -223,19 +215,13 @@ function doMenuAction(cmd,evt) {
 				act: 'dupl',
 				fref: curDir + $(slctd[0]).parents('tr').attr('data-fref')
 				};
-			$.post("fmxjx.php", parms, function(data,textStatus,jqXHR) {
-				if (data) { alert(data); }
-				else { refreshFilst(); }
-			});
+			postAndRefresh(parms);
 		}
 		break;
 	case 'mark':
-		parms = sessionStorage.fmx_mrkd ? (sessionStorage.fmx_mrkd+"\u0000") : '';
+		parms = (sessionStorage.fmx_mrkd === undefined) ? '' : (sessionStorage.fmx_mrkd+"\u0000");
 		if (scnt) {
 			sessionStorage.fmx_mrkd = parms + $("form[name='filst']").serialize();
-		} else {
-			$('#fMrk').html(sessionStorage.fmx_mrkd ? makeFileList(sessionStorage.fmx_mrkd, true) : '&lt;empty&gt;');
-			$('#fMrkDlg').dialog('open');
 		}
 		break;
 	case 'move':
@@ -252,12 +238,7 @@ function doMenuAction(cmd,evt) {
 				alert('Nothing previously selected to move');
 				break;
 			}
-			parms = 'act=mvto&todr='+encodeURIComponent(curDir)+'&'+sessionStorage.fmx_mvto;
-			//alert(parms);
-			$.post("fmxjx.php", parms, function(data,textStatus,jqXHR) {
-				if (data) { alert(data); }
-				else { refreshFilst(); }
-			});
+			postAndRefresh('act=mvto&todr='+encodeURIComponent(curDir)+'&'+sessionStorage.fmx_mvto);
 		}
 		break;
 	case 'nfle':
@@ -342,7 +323,7 @@ function doMenuAction(cmd,evt) {
 					fref: curfn,
 					dir: curDir
 					};
-				$.post("fmxjx.php", parms, function(data,textStatus,jqXHR) {
+				$.post(fmx_AJ, parms, function(data,textStatus,jqXHR) {
 					if (data) { alert(data) }
 				});
 			} else alert('Must be an XML file');
@@ -350,14 +331,14 @@ function doMenuAction(cmd,evt) {
 		break;
 	case 'fmxi':
 		parms = {act: 'fmxi'};
-		$.post("fmxjx.php", parms, function(data,textStatus,jqXHR) {
+		$.post(fmx_AJ, parms, function(data,textStatus,jqXHR) {
 				if (data) {
 					var DtD;
 					if (data.updt) {
 						var updt = data.updt.split('|');
 						DtD = $.extend(true, {}, aMsgDlg, {buttons:{'Update now':function(){if (confirm('It is a good idea to backup first. Do you want to continue with the update?')) {
 							parms = {act: 'updt', nver: updt[1]};
-							$.post("fmxjx.php", parms, function(data,textStatus,jqXHR) {
+							$.post(fmx_AJ, parms, function(data,textStatus,jqXHR) {
 								if (data) { alert(data) }
 								else refreshFilst();
 							});
@@ -381,7 +362,7 @@ function doMenuAction(cmd,evt) {
 		document.body.appendChild(utilview);
 
 		parms = {act: 'CLIC'};
-		$(utilview).load("fmxjx.php", parms, function(data,textStatus,jqXHR) {
+		$(utilview).load(fmx_AJ, parms, function(data,textStatus,jqXHR) {
 				utilview.style.top = (evt.clientY-utilview.clientHeight-20) + 'px';
 				$("#util-view div").click(function(e) {e.preventDefault(); doFillCLI($(this).attr('data-cmd')); document.body.removeChild(utilview); });
 			});
@@ -397,19 +378,19 @@ function doMenuAction(cmd,evt) {
 var editWindow;
 
 function doViewFile(fpath) {
-	var fvurl = 'filwin.php?fref='+fpath;
+	var fvurl = fmx_appPath+'filwin.php?fref='+fpath;
 	pop(fvurl,600,800);
 }
 function doEditFile(fpath) {
-	var feurl = 'filedtwin.php?fref='+fpath;
+	var feurl = fmx_appPath+'filedtwin.php?fref='+fpath;
 	editWindow = pop(feurl,screen.availHeight,screen.availWidth);
 }
 function doEditImage(fpath) {
-	popPost("imgedtwin.php", {"fref":fpath}, "imgedt", screen.availHeight, Math.min(1200,screen.availWidth));
+	popPost(fmx_appPath+"imgedtwin.php", {"fref":fpath}, "imgedt", screen.availHeight, Math.min(1200,screen.availWidth));
 }
 
 function doFileAction(act,elem,evt) {
-	evt.preventDefault();evt.stopPropagation();
+	if (evt) { evt.preventDefault();evt.stopPropagation(); }
 	var fName = escape($(elem).parents('tr').attr('data-fref'));
 	var fileoi = curDir+fName;
 	var parms;
@@ -419,7 +400,7 @@ function doFileAction(act,elem,evt) {
 				act: act,
 				fref: fileoi
 				};
-			$.post("fmxjx.php", parms, function(data,textStatus,jqXHR) {
+			$.post(fmx_AJ, parms, function(data,textStatus,jqXHR) {
 					if (data) {
 						myOpenDlg(evt,aMsgDlg,{'msg':data},'File info for: '+fName);
 					}
@@ -480,26 +461,87 @@ function selectionAction(fedt) {
 	else { doViewFile(fpth); }
 }
 
+function display_cmmStorage(stor) {
+	if (!stor) { alert("[ empty ]"); return; }
+	var disp = '';
+	var pecs = stor.split("\u0000");
+	for (var x in pecs) {
+		var prts = decodeURIComponent(pecs[x]).split('&');
+		for (var i=0; i<prts.length; i++) {
+			if (i>0) disp += '    ';
+			disp += prts[i] + "\n";
+		}
+	}
+	alert(disp);
+}
+
+// some functionality checks
+try { sessionStorage.fmx_ok = 1; }
+catch(err) { alert("Your browser 'sessionStorage' is not functioning. (private browsing?) Not all functions of FMX will work successfully."); }
+
+// initialize the UI
 $(function() {
 	$("#fmnu [data-mnu]").click(function(e) {e.preventDefault(); doMenuAction($(this).attr('data-mnu'),e); });
 	$("#trmfrm [data-mnu]").click(function(e) {e.preventDefault(); doMenuAction($(this).attr('data-mnu'),e); });
 	$("#ftbl [data-act]").click(function(e) {e.preventDefault(); doFileAction($(this).attr('data-act'),this,e); });
-	/*$('#fMrkDlg').dialog({
-		autoOpen: false,
-		width: 600,
-		position: [200,100],
-		buttons: {
-			Okay: function() {
-				$(this).dialog("close");
-				},
-			Clear: function() {
-				sessionStorage.removeItem('fmx_mrkd');
-				$(this).dialog("close");
-				}
-			}
-		});*/
 	$('nav li ul').hide().removeClass('fallback');
 	$('nav li').hover(function () {
 		$('ul', this).stop(true,true).fadeToggle(100);
+	});
+	$('a.cppaMenu').contextMenu('cppaMenu', {
+		bindings: {
+			'cppaClr': function(t) { sessionStorage.removeItem("fmx_cppa"); },
+			'cppaDsp': function(t) { display_cmmStorage(sessionStorage.fmx_cppa); }
+		}
+	});
+	$('a.markMenu').contextMenu('cppaMenu', {
+		bindings: {
+			'cppaClr': function(t) { sessionStorage.removeItem("fmx_mrkd"); },
+			'cppaDsp': function(t) { display_cmmStorage(sessionStorage.fmx_mrkd); }
+		}
+	});
+	$('a.mvtoMenu').contextMenu('cppaMenu', {
+		bindings: {
+			'cppaClr': function(t) { sessionStorage.removeItem("fmx_mvto"); },
+			'cppaDsp': function(t) { display_cmmStorage(sessionStorage.fmx_mvto); }
+		}
+	});
+	$('a.upldMenu').contextMenu('upldMenu', {
+		onContextMenu: function(e) { sessionStorage.fmx_curD = curDir; return true; },
+		bindings: {
+			'H5w': function(t) { upldAction.H5w(); },
+			'H5o': function(t) { upldAction.H5o(); },
+			'L4w': function(t) { upldAction.L4w(); },
+			'L4o': function(t) { upldAction.L4o(); }
+		}
+	});
+	$('td.fileCtxt').contextMenu('fileCtxt', {
+		bindings: {
+			'cfi_edt': function(t) {
+				doFileAction('fedt', t, null);
+			},
+			'cfi_del': function(t) {
+				var fle = $(t).parents('tr').attr('data-fref');
+				if (confirm('Are you sure you want to delete this file: '+fle+' ?')) {
+					postAndRefresh('act=delf&dir='+encodeURIComponent(curDir)+'&files[]='+fle);
+				}
+			},
+			'cfi_dld': function(t) {
+				alert('Download');
+			},
+			'cfi_ren': function(t) {
+				var curfn = $(t).parents('tr').attr('data-fref');
+				myOpenDlg(null,fRenDlg,{'old':curfn,'new':curfn});
+			}
+		}
+	});
+	$('td.foldCtxt').contextMenu('foldCtxt', {
+		bindings: {
+			'cfo_del': function(t) { alert('del'); },
+			'cfo_dld': function(t) { alert('dld'); },
+			'cfo_dup': function(t) { alert('dup'); },
+			'cfo_ren': function(t) { alert('ren'); },
+			'cfo_zip': function(t) { alert('zip'); }
+		}
 	});
 });

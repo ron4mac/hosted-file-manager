@@ -1,10 +1,20 @@
 <?php
-$rmtuser = getenv('REMOTE_USER');
-$cooknam = 'fil_vew' . ($rmtuser ? "_$rmtuser" : '');
+include 'fmx.ini';
+if ($fmxInJoomla) {
+	if (isset($this)) {
+		$userN = $this->user->id;
+	} else {
+		$userN = fmx_getJoomlaUserId();
+	}
+	$cooknam = 'jfil_vew' . ($userN ? "_$userN" : '');
+} else {
+	$rmtuser = getenv('REMOTE_USER');
+	$cooknam = 'fil_vew' . ($rmtuser ? "_$rmtuser" : '');
+}
 $cookie = $_COOKIE[$cooknam];
 if (!$cookie) { exit('Unauthorized'); }
 $baseDir = convert_uudecode($cookie).'/';
-$fmxVersion = '2.9.8 - June 2014';
+$fmxVersion = '2.9.9 - August 2014';
 
 function FileMimeType ($fpath) {
 	$mtyp = 'text/plain';
@@ -18,7 +28,6 @@ function FileMimeType ($fpath) {
 		$sfe = array();
 		$rslt = 0;
 		$sf = exec('file --mime-type -b '.$fpath, $sfe, $rslt);
-		//var_dump($sf,$sfe,$rslt);exit();
 		if (!$rslt) $mtyp = $sf;
 	}
 	return $mtyp;
@@ -38,4 +47,16 @@ function return_bytes ($val) {
 function doUnescape ($inp) {
 	if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc()) return stripslashes($inp);
 	else return $inp;
+}
+
+function fmx_getJoomlaUserId() {
+	define( '_JEXEC', 1 );
+	define( 'JPATH_BASE', realpath(dirname(__FILE__).'/../../..' ));
+	define( 'DS', DIRECTORY_SEPARATOR );
+
+	require_once ( JPATH_BASE .DS.'includes'.DS.'defines.php' );
+	require_once ( JPATH_BASE .DS.'includes'.DS.'framework.php' );
+	$app = JFactory::getApplication('site');
+	$app->initialise();
+	return JFactory::getUser()->id;
 }

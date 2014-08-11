@@ -1,29 +1,56 @@
 <?php
-include('fmx.ini');
-$rmtuser = getenv('REMOTE_USER');
-$cooknam = 'fil_vew' . ($rmtuser ? "_$rmtuser" : '');
-
-$basDir = '';
-$pDir = '';
-$rDir = '';
-$rootD = '';
-$rootcook = '';
-
-// establish (or get) a base directory path
-if (isset($_GET['bgn'])) {
-	$basDir = $_GET['bgn'];
-	$rootcook = setcookie($cooknam,convert_uuencode($basDir));
-} else {
-	$basDir = convert_uudecode($_COOKIE[$cooknam]);
+include 'fmx.ini';
+include 'cfg.php';
+if ($fmxInJoomla) {
+	defined('_JEXEC') or die('Restricted access');
+	JHtml::stylesheet('components/com_fmx/fmx/css/css.php');
+	JFactory::getDocument()->addScript('components/com_fmx/fmx/js/js.php');
+	$userN = $this->user->id;
+	$cooknam = 'jfil_vew' . ($userN ? "_$userN" : '');
+	$basDir = isset($_COOKIE[$cooknam]) ? convert_uudecode($_COOKIE[$cooknam]) : false;
 	if (!$basDir) {
-		$basDir = trim(`cd ~;pwd`);
-		$rootcook = setcookie($cooknam,convert_uuencode($basDir));
-		}
-}
+		$basDir = JPATH_ROOT.'/'. $this->params->get('fmx_base');
+		$rootcook = setcookie($cooknam,convert_uuencode($basDir), 0, '/'.basename(JPATH_ROOT));
+	}
+	$pDir = JFactory::getApplication()->input->getPath('dir','');
+	$appB = 'components/com_fmx/fmx/';
+	$popW = isset($fmx_upload_winpop)?'true':'false';
+	$fmxAppPath = JUri::base().'components/com_fmx/fmx/';
+	$fmx_AJ = basename($_SERVER['PHP_SELF']) . '?format=raw';
+	$scr = "var fmx_appPath = '{$fmxAppPath}';
+var fmx_juid={$userN};
+var fmx_AJ='{$fmx_AJ}';
+var curDir='{$pDir}/';
+var upload_winpop = {$popW};
+";
+	JFactory::getDocument()->addScriptDeclaration($scr);
+} else {
+	$rmtuser = getenv('REMOTE_USER');
+	$cooknam = 'fil_vew' . ($rmtuser ? "_$rmtuser" : '');
 
-// get any current directory path
-if (isset($_GET['dir'])) {
-	$pDir = urldecode($_GET['dir']);
+	$basDir = '';
+	$pDir = '';
+	$rDir = '';
+	$rootD = '';
+	$rootcook = '';
+	$appB = '';
+
+	// establish (or get) a base directory path
+	if (isset($_GET['bgn'])) {
+		$basDir = $_GET['bgn'];
+		$rootcook = setcookie($cooknam,convert_uuencode($basDir));
+	} else {
+		$basDir = isset($_COOKIE[$cooknam]) ? convert_uudecode($_COOKIE[$cooknam]) : false;
+		if (!$basDir) {
+			$basDir = trim(`cd ~;pwd`);
+			$rootcook = setcookie($cooknam,convert_uuencode($basDir));
+			}
+	}
+
+	// get any current directory path
+	if (isset($_GET['dir'])) {
+		$pDir = urldecode($_GET['dir']);
+	}
 }
 
 // full path to current directory
@@ -43,6 +70,7 @@ if (isset($_POST['cmdlin'])) {
 //	$rsptxt = preg_replace(array('/</','/>/'),array('&lt;','&gt;'),$rsptxt);		removed since using <xmp> to wrap output
 	}
 ?>
+<?php if (!$fmxInJoomla): ?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
@@ -51,20 +79,21 @@ if (isset($_POST['cmdlin'])) {
 <meta http-equiv="Content-Language" content="en" />
 <meta name="google" content="notranslate">
 <link rel="stylesheet" type="text/css" href="css/css.php" />
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="<?=$jqlink?>"></script>
 <script src="js/js.php" type="text/javascript"></script>
 <script type="text/javascript">
+var fmx_appPath = '';
+var fmx_AJ='fmxjx.php';
 var curDir='<?php echo $pDir; ?>/';
 var upload_winpop = <?php echo isset($fmx_upload_winpop)?'true':'false' ?>;
-try { sessionStorage.fmx_ok = 1; }
-catch(err) { alert("Your browser 'sessionStorage' is not functioning. (private browsing?) Not all functions of FMX will work successfully."); }
 </script>
 </head>
 <body class="fmgt">
+<?php endif; ?>
 <span class="pathbread">
 <?php
 if ($pDir) {
-	print '<a href="index.php">'.$rootD.'</a>';
+	print '<a href="'.$_SERVER['PHP_SELF']/*index.php*/.'">'.$rootD.'</a>';
 	$href = 'index.php?dir=';
 	$path = explode('/', $pDir);
 	$curD = array_pop($path);
@@ -80,7 +109,7 @@ else {
 	}
 ?>
 </span>
-<hr />
+<hr style="margin:6px 0" />
 <div id="fmnu">
 	<nav>
 	<ul>
@@ -93,14 +122,14 @@ else {
 				<li><a href="#" data-mnu="utrz" data-req="2">untar/gz</a></li>
 			</ul>
 		</li>
-		<li><a href="#" data-mnu="copy" data-req="2">copy</a></li>
+	<!--	<li><a href="#" data-mnu="copy" data-req="2">copy</a></li> -->
 		<li><a href="#" data-mnu="cppa" data-req="2" class="cppaMenu">copy/paste</a></li>
 		<li><a href="#" data-mnu="delf" data-req="2">delete</a></li>
 		<li><a href="#" data-mnu="dnld" data-req="2">download</a><div class="dnldprg"> rr</div></li>
 		<li><a href="#" data-mnu="dupl" data-req="2">duplicate</a></li>
-		<li><a href="#" data-mnu="mark" data-req="2">mark</a></li>
-		<li><a href="#" data-mnu="move" data-req="2">move</a></li>
-		<li><a href="#" data-mnu="mvto" data-req="2">move/to</a></li>
+		<li><a href="#" data-mnu="mark" data-req="2" class="markMenu">mark</a></li>
+	<!--	<li><a href="#" data-mnu="move" data-req="2">move</a></li> -->
+		<li><a href="#" data-mnu="mvto" data-req="2" class="mvtoMenu">move/to</a></li>
 		<li>
 			<a href="#" data-mnu="mnu">new</a>
 			<ul class="fallback">
@@ -125,7 +154,7 @@ else {
 	</ul>
 	</nav>
 </div>
-<br /><hr />
+<hr style="margin:6px 0;clear:both" />
 <form name="filst">
 	<input type="hidden" name="dir" value="<?php echo $pDir;?>" />
 	<table id="ftbl">
@@ -142,11 +171,11 @@ else {
 		</tr>
 <?php
 if ($pDir) {
-	$aRef = 'index.php';
+	$aRef = $_SERVER['PHP_SELF'];	//'index.php';
 	if (dirname($pDir)!='.') {
 		$aRef .= '?dir=' . urlencode(dirname($pDir));
 		}
-	echo '<tr><td><input type="checkbox" onchange="allSelect(event,this)" /></td><td><img src="icons/arrow-ret.png" width="16" height="16" alt="" /></td><td colspan="7"><a href="'.$aRef.'">Parent&nbsp;Folder</a></td></tr>';
+	echo '<tr><td><input type="checkbox" onchange="allSelect(event,this)" /></td><td><img src="'.$appB.'icons/arrow-ret.png" width="16" height="16" alt="" /></td><td colspan="7"><a href="'.$aRef.'">Parent&nbsp;Folder</a></td></tr>';
 }
 $dFiles = array();
 if ($drsrc = @opendir($rDir)) {
@@ -185,11 +214,11 @@ foreach ($dFiles as $fle) {
 		} else {
 			echo '<td>&nbsp;</td>';
 		}
-		echo '<td class="diricon"> </td>';
-		echo '<td><a href="index.php?dir='.$efle.'">'.$fle.'</a>'.($isLnk ? " &rarr; $rlnk" : '').'</td>';
+		echo '<td class="diricon foldCtxt"> </td>';
+		echo '<td class="foldCtxt"><a href="index.php?dir='.$efle.'">'.$fle.'</a>'.($isLnk ? " &rarr; $rlnk" : '').'</td>';
 		echo '<td></td><td>'.$dt.'</td><td></td>';
 		echo '<td class="right">--</td>';
-		echo '<td></td><td><a href="#" data-act="finf"><img src="graphics/info10x10.gif" width="10" height="10" alt="" /></a></td>';
+		echo '<td></td><td><a href="#" data-act="finf"><img src="'.$appB.'graphics/info10x10.gif" width="10" height="10" alt="" /></a></td>';
 		echo '</tr>'."\n";
 		}
 	else {
@@ -214,19 +243,20 @@ foreach ($dFiles as $fle) {
 		} elseif ($imgedt) {
 			echo '<td class="imgedticon" onclick="doFileAction(\'iedt\',this,event)">&nbsp;</td>';
 		} else {
-			echo '<td class="filicon">&nbsp;</td>';
+			echo '<td class="filicon fileCtxt">&nbsp;</td>';
 		}
-		print '<td><a href="#" data-act="fvue">'.$ufle.'</a>'.($isLnk ? " &rarr; $rlnk" : '').'</td>';
+		print '<td class="fileCtxt"><a href="#" data-act="fvue">'.$ufle.'</a>'.($isLnk ? " &rarr; $rlnk" : '').'</td>';
 		echo '<td></td><td>'.$dt.'</td><td></td>';
 		echo '<td class="right">'.$sz.'</td>';
-		echo '<td></td><td><a href="#" data-act="finf"><img src="graphics/info10x10.gif" width="10" height="10" alt="" /></a></td>';
+		echo '<td></td><td><a href="#" data-act="finf"><img src="'.$appB.'graphics/info10x10.gif" width="10" height="10" alt="" /></a></td>';
 		echo '</tr>'."\n";
 		}
 }
 ?>
 	</table>
 </form>
-<br /><br /><hr /><br />
+<hr /><br />
+<?php if (isset($fmx_ui_cli) && $fmx_ui_cli) : ?>
 <div id="trmfrm">
 <form name="cliterm" method="post">
 <input type="hidden" name="dir" value="<?php echo $pDir ?>" />
@@ -246,13 +276,8 @@ Command: <input type="text" id="cmdlin" name="cmdlin" size="80" maxlength="200" 
 <script type="text/javascript">window.location.hash="cmdRsp";</script>
 <?php endif; ?>
 </div>
+<?php endif; ?>
 <div style="display:none">
-<!-- <div id="aMsgDlg" title="Message:"><span id="aMsg"></span></div> -->
-<!-- <div id="fMrkDlg" title="Marked files:"><span id="fMrk"></span></div> -->
-<!-- <div id="fRenDlg" title="Rename:"><input type="hidden" id="oldnm" value="old" /><input type="text" id="nunam" name="nunam" size="55" maxlength="80" /></div> -->
-<!-- <div id="fNamDlg" title="Name:"><input type="hidden" id="ffact" value="new" /><input type="text" id="ffnam" name="ffnam" size="55" maxlength="80" /></div> -->
-<!-- <div id="fCpyDlg" title="Copy:"><input type="hidden" id="cpyfnm" value="old" /><p id="cpyfnam"></p>To: <input type="text" id="cpy2nam" name="nunam" size="70" maxlength="100" /></div> -->
-<!-- <div id="fMovDlg" title="Move:"><input type="hidden" id="movfnm" value="old" /><p id="movfnam"></p>To: <input type="text" id="mov2nam" name="nunam" size="70" maxlength="100" /></div> -->
 <!-- <div id="fCpyDlog" title="Copy:"><input type="hidden" name="cpyfnm" value="{cpy}" /><p>From: {cpy}</p>To: <input type="text" name="cpy2nam" value="{cpy}" size="70" maxlength="100" /></div> -->
 <!-- <div id="fMovDlog" title="Move:"><input type="hidden" name="movfnm" value="{mov}" /><p>From: {mov}</p>To: <input type="text" name="mov2nam" value="{mov}" size="70" maxlength="100" /></div> -->
 <div id="aMsgDlog" title="Message:"><span class="aMsg">{msg}</span></div>
@@ -261,9 +286,9 @@ Command: <input type="text" id="cmdlin" name="cmdlin" size="80" maxlength="200" 
 <div id="fNamDlog" title="{ttl}"><input type="hidden" name="act" value="{act}" /><input type="text" name="fref" size="55" maxlength="80" /></div>
 <div id="fCpmDlog" title="CopMov:"><input type="hidden" name="act" value="{act}" /><input type="hidden" name="cpmfnm" value="{cpm}" /><p>From: {cpm}</p>To: <input type="text" name="cpm2nam" value="{cpm}" size="70" maxlength="100" /></div>
 </div>
-<div class="jqmWindow" id="upload"><div class="upldr"></div><span class="button jqmClose"><img src="css/closex.png" alt="close" /></span></div>
+<div class="jqmWindow" id="upload"><div class="upldr"></div><span class="button jqmClose"><img src="<?=$appB?>css/closex.png" alt="close" /></span></div>
 <div id="element_to_pop_up" class="jqmWindow">
-	<div class="bpDlgHdr"><span class="bpDlgTtl">TITLE</span><span class="button jqmClose"><img src="css/closex.png" alt="close" /></span></div>
+	<div class="bpDlgHdr"><span class="bpDlgTtl">TITLE</span><span class="button jqmClose"><img src="<?=$appB?>css/closex.png" alt="close" /></span></div>
 	<div class="bpDlgCtn"><form class="bp-dctnt" name="myUIform" onsubmit="return false"></form></div>
 	<div class="bpDlgFtr"><div class="bp-bttns"></div></div>
 </div>
@@ -281,33 +306,24 @@ Command: <input type="text" id="cmdlin" name="cmdlin" size="80" maxlength="200" 
 		<li id="L4o">L4ovr</li>
 	</ul>
 </div>
-<script>
-	$('a.cppaMenu').contextMenu('cppaMenu', {
-		bindings: {
-			'cppaClr': function(t) {
-				sessionStorage.fmx_cppa = undefined;
-			},
-			'cppaDsp': function(t) {
-				alert(sessionStorage.fmx_cppa);
-			}
-		}
-	});
-	$('a.upldMenu').contextMenu('upldMenu', {
-		bindings: {
-			'H5w': function(t) {
-				upldAction.H5w();
-			},
-			'H5o': function(t) {
-				upldAction.H5o();
-			},
-			'L4w': function(t) {
-				upldAction.L4w();
-			},
-			'L4o': function(t) {
-				upldAction.L4o();
-			}
-		}
-	});
-</script>
+<div class="contextMenu" id="fileCtxt">
+	<ul>
+		<li id="cfi_edt">Edit</li>
+		<li id="cfi_del">Delete</li>
+		<li id="cfi_dld">Download</li>
+		<li id="cfi_ren">Rename</li>
+	</ul>
+</div>
+<div class="contextMenu" id="foldCtxt">
+	<ul>
+		<li id="cfo_del">Delete</li>
+		<li id="cfo_dld">Download</li>
+		<li id="cfo_dup">Duplicate</li>
+		<li id="cfo_ren">Rename</li>
+		<li id="cfo_zip">Zip</li>
+	</ul>
+</div>
+<?php if (!$fmxInJoomla): ?>
 </body>
 </html>
+<?php endif; ?>

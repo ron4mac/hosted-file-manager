@@ -1,6 +1,7 @@
 <?php
 //echo'<pre>';var_dump($_POST);echo'</pre>';
 require_once('functions.php');
+include 'cfg.php';
 $fref = urldecode($_POST['fref']);
 if (!$fref) {
 	if (!isset($_POST['imgfil'])) { die('Error: no image'); }
@@ -24,6 +25,7 @@ if (!$fref) {
 	}
 	$imgObj->saveToFile($baseDir.$fref);
 }
+$imageSize = getimagesize($baseDir.$fref);
 $iurl = 'filproxy.php?f='.urlencode($fref);
 ?>
 <!DOCTYPE html>
@@ -41,9 +43,9 @@ $iurl = 'filproxy.php?f='.urlencode($fref);
 		.tsize { width:4em; }
 		#target { /*width:100%;*/ max-width:100%;max-height:100%;/*display:block;margin:auto;*/ }
 	</style>
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="<?=$jqlink?>"></script>
 	<script src="js/jqcropper.js"></script>
-	<script src="js/Jcrop.min.js"></script>
+	<script src="js/Jcrop<?=$jsver?>.js"></script>
 </head>
 <body>
 <script type="text/javascript">
@@ -204,7 +206,7 @@ function saveAsFile()
 			<input type="checkbox" id="reszit" name="reszit" value="resz" class="lft20" /><label>Resize Image</label>
 			<label class="lft20">w:&nbsp;</label><input type="text" id="reszw" name="reszw" class="tsize" />
 			<label>h:&nbsp;</label><input type="text" id="reszh" name="reszh" class="tsize" />
-			<span class="lft20">FILE NAME</span>
+			<span class="lft20"><?php echo basename($fref).' ('.$imageSize[0].'x'.$imageSize[1].')'; ?></span>
 			<img id="spinner" src="graphics/spinner.gif" />
 			<div id="sbbtns">
 				<input type="submit" value="Save as ..." class="btn btn-large btn-inverse" onclick="return saveAsFile();" />

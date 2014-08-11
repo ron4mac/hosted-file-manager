@@ -1,5 +1,5 @@
 <?php
-include('fmx.ini');
+include 'fmx.ini';
 require_once('functions.php');
 
 $fref = isset($_POST['fref']) ? $baseDir.doUnescape($_POST['fref']) : '';
@@ -54,7 +54,7 @@ switch ($_POST['act']) {
 	case 'dupl':
 		$path_parts = pathinfo($fref);
 		$pfmx = $path_parts['dirname'].'/'.$path_parts['filename'];		//file path minus extension
-		$pfxp = $path_parts['extension']?('.'.$path_parts['extension']):'';		//file path estension part
+		$pfxp = isset($path_parts['extension'])?('.'.$path_parts['extension']):'';		//file path estension part
 		$nn = 1;
 		while (file_exists($pfmx.'_'.$nn.$pfxp)) {
 			$nn++;
@@ -330,7 +330,7 @@ function alt_stat ($file) {
 			'device_number'=>$ss['rdev'], //Device number, if device.
 			'inode'=>$ss['ino'], //File serial number
 			'link_count'=>$ss['nlink'], //link count
-			'link_to'=>($s['type']=='link') ? @readlink($file) : ''
+			'link_to'=>(substr($ts[octdec($t)],1)=='link') ? @readlink($file) : ''
 		),
 		'size'=>array(
 			'size'=>$ss['size'], //Size of file, in bytes.
