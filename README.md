@@ -1,4 +1,5 @@
 hosted-file-manager
 ===================
 
-A php/javascript file manager with command line capabilities for linux hosted accounts
+A php/javascript file manager with command line capabilities for linux hosted accounts. 
+Because of the extreme capabilities of this file manager, it is strongly advised to place it in a password protected server directory.
