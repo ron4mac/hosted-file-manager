@@ -102,3 +102,9 @@ input[type="checkbox"] {
 	background-color: #BCE;
 	cursor: pointer;
 }
+
+#filsform.hover {
+	background-color: #BCE;
+	border: 1px solid #999;
+	border-radius: 4px;
+}

@@ -61,15 +61,20 @@
 
 	// file selection
 	function FileSelectHandler(e) {
+		var files;
 
 		// here is a good spot to get the tot progress div width
 		totProgressDivW = totProgressDiv.offsetWidth;
 
-		// cancel event and hover styling
-		FileDragHover(e);
+		if (e instanceof FileList) {
+			files = e;
+		} else {
+			// cancel event and hover styling
+			FileDragHover(e);
 
-		// fetch FileList object
-		var files = e.target.files || e.dataTransfer.files;
+			// fetch FileList object
+			files = e.target.files || e.dataTransfer.files;
+		}
 
 		// process all File objects
 		for (var i = 0, f; (f = files[i]); i++) {
@@ -171,7 +176,7 @@
 					// check result
 					if (self.xhr.status == 200) {
 						rp = self.xhr.responseText;
-						msg = rp == 'Ok' ? '' : ('<br />'+rp);
+						msg = rp == 'Ok' ? '' : ('<br />'+(rp?rp:'Could not upload'));
 					}
 					else if (self.xhr.status === 0) msg += '<br />-- aborted';
 					else msg += '<br />' + self.xhr.status + ': ' + self.xhr.statusText;
@@ -241,6 +246,7 @@
 	}
 
 	w.fupQctrl = queueCtrl;
+	w.fupQadd2 = FileSelectHandler;
 
 })(window);
 

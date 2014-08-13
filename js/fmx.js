@@ -99,7 +99,7 @@ var upldAction = {
 	// HTML5 w/progress in a popup window
 	H5w: function(){ popUp(fmx_appPath+'filupld5d.php'); },
 	// HTML5 w/progress in a div overlay
-	H5o: function(){ $('#upload').jqm({ajax:fmx_appPath+'filupld5dm.php', ajaxText:'Loading...', target:'.upldr',overlay:5}).jqmShow(); },
+	H5o: function(cbf){ $('#upload').jqm({ajax:fmx_appPath+'filupld5dm.php', ajaxText:'Loading...', onLoad: cbf, target:'.upldr', overlay:5}).jqmShow(); },
 	// legacy HTML in a popup window
 	L4w: function(){ popUp(fmx_appPath+'filupld.php'); },
 	// legact HTML in a div overlay
@@ -224,6 +224,11 @@ function doMenuAction(cmd,evt) {
 			sessionStorage.fmx_mrkd = parms + $("form[name='filst']").serialize();
 		}
 		break;
+	case 'mmiz':
+		if (hasSome()) {
+			postAndRefresh('act=mmiz&'+$("form[name='filst']").serialize());
+		}
+		break;
 	case 'move':
 		if (oneItem()) {
 			curfn = curDir+$(slctd[0]).parents('tr').attr('data-fref');
@@ -324,7 +329,7 @@ function doMenuAction(cmd,evt) {
 					dir: curDir
 					};
 				$.post(fmx_AJ, parms, function(data,textStatus,jqXHR) {
-					if (data) { alert(data) }
+					if (data) { alert(data); }
 				});
 			} else alert('Must be an XML file');
 		}
@@ -339,7 +344,7 @@ function doMenuAction(cmd,evt) {
 						DtD = $.extend(true, {}, aMsgDlg, {buttons:{'Update now':function(){if (confirm('It is a good idea to backup first. Do you want to continue with the update?')) {
 							parms = {act: 'updt', nver: updt[1]};
 							$.post(fmx_AJ, parms, function(data,textStatus,jqXHR) {
-								if (data) { alert(data) }
+								if (data) { alert(data); }
 								else refreshFilst();
 							});
 							myCloseDlg(this);
@@ -475,6 +480,12 @@ function display_cmmStorage(stor) {
 	alert(disp);
 }
 
+function fileDragin(e) {
+		e.stopPropagation();
+		e.preventDefault();
+		e.target.className = (e.type == "dragover" ? "hover" : "");
+}
+
 // some functionality checks
 try { sessionStorage.fmx_ok = 1; }
 catch(err) { alert("Your browser 'sessionStorage' is not functioning. (private browsing?) Not all functions of FMX will work successfully."); }
@@ -544,4 +555,8 @@ $(function() {
 			'cfo_zip': function(t) { alert('zip'); }
 		}
 	});
+	// let's try file drag-n-drop
+	$('#filsform').on('dragover', fileDragin);
+	$('#filsform').on('dragleave', fileDragin);
+	$('#filsform').on('drop',function(e){ var fils = e.originalEvent.dataTransfer.files; fileDragin(e); upldAction.H5o(function(){ fupQadd2(fils); }); });
 });

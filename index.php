@@ -149,13 +149,20 @@ else {
 		<li><a href="#" data-mnu="upld" data-req="0" class="upldMenu">upload</a></li>
 		<li><a href="#" data-mnu="webv" data-req="0">webview</a><!-- <span style="padding-left:8px"> || </span> --></li>
 		<li>&nbsp;&nbsp;&nbsp;||&nbsp;</li>
+		<li>
+			<a href="#" data-mnu="mnu">develop</a>
+			<ul class="fallback">
+				<li><a href="#" data-mnu="mmiz" data-req="0">minimize</a></li>
+				<li><a href="#" data-mnu="lint" data-req="0">lint</a></li>
+			</ul>
+		</li>
 		<li><a href="#" data-mnu="jxtr" data-req="1">jextract</a></li>
 		<li><a href="#" data-mnu="fmxi" data-req="0">?</a></li>
 	</ul>
 	</nav>
 </div>
 <hr style="margin:6px 0;clear:both" />
-<form name="filst">
+<form name="filst" id="filsform">
 	<input type="hidden" name="dir" value="<?php echo $pDir;?>" />
 	<table id="ftbl">
 		<tr>
@@ -239,9 +246,9 @@ foreach ($dFiles as $fle) {
 			echo '<td>&nbsp;</td>';
 		}
 		if ($filedt) {
-			echo '<td class="filedticon" onclick="doFileAction(\'fedt\',this,event)">&nbsp;</td>';
+			echo '<td class="filedticon fileCtxt" onclick="doFileAction(\'fedt\',this,event)">&nbsp;</td>';
 		} elseif ($imgedt) {
-			echo '<td class="imgedticon" onclick="doFileAction(\'iedt\',this,event)">&nbsp;</td>';
+			echo '<td class="imgedticon fileCtxt" onclick="doFileAction(\'iedt\',this,event)">&nbsp;</td>';
 		} else {
 			echo '<td class="filicon fileCtxt">&nbsp;</td>';
 		}

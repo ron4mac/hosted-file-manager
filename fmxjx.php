@@ -86,6 +86,13 @@ switch ($_POST['act']) {
 		$fcon = nl2br(htmlspecialchars(file_get_contents($fref)));
 		echo $fcon;
 		break;
+	case 'mmiz':
+		$path = escapeshellcmd($_POST['dir']);
+		$files = $_POST['files'];
+		foreach ($files as $fle) {
+			mmizFile("$baseDir$path/".rtrim(doUnescape($fle)));
+		}
+		break;
 	case 'move':
 		$tonam = $baseDir.escapeshellcmd($_POST['tonm']);
 		system('mv -f "'.$fref.'" "'.$tonam.'"',$rslt);
@@ -175,6 +182,14 @@ function recursiveDelete ($pstr) {
 		closedir($dh);
 		@rmdir($pstr);
 	}
+}
+
+function mmizFile ($path) {
+	$pinf = pathinfo($path);
+	if (!isset($pinf['extension']) || $pinf['extension'] != 'js') return;
+	$min = json_decode(`curl -s -d compilation_level=SIMPLE_OPTIMIZATIONS -d output_format=json -d output_info=compiled_code --data-urlencode "js_code@{$path}" http://closure-compiler.appspot.com/compile`);
+	if (isset($min->compiledCode))
+		file_put_contents($pinf['dirname'].'/'.$pinf['filename'].'.min.'.$pinf['extension'], $min->compiledCode);
 }
 
 function smartCopy ($source, $dest)  {
