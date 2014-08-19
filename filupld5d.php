@@ -29,15 +29,18 @@ $uploadMaxFilesizeBytes = return_bytes($uploadMaxFilesize);
 		<div id="fprogress"></div>
 		<div id="server_response"></div>
 	</div>
-	<script type="text/javascript">
-		var fmx_appPath = '';
-		var filesPath = sessionStorage.fmx_curD;
-		var uploadMaxFilesize = <?php echo $uploadMaxFilesizeBytes; ?>;
+<script type="text/javascript">
+	var fmx_appPath = '';
+	var filesPath = sessionStorage.fmx_curD;
+	var uploadMaxFilesize = <?php echo $uploadMaxFilesizeBytes; ?>;
+	var h5_fup = {
+		lang: {abortd:'-- aborted', noupld:'Could not upload', toobig:'File is larger than max size allowed.', notype:'Cannot upload a file of this type.'},
 		// optional array of allowed mime types
-		//var fup_ftypes = ['image/jpeg'];
-		var fup_payload = {'fpath':sessionStorage.fmx_curD, 'oefile':'1'};
-		function fup_done(errcnt) { parent.opener.refreshFilst(); if (!errcnt) window.close(); }
+		//ftypes: ['image/jpeg'],
+		payload: {'fpath':sessionStorage.fmx_curD, 'oefile':'1'},
+		done: function (errcnt) { parent.opener.refreshFilst(); if (!errcnt) window.close(); }
+	};
 <?php readfile('js/upload5d'.$jsver.'.js'); ?>
-	</script>
+</script>
 </body>
 </html>

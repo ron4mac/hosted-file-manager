@@ -1,5 +1,4 @@
-(function(w) {
-
+(function(w, z) {
 	var totProgressDiv,
 		totProgressDivW,
 		progressDiv,
@@ -89,7 +88,7 @@
 	function _endUp() {
 		if (!qStopt) {
 			allDone = 1;
-			if (typeof(fup_done == 'function')) fup_done(errCount);
+			if (typeof(z.done == 'function')) z.done(errCount);
 		}
 	}
 
@@ -111,7 +110,7 @@
 	function UpdateTotalProgress(adsz) {
 		if (!totProgressDiv) return;
 		totalDone += adsz;
-		var p = Math.floor(totProgressDivW * totalDone / total2do) - 800;
+		var p = Math.floor(totProgressDivW * totalDone / total2do);
 		totProgressDiv.style.backgroundPosition = p + "px 0";
 	}
 
@@ -137,8 +136,8 @@
 			this.xhr.upload.onloadstart = function(evt) {
 				this.onprogress = function(e) {
 					if (!e.lengthComputable) return;
-					var p = Math.floor(self.progressW * e.loaded / e.total) - 800;
-					self.progress.style.backgroundPosition = p + "px -20px";
+					var p = Math.floor(self.progressW * e.loaded / e.total);
+					self.progress.style.backgroundPosition = p + "px 0";
 					if (e.loaded == e.total) {
 						self.progress.innerHTML = file.name;
 						self.progress.className = 'indeterm';
@@ -149,10 +148,10 @@
 					};
 			};
 
-			if (typeof(fup_ftypes) == 'object' && fup_ftypes.indexOf(file.type) < 0) {
-				errM = 'Cannot upload a file of this type. ('+file.type+')';
+			if (typeof(z.ftypes) == 'object' && z.ftypes.indexOf(file.type) < 0) {
+				errM = z.lang.notype+' ('+file.type+')';
 			} else if (file.size > $id("MAX_FILE_SIZE").value) {
-				errM = 'File is larger than max size allowed.';
+				errM = z.lang.toobig;
 			}
 
 			// create progress bar
@@ -176,9 +175,9 @@
 					// check result
 					if (self.xhr.status == 200) {
 						rp = self.xhr.responseText;
-						msg = rp == 'Ok' ? '' : ('<br />'+(rp?rp:'Could not upload'));
+						msg = rp == 'Ok' ? '' : ('<br />'+(rp?rp:z.lang.noupld));
 					}
-					else if (self.xhr.status === 0) msg += '<br />-- aborted';
+					else if (self.xhr.status === 0) msg += '<br />'+z.lang.abortd;
 					else msg += '<br />' + self.xhr.status + ': ' + self.xhr.statusText;
 
 					if (msg) {insertElemMsg(self.progress,msg,true)}
@@ -189,11 +188,11 @@
 
 			// start upload
 			this.xhr.open("POST", fmx_appPath+'upload5.php', true);
-			if (fup_payload) {
+			if (z.payload) {
 				var formData = new FormData();
 				formData.append('user_file[]', file);
-				for (var key in fup_payload) {
-					formData.append(key, fup_payload[key]);
+				for (var key in z.payload) {
+					formData.append(key, z.payload[key]);
 				}
 				this.xhr.send(formData);
 			} else {
@@ -248,7 +247,7 @@
 	w.fupQctrl = queueCtrl;
 	w.fupQadd2 = FileSelectHandler;
 
-})(window);
+})(window, h5_fup);
 
 function AbortUpload (node) {
 	node.parentNode._upld.doAbort();
