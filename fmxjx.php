@@ -272,7 +272,11 @@ function mmizFile ($path) {
 	}
 	if (isset($min->warnings)) {
 		foreach ($min->warnings as $cpwrn) {
-			var_dump($cpwrn);
+			echo $cpwrn->type;
+			echo "\n".$cpwrn->warning;
+			echo "\n\nLine: ".$cpwrn->lineno;
+			echo ' Char: '.$cpwrn->charno;
+			echo "\n".trim($cpwrn->line);
 		}
 	}
 	if (isset($min->compiledCode))
