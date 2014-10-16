@@ -10,7 +10,7 @@ require_once('functions.php');
 	<br /><br /><label><input type="checkbox" name="ovrok" value="on" style="margin-right:5px;vertical-align:text-top" />Overwrite same-named server files</label>
 </div>
 <hr />
-<input type="button"  name="do_upload" value="Upload file(s)" onclick="chknsend()" style="float:right;margin-bottom:12px" />
+<input type="button" name="do_upload" value="Upload file(s)" onclick="chknsend()" style="float:right;margin-bottom:12px" />
 </form>
 </div>
 <div id="uplmsg" style="display:none;color:red">

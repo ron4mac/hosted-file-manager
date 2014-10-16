@@ -21,6 +21,78 @@ switch ($_POST['act']) {
 			}
 		if ($rslt) echo $rslt;
 		break;
+	case 'crlg':
+		$save_path = $_POST['path'];
+		$url = $_POST['url'];
+		$fullfile = $baseDir.$save_path.basename($url);
+		$fexists = file_exists($fullfile);	//remember that the file already existed
+		if ($fexists) {
+			echo basename($fullfile).' already exists here';
+			break;
+		}
+		$fp = fopen($fullfile, 'w');
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_FILE, $fp);
+		curl_setopt($ch, CURLOPT_FAILONERROR, true);
+		curl_setopt($ch, CURLOPT_FILETIME, true);
+		if (isset($_POST['user']) && isset($_POST['pass'])) curl_setopt($ch, CURLOPT_USERPWD, $_POST['user'].':'.$_POST['pass']);
+		$rslt = curl_exec($ch);
+		$msg = curl_error($ch);
+		$ftime = curl_getinfo($ch, CURLINFO_FILETIME);
+		curl_close($ch);
+		fclose($fp);
+		if ($msg) {
+			if (!$fexists) @unlink($fullfile);	//remove the file
+			echo $msg;
+		} else {
+			if ($ftime > 0) touch($fullfile, $ftime);
+		}
+		break;
+	case 'crlp':
+		$save_path = $_POST['path'];
+		$url = $_POST['url'];
+		$fullfile = $baseDir.$save_path.basename($url);
+		$fexists = file_exists($fullfile);	//remember that the file already existed
+		if ($fexists) {
+			echo basename($fullfile).' already exists here';
+			break;
+		}
+/*
+$url_path_str = 'http://my_url';
+$file_path_str = '/my_file_path';
+
+$ch = curl_init();
+
+curl_setopt($ch, CURLOPT_URL, ''.$url_path_str.'');
+curl_setopt($ch, CURLOPT_PUT, 1);
+
+$fh_res = fopen($file_path_str, 'r');
+
+curl_setopt($ch, CURLOPT_INFILE, $fh_res);
+curl_setopt($ch, CURLOPT_INFILESIZE, filesize($file_path_str));
+
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+$curl_response_res = curl_exec ($ch);
+fclose($fh_res);
+*/
+		$fp = fopen($fullfile, 'w');
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_FILE, $fp);
+		curl_setopt($ch, CURLOPT_FAILONERROR, true);
+		curl_setopt($ch, CURLOPT_FILETIME, true);
+		if (isset($_POST['user']) && isset($_POST['pass'])) curl_setopt($ch, CURLOPT_USERPWD, $_POST['user'].':'.$_POST['pass']);
+		$rslt = curl_exec($ch);
+		$msg = curl_error($ch);
+		$ftime = curl_getinfo($ch, CURLINFO_FILETIME);
+		curl_close($ch);
+		fclose($fp);
+		if ($msg) {
+			if (!$fexists) @unlink($fullfile);	//remove the file
+			echo $msg;
+		} else {
+			if ($ftime > 0) touch($fullfile, $ftime);
+		}
+		break;
 	case 'delf':
 		$path = escapeshellcmd($_POST['dir']);
 		$files = $_POST['files'];

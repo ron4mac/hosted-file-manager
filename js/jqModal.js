@@ -26,6 +26,8 @@
 		
 		var o = $.extend({}, $.jqm.params, options);
 
+		this.removeData('jqm');	// remove any existing data
+
 		return this.each(function(){
 			var e = $(this),
 				jqm = $(this).data('jqm');

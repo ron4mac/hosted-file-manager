@@ -146,6 +146,13 @@ else {
 				<li><a href="#" data-mnu="srhc" data-req="0">content</a></li>
 			</ul>
 		</li>
+		<li>
+			<a href="#" data-mnu="mnu">transfer</a>
+			<ul class="fallback">
+				<li><a href="#" data-mnu="furl" data-req="0">from URL</a></li>
+				<li><a href="#" data-mnu="turl" data-req="0">to URL</a></li>
+			</ul>
+		</li>
 		<li><a href="#" data-mnu="upld" data-req="0" class="upldMenu">upload</a></li>
 		<li><a href="#" data-mnu="webv" data-req="0">webview</a><!-- <span style="padding-left:8px"> || </span> --></li>
 		<li>&nbsp;&nbsp;&nbsp;||&nbsp;</li>
@@ -237,8 +244,8 @@ foreach ($dFiles as $fle) {
 		$filedt = preg_match('/php|js|html|htm|pl|cgi|css|ini|xml|sql|txt|csv|htaccess/i', $flext);
 		$imgedt = preg_match('/jpg|jpeg|png|gif|bmp/i', $flext);
 		$sz = $fs[7];
-		if ($sz > 1048576) {$sz = sprintf('%.1f', ($sz / 1048576)) . 'm';}
-		elseif ($sz > 1024) {$sz = sprintf('%.1f', ($sz / 1024)) . 'k';}
+		if ($sz > 1048575) {$sz = sprintf('%.1f', ($sz / 1048576)) . 'm';}
+		elseif ($sz > 1023) {$sz = sprintf('%.1f', ($sz / 1024)) . 'k';}
 		$dt = strftime("%b %d, %Y  %l:%M%P", $fs[9]);
 		if (is_writable($fPth)) {
 			echo '<td><input type="checkbox" class="fsel" name="files[]" value="'.$fle.'" /></td>';
@@ -311,6 +318,8 @@ Command: <input type="text" id="cmdlin" name="cmdlin" size="80" maxlength="200" 
 		<li id="H5o">H5ovr</li>
 		<li id="L4w">L4win</li>
 		<li id="L4o">L4ovr</li>
+		<li id="Chk">Chunked</li>
+		<li id="FUo">from URL</li>
 	</ul>
 </div>
 <div class="contextMenu" id="fileCtxt">

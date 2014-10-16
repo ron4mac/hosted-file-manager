@@ -102,8 +102,10 @@ var upldAction = {
 	H5o: function(cbf){ $('#upload').jqm({ajax:fmx_appPath+'filupld5dm.php', ajaxText:'Loading...', onLoad: cbf, target:'.upldr', overlay:5}).jqmShow(); },
 	// legacy HTML in a popup window
 	L4w: function(){ popUp(fmx_appPath+'filupld.php'); },
-	// legact HTML in a div overlay
-	L4o: function(){ $('#upload').jqm({ajax:fmx_appPath+'filupldm.php', ajaxText:'Loading...', target:'.upldr',overlay:5}).jqmShow(); }
+	// legacy HTML in a div overlay
+	L4o: function(){ $('#upload').jqm({ajax:fmx_appPath+'filupldm.php', ajaxText:'Loading...', target:'.upldr',overlay:5}).jqmShow(); },
+	// chunked upload for very large files
+	Chk: function(){ popUp(fmx_appPath+'upchunk.php'); }
 	};
 
 function downloadFile(A, cdl, asf) {
@@ -137,9 +139,11 @@ function makeFileList(fstr, htm) {
 function doesSupportAjaxUploadWithProgress() {
 
 	function supportFileAPI() {
-		var fi = document.createElement('INPUT');
-		fi.type = 'file';
-		return fi.hasOwnProperty('files');
+		return (typeof window.FileList !== 'undefined');
+	//	return (window.File && window.FileList);
+	//	var fi = document.createElement('INPUT');
+	//	fi.type = 'file';
+	//	return fi.hasOwnProperty('files');
 	}
 
 	function supportAjaxUploadProgressEvents() {
@@ -268,6 +272,16 @@ function doMenuAction(cmd,evt) {
 			strm = sessionStorage.fmx_strmc;
 		}
 		myOpenDlg(evt,aSchDlg,{'cmd':cmd,'trm':strm});
+		break;
+	case 'turl':
+		// curl a file to a URL
+		if (oneItem()) {
+			$('#upload').jqm({ajax:fmx_appPath+'filcurlm.php?t=1', ajaxText:'Loading...', target:'.upldr',overlay:5}).jqmShow();
+		}
+		break;
+	case 'furl':
+		// curl a file from a URL
+		$('#upload').jqm({ajax:fmx_appPath+'filcurlm.php', ajaxText:'Loading...', target:'.upldr',overlay:5}).jqmShow();
 		break;
 	case 'upld':
 		sessionStorage.fmx_curD = curDir;
@@ -523,7 +537,8 @@ $(function() {
 			'H5w': function(t) { upldAction.H5w(); },
 			'H5o': function(t) { upldAction.H5o(); },
 			'L4w': function(t) { upldAction.L4w(); },
-			'L4o': function(t) { upldAction.L4o(); }
+			'L4o': function(t) { upldAction.L4o(); },
+			'Chk': function(t) { upldAction.Chk(); }
 		}
 	});
 	$('td.fileCtxt').contextMenu('fileCtxt', {
