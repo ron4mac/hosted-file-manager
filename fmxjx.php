@@ -259,7 +259,22 @@ function recursiveDelete ($pstr) {
 function mmizFile ($path) {
 	$pinf = pathinfo($path);
 	if (!isset($pinf['extension']) || $pinf['extension'] != 'js') return;
-	$min = json_decode(`curl -s -d compilation_level=SIMPLE_OPTIMIZATIONS -d output_format=json -d output_info=compiled_code --data-urlencode "js_code@{$path}" http://closure-compiler.appspot.com/compile`);
+	$min = json_decode(`curl -s -d compilation_level=SIMPLE_OPTIMIZATIONS -d output_format=json -d output_info=compiled_code -d output_info=errors -d output_info=warnings --data-urlencode "js_code@{$path}" http://closure-compiler.appspot.com/compile`);
+	if (isset($min->errors)) {
+		foreach ($min->errors as $cperr) {
+			echo $cperr->type;
+			echo "\n".$cperr->error;
+			echo "\n\nLine: ".$cperr->lineno;
+			echo ' Char: '.$cperr->charno;
+			echo "\n".trim($cperr->line);
+		}
+		return;
+	}
+	if (isset($min->warnings)) {
+		foreach ($min->warnings as $cpwrn) {
+			var_dump($cpwrn);
+		}
+	}
 	if (isset($min->compiledCode))
 		file_put_contents($pinf['dirname'].'/'.$pinf['filename'].'.min.'.$pinf['extension'], $min->compiledCode);
 }
