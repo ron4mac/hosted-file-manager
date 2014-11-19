@@ -5,7 +5,7 @@ $ffref = $baseDir.$fref;
 $fcon = '';
 $mtyp = $mtyp_arg = isset($_GET['mtyp']) ? escapeshellcmd($_GET['mtyp']) : '';
 if (!$mtyp) $mtyp = FileMimeType($ffref);
-list($x,$y) = preg_split('/\//',$mtyp);
+list($x,$y) = preg_split('/\//',$mtyp.'/');
 switch ($y) {
 	case 'zip':
 		$mtyp = 'text/plain';

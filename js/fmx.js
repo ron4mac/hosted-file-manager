@@ -99,11 +99,11 @@ var upldAction = {
 	// HTML5 w/progress in a popup window
 	H5w: function(){ popUp(fmx_appPath+'filupld5d.php'); },
 	// HTML5 w/progress in a div overlay
-	H5o: function(cbf){ $('#upload').jqm({ajax:fmx_appPath+'filupld5dm.php', ajaxText:'Loading...', onLoad: cbf, target:'.upldr', overlay:5}).jqmShow(); },
+	H5o: function(cbf){ $('#upload').jqm({ajax:fmx_appPath+'filupld5dm.php', ajaxText:'Loading...', onLoad: cbf, onHide: function(h){refreshFilst();}, target:'.upldr', overlay:5}).jqmShow(); },
 	// legacy HTML in a popup window
 	L4w: function(){ popUp(fmx_appPath+'filupld.php'); },
 	// legacy HTML in a div overlay
-	L4o: function(){ $('#upload').jqm({ajax:fmx_appPath+'filupldm.php', ajaxText:'Loading...', target:'.upldr',overlay:5}).jqmShow(); },
+	L4o: function(){ $('#upload').jqm({ajax:fmx_appPath+'filupldm.php', ajaxText:'Loading...', onHide: function(h){refreshFilst();}, target:'.upldr',overlay:5}).jqmShow(); },
 	// chunked upload for very large files
 	Chk: function(){ popUp(fmx_appPath+'upchunk.php'); }
 	};
@@ -284,7 +284,7 @@ function doMenuAction(cmd,evt) {
 		$('#upload').jqm({ajax:fmx_appPath+'filcurlm.php', ajaxText:'Loading...', target:'.upldr',overlay:5}).jqmShow();
 		break;
 	case 'upld':
-		sessionStorage.fmx_curD = curDir;
+//		sessionStorage.fmx_curD = curDir;
 		if (doesSupportAjaxUploadWithProgress()) {
 			if (upload_winpop) {
 				upldAction.H5w();
@@ -346,6 +346,16 @@ function doMenuAction(cmd,evt) {
 					if (data) { alert(data); }
 				});
 			} else alert('Must be an XML file');
+		}
+		break;
+	case 'sql3':
+		if (!scnt || oneItem()) {
+			parms = '?dir='+curDir;
+			if (scnt) {
+				parms = '?dbf='+curDir+$(slctd[0]).parents('tr').attr('data-fref');
+			}
+			var fvurl = fmx_appPath+'pla/phpliteadmin.php'+parms;
+			pop(fvurl,screen.availHeight,screen.availWidth*0.8);
 		}
 		break;
 	case 'fmxi':
@@ -500,12 +510,14 @@ function fileDragin(e) {
 		e.target.className = (e.type == "dragover" ? "hover" : "");
 }
 
-// some functionality checks
-try { sessionStorage.fmx_ok = 1; }
-catch(err) { alert("Your browser 'sessionStorage' is not functioning. (private browsing?) Not all functions of FMX will work successfully."); }
-
-// initialize the UI
+// initialize session settings and the UI
 $(function() {
+	// some functionality checks
+	try { sessionStorage.fmx_ok = 1; }
+	catch(err) { alert("Your browser 'sessionStorage' is not functioning. (private browsing?) Not all functions of FMX will work successfully."); }
+
+	sessionStorage.fmx_curD = curDir;
+
 	$("#fmnu [data-mnu]").click(function(e) {e.preventDefault(); doMenuAction($(this).attr('data-mnu'),e); });
 	$("#trmfrm [data-mnu]").click(function(e) {e.preventDefault(); doMenuAction($(this).attr('data-mnu'),e); });
 	$("#ftbl [data-act]").click(function(e) {e.preventDefault(); doFileAction($(this).attr('data-act'),this,e); });
@@ -532,7 +544,7 @@ $(function() {
 		}
 	});
 	$('a.upldMenu').contextMenu('upldMenu', {
-		onContextMenu: function(e) { sessionStorage.fmx_curD = curDir; return true; },
+		onContextMenu: function(e) { /*sessionStorage.fmx_curD = curDir;*/ return true; },
 		bindings: {
 			'H5w': function(t) { upldAction.H5w(); },
 			'H5o': function(t) { upldAction.H5o(); },

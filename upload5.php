@@ -21,11 +21,9 @@ if ($_FILES['user_file'] && isset($_POST['fpath'])) {
 					}
 					$name = $uniq.$ext;
 				}
-				move_uploaded_file($tmp_name, $baseDir.$fpath.$name);
+				if (!@move_uploaded_file($tmp_name, $baseDir.$fpath.$name)) $msg = 'Could not move uploaded file to specified destination';
 			} else $msg .= 'failed to upload';
 		} else $msg .= "Error: $error";
 	}
 	exit($msg);
 }
-
-?>

@@ -159,11 +159,11 @@ else {
 		<li>
 			<a href="#" data-mnu="mnu">develop</a>
 			<ul class="fallback">
+				<li><a href="#" data-mnu="jxtr" data-req="1">jextract</a></li>
 				<li><a href="#" data-mnu="mmiz" data-req="0">minimize</a></li>
-				<li><a href="#" data-mnu="lint" data-req="0">lint</a></li>
+				<li><a href="#" data-mnu="sql3" data-req="0">sqlite3</a></li>
 			</ul>
 		</li>
-		<li><a href="#" data-mnu="jxtr" data-req="1">jextract</a></li>
 		<li><a href="#" data-mnu="fmxi" data-req="0">?</a></li>
 	</ul>
 	</nav>
@@ -319,7 +319,6 @@ Command: <input type="text" id="cmdlin" name="cmdlin" size="80" maxlength="200" 
 		<li id="L4w">L4win</li>
 		<li id="L4o">L4ovr</li>
 		<li id="Chk">Chunked</li>
-		<li id="FUo">from URL</li>
 	</ul>
 </div>
 <div class="contextMenu" id="fileCtxt">

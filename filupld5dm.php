@@ -31,7 +31,7 @@ var h5_fup = {
 	// optional array of allowed mime types
 	//ftypes: ['image/jpeg'],
 	payload: {'fpath':sessionStorage.fmx_curD, 'oefile':'1'},
-	done: function (errcnt) { refreshFilst(); }
+	done: function (errcnt) { if (!errcnt) refreshFilst(); }
 };
 <?php readfile('js/upload5d'.$jsver.'.js'); ?>
 </script>

@@ -1,5 +1,6 @@
 <?php
 error_reporting(-1);
+ini_set('display_errors', 'Off');
 require_once('functions.php');
 include 'cfg.php';
 $utmpdir = dirname($_SERVER['DOCUMENT_ROOT']).'/tmp/';
@@ -23,6 +24,11 @@ function _log($str) {
 		fputs($fp, $log_str);
 		fclose($fp);
 	}
+}
+
+function _errOut($str) {
+	header("HTTP/1.0 415 Failure");
+	echo $str;
 }
 
 /**
@@ -70,14 +76,14 @@ function createFileFromChunks($temp_dir, $fpath, $fileName, $chunkSize, $totalSi
 	if ($total_files * $chunkSize >=  ($totalSize - $chunkSize + 1)) {
 
 		// create the final destination file 
-		if (($fp = fopen($baseDir.$fpath.$fileName, 'w')) !== false) {
+		if (($fp = @fopen($baseDir.$fpath.$fileName, 'w')) !== false) {
 			for ($i=1; $i<=$total_files; $i++) {
 				fwrite($fp, file_get_contents($temp_dir.'/'.$fileName.'.part'.$i));
 				_log('writing chunk '.$i);
 			}
 			fclose($fp);
 		} else {
-			_log('cannot create the destination file: '.$baseDir.' : '.$fpath.' : '.$fileName);
+			_errOut('cannot create the destination file: '.$baseDir.' : '.$fpath.' : '.$fileName);
 			return false;
 		}
 
@@ -115,7 +121,7 @@ if (!empty($_FILES)) foreach ($_FILES as $file) {
 
 	// check the error status
 	if ($file['error'] != 0) {
-		_log('error '.$file['error'].' in file '.$_POST['resumableFilename']);
+		_errOut('error '.$file['error'].' in file '.$_POST['resumableFilename']);
 		continue;
 	}
 
@@ -131,7 +137,7 @@ if (!empty($_FILES)) foreach ($_FILES as $file) {
 
 	// move the temporary file
 	if (!move_uploaded_file($file['tmp_name'], $dest_file)) {
-		_log('Error saving (move_uploaded_file) chunk '.$_POST['resumableChunkNumber'].' for file '.$_POST['resumableFilename']);
+		_errOut('Error saving (move_uploaded_file) chunk '.$_POST['resumableChunkNumber'].' for file '.$_POST['resumableFilename']);
 	} else {
 		// check if all the parts present, and create the final destination file
 		createFileFromChunks($temp_dir, $_POST['fpath'], $_POST['resumableFilename'], $_POST['resumableChunkSize'], $_POST['resumableTotalSize']);
@@ -140,7 +146,7 @@ if (!empty($_FILES)) foreach ($_FILES as $file) {
 }
 ?>
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="upld-body">
 <head>
 	<title>Chunky Resumable Uploader</title>
 	<link rel="stylesheet" type="text/css" href="css/fmx.css" />
@@ -192,6 +198,8 @@ r.on('fileRetry', function(file){
   });
 r.on('fileError', function(file, message){
 	err_count++;
+	file.fpp.innerHTML += '<br />' + message;
+	file.fpp.className = 'failure';
     //console.debug(file, message);
   });
 r.on('uploadStart', function(){
@@ -200,7 +208,7 @@ r.on('uploadStart', function(){
 r.on('complete', function(){
 	//document.write("=");
     //console.debug();
-    parent.opener.refreshFilst(); if (!err_count) window.close();
+    parent.opener.refreshFilst(); //if (!err_count) window.close();
   });
 r.on('progress', function(){
     //console.debug();

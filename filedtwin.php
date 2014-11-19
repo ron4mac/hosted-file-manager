@@ -7,8 +7,9 @@ if (isset($_POST['savef'])) {
 	$fpath = $baseDir . $fref;
 	$fcon = doUnescape($_POST['fcontent']);
 	$rslt = file_put_contents($fpath, str_replace("\r\n","\n",$fcon));
+	header("X-XSS-Protection: 0");
 	if ($rslt === FALSE) echo 'FAILED TO SAVE :O(';
-	else echo 'SAVED :O)';
+	else echo '<!DOCTYPE html><html><head><title></title><script>window.close();</script></head></html>';
 	exit(0);
 }
 
@@ -62,6 +63,12 @@ function pop(url, h1, w1) {
 	var wcon="toolbar=no,status=no,location=no,menubar=no,resizable=0,scrollbars=1,width="+w1+",height="+h1+",left="+w2+",top="+h2;
 	return open(url, "", wcon);
 }
+window.addEventListener("beforeunload", function (e) {
+	if (!editor.session.getUndoManager().hasUndo() || editor.session.isSaving) return;
+	var confirmationMessage = "You have not saved changes to this document.";
+	(e || window.event).returnValue = confirmationMessage;	//Gecko + IE
+	return confirmationMessage								//Webkit, Safari, Chrome etc.
+});
 </script>
 <style>
 html, body {width:100%;height:100%;margin:0;padding:0;}
@@ -71,7 +78,7 @@ div.cntrl {float:left;margin-right:10px;}
 </style>
 </head>
 <body>
-	<form action="<?php echo array_pop($scrptFilPrts); ?>" method="post" name="sform" style="position:relative:height:33px;" onsubmit="eData.value=editor.getSession().getValue();return true;">
+	<form action="<?php echo array_pop($scrptFilPrts); ?>" method="post" name="sform" style="position:relative:height:33px;" onsubmit="eData.value=editor.session.getValue();editor.session.isSaving=true;return true;">
 		<ul id="navc" class="drop">
 			<li><img src="graphics/cfg16.png" />
 				<ul>
