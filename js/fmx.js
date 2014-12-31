@@ -1,5 +1,6 @@
 function refreshFilst() {
-	window.location.reload();
+	//window.location.reload();
+	window.location = window.location.href.split("#")[0];
 }
 
 function postAndRefresh(parms) {

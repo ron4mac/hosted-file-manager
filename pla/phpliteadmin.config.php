@@ -10,7 +10,7 @@
 // Please see http://code.google.com/p/phpliteadmin/wiki/Configuration for more details
 
 //password to gain access
-$password = 'Cola4reeJ';
+$password = 'hfm-fmx';
 
 //directory relative to this file to search for databases (if false, manually list databases in the $databases variable)
 $directory = false;	//'.';
@@ -83,7 +83,9 @@ $allowed_extensions = array('db','db3','sqlite','sqlite3');
 
 require_once('../functions.php');
 
-//$dbfBase = dirname($_SERVER['DOCUMENT_ROOT']);
+if (isset($fmxVersion) && (isset($rmtuser) || isset($userN))) $password = '';
+if (isset($dev_mode) and $dev_mode) $debug = true;
+
 if (isset($_GET['dbf'])) {
 	$databases = array( array('path'=> $baseDir.$_GET['dbf'], 'name'=> 'Database 1') );
 } elseif (isset($_GET['dir'])) {

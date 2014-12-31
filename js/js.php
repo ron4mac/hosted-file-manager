@@ -16,8 +16,7 @@ foreach ($jsfiles as $jsf) {
 $hash = $lastmod . '-' . md5(implode(':',$jsfiles));
 header("Etag: " . $hash);
 
-if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && stripslashes($_SERVER['HTTP_IF_NONE_MATCH']) == $hash)
-{
+if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && stripslashes($_SERVER['HTTP_IF_NONE_MATCH']) == $hash) {
 	// Return visit and no modifications, so do not send anything 
 	header ("HTTP/1.0 304 Not Modified"); 
 	header ('Content-Length: 0'); 
