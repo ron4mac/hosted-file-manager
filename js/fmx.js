@@ -141,18 +141,13 @@ function doesSupportAjaxUploadWithProgress() {
 
 	function supportFileAPI() {
 		return (typeof window.FileList !== 'undefined');
-	//	return (window.File && window.FileList);
-	//	var fi = document.createElement('INPUT');
-	//	fi.type = 'file';
-	//	return fi.hasOwnProperty('files');
 	}
 
 	function supportAjaxUploadProgressEvents() {
 		var xhr = new XMLHttpRequest();
-		return !! (xhr && (xhr.hasOwnProperty('upload')) && (xhr.upload.hasOwnProperty('onprogress')));
+		return !! (xhr && (('upload' in xhr) && ('onprogress' in xhr.upload)));
 	}
 
-	//return false;
 	return supportFileAPI() && supportAjaxUploadProgressEvents();
 }
 
@@ -308,8 +303,10 @@ function doMenuAction(cmd,evt) {
 			curfn = /*curDir+*/$(slctd[0]).parents('tr').attr('data-fref');
 			trmFrm = document.forms.cliterm;
 			if (cmd=='zip') {
+				var zcmd = "zip ";
+				if ($(slctd[0]).parent().next().hasClass('foldCtxt')) { zcmd += "-r "; }
 				destfn = curfn.replace(/\s/g,'_');
-				trmFrm.cmdlin.value = 'zip -r '+destfn+' "'+curfn+'"';
+				trmFrm.cmdlin.value = zcmd+destfn+'.zip "'+curfn+'"';
 			} else if (cmd=='uzip') {
 				trmFrm.cmdlin.value = 'unzip "'+curfn+'"';
 			} else if (cmd=='tarz') {

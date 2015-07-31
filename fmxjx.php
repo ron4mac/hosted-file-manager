@@ -224,8 +224,8 @@ fclose($fh_res);
 		}
 		break;
 	case 'CLIC':
-		echo file_get_contents('my_cliref.html');
-		echo file_get_contents('cliref.html');
+		if (file_exists('my_cliref.html')) echo file_get_contents('my_cliref.html');
+		if (file_exists('cliref.html')) echo file_get_contents('cliref.html');
 		break;
 	default:
 		echo $_POST['act'];

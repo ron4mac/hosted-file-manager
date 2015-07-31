@@ -38,7 +38,7 @@ class DirCheck
 		$l = str_repeat($lc, $lvl);
 		while ($val = current($node)) {
 			echo $l . key($node) . ($htm ? '<br />' : "\n");
-			if (is_array($val)) $this->traverse($val, $htm, $lvl+1);
+		//	if (is_array($val)) $this->traverse($val, $htm, $lvl+1);
 			next($node);
 		}
 	}
@@ -139,7 +139,7 @@ class Joomext
 			mkdir($this->fbase);
 			$this->traverse($this->instXml);
 			$this->log .= $this->instXmlRef.' -> '.$this->fbase."\n";
-			system('cp "'.$this->instXmlRef.'" "'.$this->fbase.'"',$rslt);
+			system('cp -p "'.$this->instXmlRef.'" "'.$this->fbase.'"',$rslt);
 			if ($rslt) $this->log .= $rslt."\n";
 			if ($this->extype == 'component') $this->asdchk->remPath($this->instXmlRef);
 			else $this->sdchk->remPath($this->instXmlRef);
@@ -321,7 +321,7 @@ class Joomext
 		$to = $dpath.DS;
 		//echo $fr.' -> '.$to."\n";
 		$this->log .= $fr.' -> '.$to."\n"; //return;
-		system('cp "'.$fr.'" "'.$to.'"',$rslt);
+		system('cp -p "'.$fr.'" "'.$to.'"',$rslt);
 		if ($rslt) $this->log .= $rslt."\n";	//echo $rslt;
 		if ($this->inAdmin || $fradm) $this->asdchk->remPath($fr);
 		else $this->sdchk->remPath($fr);
@@ -346,7 +346,7 @@ class Joomext
 		$to = $dpath.DS;
 		//echo $fr.' -> '.$to."\n";
 		$this->log .= $fr.' -> '.$to."\n"; //return;
-		system('cp "'.$fr.'" "'.$to.'"',$rslt);
+		system('cp -p "'.$fr.'" "'.$to.'"',$rslt);
 		if ($rslt) $this->log .= $rslt."\n";	//echo $rslt;
 		if ($this->inAdmin || $fradm) $this->asdchk->remPath($fr);
 		else $this->sdchk->remPath($fr);
@@ -367,7 +367,8 @@ class Joomext
 		$to = $ddir;
 		//echo $fr.' -> '.$to."\n";
 		$this->log .= $fr.' -> '.$to."\n"; //return;
-		system('cp -a "'.$fr.'" "'.$to.'"',$rslt);
+//		system('cp -a "'.$fr.'" "'.$to.'"',$rslt);
+		system('rsync -at --exclude=sv_* --exclude=~* "'.$fr.'/" "'.$to.'"',$rslt);
 		if ($rslt) $this->log .= $rslt."\n";	//echo $rslt;
 		if ($this->inAdmin) $this->asdchk->remPath($fr);
 		else $this->sdchk->remPath($fr);
