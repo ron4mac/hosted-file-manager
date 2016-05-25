@@ -67,7 +67,7 @@ if (isset($_POST['cmdlin'])) {
 	// get rid of backspaced characters (found in man pages)
 	$rsptxt = preg_replace('/.\x08/','',$rsptxt);
 	// mostly because of a possible </textarea>, escape tags
-//	$rsptxt = preg_replace(array('/</','/>/'),array('&lt;','&gt;'),$rsptxt);		removed since using <xmp> to wrap output
+	$rsptxt = preg_replace(array('/<xmp/','/<\/xmp/'),array('<x m p','</x m p'),$rsptxt);		//removed since using <xmp> to wrap output
 	}
 ?>
 <?php if (!$fmxInJoomla): ?>
@@ -159,9 +159,11 @@ else {
 		<li>
 			<a href="#" data-mnu="mnu">develop</a>
 			<ul class="fallback">
+				<li><a href="#" data-mnu="gitr" data-req="0">gitter</a></li>
 				<li><a href="#" data-mnu="jxtr" data-req="1">jextract</a></li>
 				<li><a href="#" data-mnu="mmiz" data-req="0">minimize</a></li>
 				<li><a href="#" data-mnu="sql3" data-req="0">sqlite3</a></li>
+				<li><a href="#" data-mnu="pvck" data-req="0">phpVerReq</a></li>
 			</ul>
 		</li>
 		<li><a href="#" data-mnu="fmxi" data-req="0">?</a></li>
@@ -215,7 +217,7 @@ foreach ($dFiles as $fle) {
 	$isLnk = ($fs[2] & 0xA000)==0xA000;
 	$rlnk = '';
 	if ($isLnk) {
-		$fs = stat($fPth);
+		$fs = @stat($fPth);
 		$rlnk = readlink($fPth);
 	}
 	$afle = ($pDir ? "$pDir/" : '') . $fle;

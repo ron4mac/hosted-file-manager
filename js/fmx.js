@@ -330,6 +330,16 @@ function doMenuAction(cmd,evt) {
 			pop(wPath+curfn,screen.availHeight,1200);
 		}
 		break;
+	case 'gitr':
+		if (oneItem()) {
+			if (".git" == $(slctd[0]).parents('tr').attr('data-fref')) {
+				parms = '?dir='+curDir;
+				pop(fmx_appPath+'gitter.php'+parms,screen.availHeight,1200);
+			} else {
+				alert("Please select a '.git' folder")
+			}
+		}
+		break;
 	case 'jxtr':
 		if (oneItem()) {
 			curfn = curDir+$(slctd[0]).parents('tr').attr('data-fref');
@@ -355,6 +365,10 @@ function doMenuAction(cmd,evt) {
 			var fvurl = fmx_appPath+'pla/phpliteadmin.php'+parms;
 			pop(fvurl,screen.availHeight,screen.availWidth*0.8);
 		}
+		break;
+	case 'pvck':
+		parms = '?dir='+curDir;
+		pop(fmx_appPath+'phpverreq.php'+parms,screen.availHeight,1200);
 		break;
 	case 'fmxi':
 		parms = {act: 'fmxi'};
@@ -406,7 +420,7 @@ var editWindow;
 
 function doViewFile(fpath) {
 	var fvurl = fmx_appPath+'filwin.php?fref='+fpath;
-	pop(fvurl,600,800);
+	pop(fvurl,675,900);
 }
 function doEditFile(fpath) {
 	var feurl = fmx_appPath+'filedtwin.php?fref='+fpath;

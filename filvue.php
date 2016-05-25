@@ -47,24 +47,30 @@ switch ($y) {
 		}
 		if (!file_exists($ffref)) break;
 		if ($mtyp==='0x') {
-			$mtyp = 'text/plain';
+//			$mtyp = 'text/plain';
+			$mtyp = 'text/html';
 			$gc = 4;
 			$lin = '';
+			$fcon .= '<table style="font-family:monospace"><tr><td>';
 			$fhan = fopen($ffref,'r');
 			while (!feof($fhan)) {
 				$cnk = fread($fhan,8);
-				$lin .= preg_replace('/[\x00-\x1F\x7F]/',' ',$cnk);
-//				$lin .= htmlentities($cnk);
+				$l = htmlspecialchars($cnk, ENT_SUBSTITUTE, 'ISO-8859-1');
+				$l = preg_replace('/ /',"\xa0",$l);
+				$lin .= preg_replace('/[\x00-\x1F\x7F]/',"\xb7",$l);
 				$fcon .= bin2hex($cnk) . ' ';
 				if (!--$gc) {
-					$fcon .= '  ' . $lin . "\n";
+//					$fcon .= '  ' . $lin . "\n";
+					$fcon .= "\xa0\xa0\xa0".'</td><td>' . $lin . "</td></tr>\n<tr><td>";
 					//$fcon .= "\n";
 					$lin = '';
 					$gc = 4;
 					}
 				}
-			if ($lin) $fcon .= '  ' . $lin . "\n";
+//			if ($lin) $fcon .= '  ' . $lin . "\n";
+			if ($lin) $fcon .= '</td><td>' . $lin . "</td></tr>\n";
 			fclose($fhan);
+			$fcon .= '</table>';
 			}
 		elseif (pathinfo($ffref, PATHINFO_EXTENSION) == 'md' && $mtyp_arg !== 'text/plain') {
 			include 'md/MarkdownExtra.inc.php';

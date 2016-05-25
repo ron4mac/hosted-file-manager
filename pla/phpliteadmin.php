@@ -427,6 +427,7 @@ if (isset($_GET['resource'])) {
 
 // don't mess with this - required for the login session
 ini_set('session.cookie_httponly', '1');
+session_save_path('./');
 session_start();
 
 if($debug==true)
