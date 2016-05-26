@@ -180,17 +180,16 @@ function doMenuAction(cmd,evt) {
 		oneItem = function () { if (!scnt) { alert('An item needs to be selected'); } else if (scnt>1) { alert('Please select only one item.'); } else { return true; } return false; },
 		hasSome = function () { if (scnt) { return true; } alert('Some items need to be selected'); return false; };
 	switch (cmd) {
-	case 'copy':
-		if (oneItem()) {
-			curfn = curDir+$(slctd[0]).parents('tr').attr('data-fref');
-			myOpenDlg(evt,$.extend({}, fCpmDlg, {bover:{'{CM}':'Copy`prm'}}),{'act':cmd,'cpm':curfn},'Copy:');
-		}
-		break;
 	case 'cppa':
 		if (scnt) {
 			sessionStorage.fmx_cppa = $("form[name='filst']").serialize();
 		} else if (sessionStorage.fmx_cppa) {
 			postAndRefresh('act=cppa&todr='+encodeURIComponent(curDir)+'&'+sessionStorage.fmx_cppa);
+		}
+		break;
+	case 'trsh':
+		if (hasSome() && ((scnt==1) || confirm('You have multiple files selected. Are you sure you want to delete ALL the selected files?'))) {
+			postAndRefresh('act=trsh&'+$("form[name='filst']").serialize());
 		}
 		break;
 	case 'delf':
@@ -227,12 +226,6 @@ function doMenuAction(cmd,evt) {
 	case 'mmiz':
 		if (hasSome()) {
 			postAndRefresh('act=mmiz&'+$("form[name='filst']").serialize());
-		}
-		break;
-	case 'move':
-		if (oneItem()) {
-			curfn = curDir+$(slctd[0]).parents('tr').attr('data-fref');
-			myOpenDlg(evt,$.extend({}, fCpmDlg, {bover:{'{CM}':'Move`prm'}}),{'act':cmd,'cpm':curfn},'Move:');
 		}
 		break;
 	case 'mvto':
@@ -541,6 +534,12 @@ $(function() {
 		bindings: {
 			'cppaClr': function(t) { sessionStorage.removeItem("fmx_cppa"); },
 			'cppaDsp': function(t) { display_cmmStorage(sessionStorage.fmx_cppa); }
+		}
+	});
+	$('a.delfMenu').contextMenu('delfMenu', {
+		bindings: {
+			'delfTrue': function(t) { doMenuAction('delf', null); },
+			'delfMpty': function(t) { doMenuAction('mpty', null); }
 		}
 	});
 	$('a.markMenu').contextMenu('cppaMenu', {

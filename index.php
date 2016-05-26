@@ -122,13 +122,12 @@ else {
 				<li><a href="#" data-mnu="utrz" data-req="2">untar/gz</a></li>
 			</ul>
 		</li>
-	<!--	<li><a href="#" data-mnu="copy" data-req="2">copy</a></li> -->
 		<li><a href="#" data-mnu="cppa" data-req="2" class="cppaMenu">copy/paste</a></li>
-		<li><a href="#" data-mnu="delf" data-req="2">delete</a></li>
+		<!-- <li><a href="#" data-mnu="delf" data-req="2">delete</a></li> -->
+		<li><a href="#" data-mnu="trsh" data-req="2" class="delfMenu">delete</a></li>
 		<li><a href="#" data-mnu="dnld" data-req="2">download</a><div class="dnldprg"> rr</div></li>
 		<li><a href="#" data-mnu="dupl" data-req="2">duplicate</a></li>
 		<li><a href="#" data-mnu="mark" data-req="2" class="markMenu">mark</a></li>
-	<!--	<li><a href="#" data-mnu="move" data-req="2">move</a></li> -->
 		<li><a href="#" data-mnu="mvto" data-req="2" class="mvtoMenu">move/to</a></li>
 		<li>
 			<a href="#" data-mnu="mnu">new</a>
@@ -154,7 +153,7 @@ else {
 			</ul>
 		</li>
 		<li><a href="#" data-mnu="upld" data-req="0" class="upldMenu">upload</a></li>
-		<li><a href="#" data-mnu="webv" data-req="0">webview</a><!-- <span style="padding-left:8px"> || </span> --></li>
+		<li><a href="#" data-mnu="webv" data-req="0">webview</a></li>
 		<li>&nbsp;&nbsp;&nbsp;||&nbsp;</li>
 		<li>
 			<a href="#" data-mnu="mnu">develop</a>
@@ -286,16 +285,12 @@ Command: <input type="text" id="cmdlin" name="cmdlin" size="80" maxlength="200" 
 <br />With selection:
 &nbsp;<a href="#" onclick="event.preventDefault();selectionAction(true)">edit</a>
 &nbsp;<a href="#" onclick="event.preventDefault();selectionAction(false)">view</a>
-<!-- <input type="button" value="Act on selection" onclick="selectionAction(false);"> -->
 <br /><div style="padding:6px;border:1px solid #BBB;background-color:#FFF"><xmp style="margin:0"><?php echo $rsptxt ?></xmp></div>
-<!-- <br /><textarea id="cmdRsp" name="rsptxt" rows="40" onselect="noselectionAction()"><-?php echo $rsptxt ?-></textarea> -->
 <script type="text/javascript">window.location.hash="cmdRsp";</script>
 <?php endif; ?>
 </div>
 <?php endif; ?>
 <div style="display:none">
-<!-- <div id="fCpyDlog" title="Copy:"><input type="hidden" name="cpyfnm" value="{cpy}" /><p>From: {cpy}</p>To: <input type="text" name="cpy2nam" value="{cpy}" size="70" maxlength="100" /></div> -->
-<!-- <div id="fMovDlog" title="Move:"><input type="hidden" name="movfnm" value="{mov}" /><p>From: {mov}</p>To: <input type="text" name="mov2nam" value="{mov}" size="70" maxlength="100" /></div> -->
 <div id="aMsgDlog" title="Message:"><span class="aMsg">{msg}</span></div>
 <div id="aSchDlog" title="Search:"><input type="hidden" name="cmd" value="{cmd}" /><input type="text" name="sterm" value="{trm}" size="55" maxlength="80" /></div>
 <div id="fRenDlog" title="Rename:"><input type="hidden" name="oldnm" value="{old}" /><input type="text" name="nunam" value="{new}" size="55" maxlength="80" /></div>
@@ -312,6 +307,12 @@ Command: <input type="text" id="cmdlin" name="cmdlin" size="80" maxlength="200" 
 	<ul>
 		<li id="cppaClr">Clear</li>
 		<li id="cppaDsp">Display</li>
+	</ul>
+</div>
+<div class="contextMenu" id="delfMenu">
+	<ul>
+		<li id="delfTrue">Truly Delete</li>
+		<li id="delfMpty">Empty Trash</li>
 	</ul>
 </div>
 <div class="contextMenu" id="upldMenu">

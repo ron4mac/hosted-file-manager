@@ -5,11 +5,6 @@ require_once('functions.php');
 $fref = isset($_POST['fref']) ? $baseDir.doUnescape($_POST['fref']) : '';
 
 switch ($_POST['act']) {
-	case 'copy':
-		$tonam = $baseDir.escapeshellcmd($_POST['tonm']);
-		system('cp -a "'.$fref.'" "'.$tonam.'"',$rslt);
-		if ($rslt) echo $rslt;
-		break;
 	case 'cppa':
 		$todir = $baseDir.escapeshellcmd($_POST['todr']);
 		$path = escapeshellcmd($_POST['dir']);
@@ -18,7 +13,7 @@ switch ($_POST['act']) {
 		foreach ($files as $fle) {
 			system('cp -a "' . "$baseDir$path/".rtrim(doUnescape($fle),' /') . '" "'.$todir.'"',$irslt);
 			$rslt += $irslt;
-			}
+		}
 		if ($rslt) echo $rslt;
 		break;
 	case 'crlg':
@@ -93,12 +88,25 @@ fclose($fh_res);
 			if ($ftime > 0) touch($fullfile, $ftime);
 		}
 		break;
+	case 'trsh':
+		$path = escapeshellcmd($_POST['dir']);
+		$files = $_POST['files'];
+		$todir = $baseDir.'tmp/Trash';
+		@mkdir($todir, 0777, true);
+		$rslt = '';
+		foreach ($files as $fle) {
+			$cmd = 'mv -t "'.$todir.'" "'."$baseDir$path/".rtrim(doUnescape($fle),' /').'"';
+			system($cmd, $irslt);
+			$rslt += $irslt;
+		}
+		if ($rslt) echo $cmd.$rslt;
+		break;
 	case 'delf':
 		$path = escapeshellcmd($_POST['dir']);
 		$files = $_POST['files'];
 		foreach ($files as $fle) {
 			recursiveDelete("$baseDir$path/".rtrim(doUnescape($fle),' /'));
-			}
+		}
 		break;
 	case 'dnld':
 		$path = escapeshellcmd($_POST['dir']);
@@ -108,18 +116,18 @@ fclose($fh_res);
 			if ($sfil[strlen($sfil)-1]!=='/') {
 				echo json_encode(array("fpth"=>$path."/$sfil"));
 				break;
-				}
 			}
+		}
 		//zip required for multiples
 		$zh = new ZipArchive();
 		$zfn = 'tmp/files.zip';
 		if ($zh->open($baseDir.$zfn, ZIPARCHIVE::CREATE)!==TRUE) {
 			exit("cannot open <$zfn>\n");
-			}
+		}
 		foreach ($files as $fle) {
 			if ($fle[strlen($fle)-1]=='/') { addDirToAcrhive("$baseDir$path/",doUnescape($fle),$zh); }
 			else { $zh->addFile("$baseDir$path/".doUnescape($fle),$fle); }
-			}
+		}
 		$zh->close();
 		echo json_encode(array("fpth"=>$zfn,"rad"=>"Y"));
 		break;
@@ -130,7 +138,7 @@ fclose($fh_res);
 		$nn = 1;
 		while (file_exists($pfmx.'_'.$nn.$pfxp)) {
 			$nn++;
-			}
+		}
 		system('cp -a "'.$pfmx.$pfxp.'" "'.$pfmx.'_'.$nn.$pfxp.'"',$rslt);
 		if ($rslt) echo $rslt;
 		break;
@@ -165,11 +173,6 @@ fclose($fh_res);
 			mmizFile("$baseDir$path/".rtrim(doUnescape($fle)));
 		}
 		break;
-	case 'move':
-		$tonam = $baseDir.escapeshellcmd($_POST['tonm']);
-		system('mv -f "'.$fref.'" "'.$tonam.'"',$rslt);
-		if ($rslt) echo $rslt;
-		break;
 	case 'mvto':
 		$todir = $baseDir.escapeshellcmd($_POST['todr']);
 		$path = escapeshellcmd($_POST['dir']);
@@ -179,7 +182,7 @@ fclose($fh_res);
 			$cmd = 'mv -b -t "'.$todir.'" "'."$baseDir$path/".rtrim(doUnescape($fle),' /').'"';
 			system($cmd, $irslt);
 			$rslt += $irslt;
-			}
+		}
 		if ($rslt) echo $cmd.$rslt;
 		break;
 	case 'nfld':
