@@ -89,6 +89,7 @@ if (isset($_POST['cmdlin'])) {
 var fmx_appPath = '';
 var fmx_AJ='fmxjx.php';
 var curDir='<?php echo $pDir; ?>/';
+var ctxPrf='<?php echo isset($_SERVER['CONTEXT_PREFIX']) ? $_SERVER['CONTEXT_PREFIX'] : ''; ?>';
 var upload_winpop = <?php echo isset($fmx_upload_winpop)?'true':'false' ?>;
 </script>
 </head>

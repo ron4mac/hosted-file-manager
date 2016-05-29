@@ -322,7 +322,7 @@ function doMenuAction(cmd,evt) {
 				if (xyz) { curfn = xyz; }
 				else break;
 			}
-			var wPath = curDir.slice(curDir.search("/"));
+			var wPath = ctxPrf+curDir.slice(curDir.search("/"));
 			pop(wPath+curfn,screen.availHeight,1200);
 		}
 		break;
