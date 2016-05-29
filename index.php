@@ -58,6 +58,10 @@ $rDir = $basDir . ($pDir ? "/$pDir" : '');
 // current directory name
 $rootD = basename($basDir);
 
+// get count of trash files
+$trshs = @scandir($basDir.'/tmp/Trash');
+$trshc = ($trshs && count($trshs)>2) ? ('('.(count($trshs)-2).')') : '';
+
 if (isset($_POST['cmdlin'])) {
 	$cmd = $_POST['cmdlin'];
 	if (get_magic_quotes_gpc()) { $cmd = stripslashes($cmd); }
@@ -124,7 +128,7 @@ else {
 		</li>
 		<li><a href="#" data-mnu="cppa" data-req="2" class="cppaMenu">copy/paste</a></li>
 		<!-- <li><a href="#" data-mnu="delf" data-req="2">delete</a></li> -->
-		<li><a href="#" data-mnu="trsh" data-req="2" class="delfMenu">delete</a></li>
+		<li><a href="#" data-mnu="trsh" data-req="2" class="delfMenu">delete<?=$trshc?></a></li>
 		<li><a href="#" data-mnu="dnld" data-req="2">download</a><div class="dnldprg"> rr</div></li>
 		<li><a href="#" data-mnu="dupl" data-req="2">duplicate</a></li>
 		<li><a href="#" data-mnu="mark" data-req="2" class="markMenu">mark</a></li>

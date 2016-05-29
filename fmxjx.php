@@ -101,6 +101,15 @@ fclose($fh_res);
 		}
 		if ($rslt) echo $cmd.$rslt;
 		break;
+	case 'mpty':
+		$trd = $baseDir.'tmp/Trash/';
+		$trshs = @scandir($trd);
+		if (!$trshs) break;
+		foreach ($trshs as $trsh) {
+			if ($trsh=='.' || $trsh=='..') continue;
+			recursiveDelete($trd.$trsh);
+		}
+		break;
 	case 'delf':
 		$path = escapeshellcmd($_POST['dir']);
 		$files = $_POST['files'];

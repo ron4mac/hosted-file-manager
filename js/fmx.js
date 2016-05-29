@@ -192,6 +192,9 @@ function doMenuAction(cmd,evt) {
 			postAndRefresh('act=trsh&'+$("form[name='filst']").serialize());
 		}
 		break;
+	case 'mpty':
+		postAndRefresh('act=mpty');
+		break;
 	case 'delf':
 		if (hasSome() && ((scnt==1) || confirm('You have multiple files selected. Are you sure you want to delete ALL the selected files?'))) {
 			postAndRefresh('act=delf&'+$("form[name='filst']").serialize());
