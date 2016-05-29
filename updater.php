@@ -89,4 +89,23 @@ function installUpdate ($fpath) {	// NEED TO GET PATH TO INSTALL
 	}
 }
 
+if (!isset($baseDir)) {
+	require_once 'functions.php';
+	if (isset($_POST['up2mast'])) {
+		performUpdate('https://github.com/ron4mac/hosted-file-manager/archive/master.zip');
+	}
+	else echo <<<EOT
+<!DOCTYPE html>
+<html>
+<head>
+<title>FMX Update to Current Master</title>
+</head>
+<body>
+	<form action="" method="POST">
+		<button type="submit" name="up2mast">Update to Current FMX Master</button>
+	</form>
+</body>
+</html>
+EOT;
+}
 ?>
