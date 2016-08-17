@@ -95,7 +95,16 @@ fclose($fh_res);
 		@mkdir($todir, 0777, true);
 		$rslt = '';
 		foreach ($files as $fle) {
-			$cmd = 'mv -t "'.$todir.'" "'."$baseDir$path/".rtrim(doUnescape($fle),' /').'"';
+			$fod = rtrim(doUnescape($fle),' /');
+			$fpth = "$baseDir$path/".$fod;
+			if (is_dir($fpth) && file_exists($todir."/$fod")) {
+				$nn = 1;
+				while (file_exists($todir."/$fod".'_'.$nn)) {
+					$nn++;
+				}
+				rename($todir."/$fod", $todir."/$fod".'_'.$nn);
+			}
+			$cmd = 'mv --backup=numbered -t "'.$todir.'" "'.$fpth.'"';
 			system($cmd, $irslt);
 			$rslt += $irslt;
 		}

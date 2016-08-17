@@ -35,7 +35,7 @@ $databases = array(
 /* ---- Interface settings ---- */
 
 // Theme! If you want to change theme, save the CSS file in same folder of phpliteadmin or in folder "themes"
-$theme = 'phpliteadmin.css';
+$theme = 'default.css';	//'phpliteadmin.css';
 
 // the default language! If you want to change it, save the language file in same folder of phpliteadmin or in folder "languages"
 // More about localizations (downloads, how to translate etc.): http://code.google.com/p/phpliteadmin/wiki/Localization
@@ -47,6 +47,8 @@ $rowsNum = 30;
 // reduce string characters by a number bigger than 10
 $charsNum = 300;
 
+// maximum number of SQL queries to save in the history
+$maxSavedQueries = 10;
 
 /* ---- Custom functions ---- */
 
