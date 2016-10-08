@@ -334,7 +334,9 @@ Command: <input type="text" id="cmdlin" name="cmdlin" size="80" maxlength="200" 
 		<li id="cfi_edt">Edit</li>
 		<li id="cfi_del">Delete</li>
 		<li id="cfi_dld">Download</li>
+		<li id="cfi_dup">Duplicate</li>
 		<li id="cfi_ren">Rename</li>
+		<li id="cfi_zip">Zip</li>
 	</ul>
 </div>
 <div class="contextMenu" id="foldCtxt">
