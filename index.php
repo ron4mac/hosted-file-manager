@@ -80,7 +80,6 @@ if (isset($_POST['cmdlin'])) {
 <head>
 <title>Files :: <?php echo $rootD?></title>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Language" content="en" />
 <meta name="google" content="notranslate">
 <link rel="stylesheet" type="text/css" href="css/css.php" />
 <script src="<?=$jqlink?>"></script>

@@ -162,6 +162,7 @@ function popPost (url, data, name, h1, w1) {
 	var flds = "", key;
 	for (key in data) { flds += '<input type="hidden" name="'+key+'" value="'+data[key]+'" />'; }
 	var ppf = $('<form action="'+url+'" method="post" target="'+name+'">'+flds+'</form>');
+	$(document.body).append(ppf);
 	var h2 = (screen.height-h1)/2;
 	var w2 = (screen.width-w1)/2;
 	var wcon="toolbar=no,status=no,location=no,menubar=no,resizable=0,scrollbars=1,width="+w1+",height="+h1+",left="+w2+",top="+h2;
