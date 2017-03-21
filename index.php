@@ -105,12 +105,17 @@ if ($pDir) {
 		$href .= $fold;
 		print '/<a href="'.$href.'">'.$fold.'</a>';
 		$href .= '/';
-		}
+	}
 	print "/$curD";
+	$aRef = $_SERVER['PHP_SELF'];	//'index.php';
+	if (dirname($pDir)!='.') {
+		$aRef .= '?dir=' . urlencode(dirname($pDir));
 	}
-else {
+	$parntBut = '<a href="'.$aRef.'" title="Up to parent"><img src="'.$appB.'icons/arrow-ret.png" width="16" height="16" alt="" /></a>';
+} else {
 	print $rootD;
-	}
+	$parntBut = '&nbsp;';
+}
 ?>
 </span>
 <hr style="margin:6px 0" />
@@ -177,33 +182,25 @@ else {
 <form name="filst" id="filsform">
 	<input type="hidden" name="dir" value="<?php echo $pDir;?>" />
 	<table id="ftbl">
+		<thead>
 		<tr>
-		<th>&nbsp;</th>
-		<th>&nbsp;</th>
+		<td><input type="checkbox" onchange="allSelect(event,this)" /></td>
+		<td><?=$parntBut?></td>
 		<th class='left'>Name</th>
-		<th>&nbsp;&nbsp;</th>
-		<th class='left'>Last Modified</th>
-		<th>&nbsp;&nbsp;</th>
-		<th class='right'>Size</th>
-		<th>&nbsp;&nbsp;</th>
-		<th class='left'>Description</th>
+		<th class='left tpad'>Last Modified</th>
+		<th class='right tpad'>Size</th>
+		<th class='left tpad'>Description</th>
 		</tr>
+		</thead>
 <?php
-if ($pDir) {
-	$aRef = $_SERVER['PHP_SELF'];	//'index.php';
-	if (dirname($pDir)!='.') {
-		$aRef .= '?dir=' . urlencode(dirname($pDir));
-		}
-	echo '<tr><td><input type="checkbox" onchange="allSelect(event,this)" /></td><td><img src="'.$appB.'icons/arrow-ret.png" width="16" height="16" alt="" /></td><td colspan="7"><a href="'.$aRef.'">Parent&nbsp;Folder</a></td></tr>';
-}
 $dFiles = array();
 if ($drsrc = @opendir($rDir)) {
-    while (false !== ($entry = readdir($drsrc))) {
-        if ($entry != "." && $entry != "..") {
-            $dFiles[] = $entry;
-        }
-    }
-    closedir($drsrc);
+	while (false !== ($entry = readdir($drsrc))) {
+		if ($entry != "." && $entry != "..") {
+			$dFiles[] = $entry;
+		}
+	}
+	closedir($drsrc);
 } else {
 	$error = error_get_last();
 	echo '<span style="color:red">Could not read directory: '.$dDir.'<br />Error: '.$error['message'].'</span>';	//Error("Could not read directory $rDir: $!");
@@ -235,9 +232,9 @@ foreach ($dFiles as $fle) {
 		}
 		echo '<td class="diricon foldCtxt"> </td>';
 		echo '<td class="foldCtxt"><a href="index.php?dir='.$efle.'">'.$fle.'</a>'.($isLnk ? " &rarr; $rlnk" : '').'</td>';
-		echo '<td></td><td>'.$dt.'</td><td></td>';
-		echo '<td class="right">--</td>';
-		echo '<td></td><td><a href="#" data-act="finf"><img src="'.$appB.'graphics/info10x10.gif" width="10" height="10" alt="" /></a></td>';
+		echo '<td class="tpad">'.$dt.'</td>';
+		echo '<td class="right tpad">--</td>';
+		echo '<td class="tpad"><a href="#" data-act="finf"><img src="'.$appB.'graphics/info10x10.gif" width="10" height="10" alt="" /></a></td>';
 		echo '</tr>'."\n";
 		}
 	else {
@@ -265,9 +262,9 @@ foreach ($dFiles as $fle) {
 			echo '<td class="filicon fileCtxt">&nbsp;</td>';
 		}
 		print '<td class="fileCtxt"><a href="#" data-act="fvue">'.$ufle.'</a>'.($isLnk ? " &rarr; $rlnk" : '').'</td>';
-		echo '<td></td><td>'.$dt.'</td><td></td>';
-		echo '<td class="right">'.$sz.'</td>';
-		echo '<td></td><td><a href="#" data-act="finf"><img src="'.$appB.'graphics/info10x10.gif" width="10" height="10" alt="" /></a></td>';
+		echo '<td class="tpad">'.$dt.'</td>';
+		echo '<td class="right tpad">'.$sz.'</td>';
+		echo '<td class="tpad"><a href="#" data-act="finf"><img src="'.$appB.'graphics/info10x10.gif" width="10" height="10" alt="" /></a></td>';
 		echo '</tr>'."\n";
 		}
 }
@@ -347,6 +344,21 @@ Command: <input type="text" id="cmdlin" name="cmdlin" size="80" maxlength="200" 
 		<li id="cfo_zip">Zip</li>
 	</ul>
 </div>
+<script>
+	var $table = $('#ftbl'),
+		$bodyCells = $table.find('tbody tr:first').children(),
+		colWidth;
+
+	// Get the tbody columns width array
+	colWidth = $bodyCells.map(function() {
+		return $(this).width();
+	}).get();
+
+	// Set the width of thead columns
+	$table.find('thead tr').children().each(function(i, v) {
+		$(v).width(colWidth[i]);
+	});
+</script>
 <?php if (!$fmxInJoomla): ?>
 </body>
 </html>

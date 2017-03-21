@@ -9,6 +9,22 @@ span.pathbread {
 
 #ftbl {
 	border: none;
+	width: 100%;
+}
+
+#ftbl thead, #ftbl tbody {
+	display: block;
+}
+
+#ftbl tbody {
+	max-height: 600px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+.tpad {
+	padding-left: 1em;
+/*	padding-right: 2em;*/
 }
 
 #ftbl th, #ftbl td {
