@@ -358,6 +358,13 @@ Command: <input type="text" id="cmdlin" name="cmdlin" size="80" maxlength="200" 
 	$table.find('thead tr').children().each(function(i, v) {
 		$(v).width(colWidth[i]);
 	});
+
+	// Set file table scrolling height
+	//$('#ftbl tbody').css('max-height', (window.innerHeight - 180) + 'px');
+	$(window).resize(function() {
+		$('#ftbl tbody').css('max-height', (window.innerHeight - 180) + 'px');
+	});
+	$(window).trigger('resize');
 </script>
 <?php if (!$fmxInJoomla): ?>
 </body>

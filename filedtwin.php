@@ -69,6 +69,12 @@ window.addEventListener("beforeunload", function (e) {
 	(e || window.event).returnValue = confirmationMessage;	//Gecko + IE
 	return confirmationMessage								//Webkit, Safari, Chrome etc.
 });
+function kbdHelp () {
+	ace.config.loadModule("ace/ext/keybinding_menu", function(module) {
+		module.init(editor);
+		editor.showKeyboardShortcuts()
+	})
+}
 </script>
 <style>
 html, body {width:100%;height:100%;margin:0;padding:0;}
@@ -96,7 +102,7 @@ div.cntrl {float:left;margin-right:10px;}
 							<li onclick="editor.getSession().setMode('ace/mode/mysql')">mysql</li>
 						</ul>
 					</li>
-					<li onclick="pop('acecommands.html',600,600)">Command Guide</li>
+					<li onclick="kbdHelp()">Command Guide</li>
 				</ul>
 			</li>
 		</ul>
