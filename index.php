@@ -271,16 +271,21 @@ foreach ($dFiles as $fle) {
 ?>
 	</table>
 </form>
-<hr /><br />
+<div id="footerPop">
+	<div id="footerPopButton"></div>
+	<div id="footerPopContent">
+		<form name="cliterm" method="post">
+		<input type="hidden" name="dir" value="<?php echo $pDir ?>" />
+		<input type="hidden" name="mcmdlin" value="" />
+		Command: <input type="text" id="cmdlin" name="cmdlin" size="80" maxlength="200" />
+		<input type="button" name="doCmd" value="Do it" onclick="fils2up()" />
+		<a href="#" data-mnu="cmcs" data-req="0">?</a>
+		</form>
+	</div>
+</div>
+<!-- <hr /><br /> -->
 <?php if (isset($fmx_ui_cli) && $fmx_ui_cli) : ?>
 <div id="trmfrm">
-<form name="cliterm" method="post">
-<input type="hidden" name="dir" value="<?php echo $pDir ?>" />
-<input type="hidden" name="mcmdlin" value="" />
-Command: <input type="text" id="cmdlin" name="cmdlin" size="80" maxlength="200" />
-<input type="button" name="doCmd" value="Do it" onclick="fils2up()" />
-<a href="#" data-mnu="cmcs" data-req="0">?</a>
-</form>
 <?php if (isset($rsptxt) && $rsptxt) : ?>
 <a name="cmdRsp"></a>
 <br />With selection:
@@ -362,9 +367,24 @@ Command: <input type="text" id="cmdlin" name="cmdlin" size="80" maxlength="200" 
 	// Set file table scrolling height
 	//$('#ftbl tbody').css('max-height', (window.innerHeight - 180) + 'px');
 	$(window).resize(function() {
-		$('#ftbl tbody').css('max-height', (window.innerHeight - 180) + 'px');
+		var bhgt = Math.ceil($('#ftbl tbody').position().top) + parseInt($('body').css('margin-bottom')) + 6;
+		$('#ftbl tbody').css('max-height', (window.innerHeight - bhgt) + 'px');
+	//	console.log(bhgt);
 	});
 	$(window).trigger('resize');
+
+	// set footer popup trigger
+	var fpopen = false;
+	$('#footerPopButton').click(function () {
+		if (fpopen === false) {
+				$('#footerPopContent').addClass('open');
+			fpopen = true;
+		} else {
+				$('#footerPopContent').removeClass('open');
+			fpopen = false;
+		}
+	});
+
 </script>
 <?php if (!$fmxInJoomla): ?>
 </body>

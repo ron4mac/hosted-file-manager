@@ -568,17 +568,6 @@ function cm_zip (itm, fld) {
 
 // initialize session settings and the UI
 $(function() {
-	// fix file table thead/tbody widths
-/*	var colNumber=9; //number of table columns
-	for (var i=0; i<colNumber; i++) {
-		var thWidth=$("#ftbl").find("th:eq("+i+")").width();
-		var tdWidth=$("#ftbl").find("td:eq("+i+")").width();
-		if (thWidth<tdWidth)
-			$("#ftbl").find("th:eq("+i+")").width(tdWidth);
-		else
-			$("#ftbl").find("td:eq("+i+")").width(thWidth);
-	}*/
-
 	// some functionality checks
 	try { sessionStorage.fmx_ok = 1; }
 	catch(err) { alert("Your browser 'sessionStorage' is not functioning. (private browsing?) Not all functions of FMX will work successfully."); }
