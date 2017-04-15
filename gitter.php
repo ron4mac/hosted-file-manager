@@ -26,22 +26,25 @@ if (isset($_POST['commit'])) {
 if (isset($_POST['pull'])) $rslt .= `git pull --rebase`;
 
 if (isset($_POST['push'])) {
-	$cfgf = file_get_contents('.git/config');
-	if (!$cfgf) { $msg = 'config file is missing'; break; }
-	$ncfg = $cfgf;
-	$ptrn = '#\[remote "([^"]+)"\][^\[]+\t+url = https://#';
-	if (!preg_match($ptrn, $ncfg, $mtchs)) { $msg = 'pattern not found'; break; }
-	//var_dump($mtchs);
-	$remote = $mtchs[1];
-	$brchsel = trim($_POST['brchsel']);
-	$ncfg = preg_replace('#url = https://#', 'url = https://'.$_POST['user'].':'.$_POST['pass'].'@', $ncfg, 1);
-	file_put_contents('.git/config', $ncfg);
-	if (isset($_POST['force'])) {
-		$rslt .= `git push --force {$remote} {$brchsel}`;
-	} else {
-		$rslt .= `git push {$remote} {$brchsel}`;
+	while (true) {
+		$cfgf = file_get_contents('.git/config');
+		if (!$cfgf) { $msg = 'config file is missing'; break; }
+		$ncfg = $cfgf;
+		$ptrn = '#\[remote "([^"]+)"\][^\[]+\t+url = https://#';
+		if (!preg_match($ptrn, $ncfg, $mtchs)) { $msg = 'pattern not found'; break; }
+		//var_dump($mtchs);
+		$remote = $mtchs[1];
+		$brchsel = trim($_POST['brchsel']);
+		$ncfg = preg_replace('#url = https://#', 'url = https://'.$_POST['user'].':'.$_POST['pass'].'@', $ncfg, 1);
+		file_put_contents('.git/config', $ncfg);
+		if (isset($_POST['force'])) {
+			$rslt .= `git push --force {$remote} {$brchsel}`;
+		} else {
+			$rslt .= `git push {$remote} {$brchsel}`;
+		}
+		file_put_contents('.git/config', $cfgf);
+		break;
 	}
-	file_put_contents('.git/config', $cfgf);
 }
 
 $uname = `git config --local user.name`;

@@ -156,8 +156,8 @@ input[type="checkbox"] {
 #footerPopContent form {
 	position: absolute ;
 	left: 1em;
-	top: 0.5em;
+	top: 1em;
 }
 #footerPopContent.open {
-	height: 40px;
+	height: 70px;
 }

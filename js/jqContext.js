@@ -113,6 +113,6 @@
 
 })(jQuery);
 
-$(function() {
-	$('div.contextMenu').hide();
-});
+//$(function() {
+//	$('div.contextMenu').hide();
+//});

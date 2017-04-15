@@ -296,58 +296,58 @@ foreach ($dFiles as $fle) {
 <?php endif; ?>
 </div>
 <?php endif; ?>
-<div style="display:none">
-<div id="aMsgDlog" title="Message:"><span class="aMsg">{msg}</span></div>
-<div id="aSchDlog" title="Search:"><input type="hidden" name="cmd" value="{cmd}" /><input type="text" name="sterm" value="{trm}" size="55" maxlength="80" /></div>
-<div id="fRenDlog" title="Rename:"><input type="hidden" name="oldnm" value="{old}" /><input type="text" name="nunam" value="{new}" size="55" maxlength="80" /></div>
-<div id="fNamDlog" title="{ttl}"><input type="hidden" name="act" value="{act}" /><input type="text" name="fref" size="55" maxlength="80" /></div>
-<div id="fCpmDlog" title="CopMov:"><input type="hidden" name="act" value="{act}" /><input type="hidden" name="cpmfnm" value="{cpm}" /><p>From: {cpm}</p>To: <input type="text" name="cpm2nam" value="{cpm}" size="70" maxlength="100" /></div>
-</div>
-<div class="jqmWindow" id="upload"><div class="upldr"></div><span class="button jqmClose"><img src="<?=$appB?>css/closex.png" alt="close" /></span></div>
+<div id="upload" class="jqmWindow"><div class="upldr"></div><span class="button jqmClose"><img src="<?=$appB?>css/closex.png" alt="close" /></span></div>
 <div id="element_to_pop_up" class="jqmWindow">
 	<div class="bpDlgHdr"><span class="bpDlgTtl">TITLE</span><span class="button jqmClose"><img src="<?=$appB?>css/closex.png" alt="close" /></span></div>
 	<div class="bpDlgCtn"><form class="bp-dctnt" name="myUIform" onsubmit="return false"></form></div>
 	<div class="bpDlgFtr"><div class="bp-bttns"></div></div>
 </div>
-<div class="contextMenu" id="cppaMenu">
-	<ul>
-		<li id="cppaClr">Clear</li>
-		<li id="cppaDsp">Display</li>
-	</ul>
-</div>
-<div class="contextMenu" id="delfMenu">
-	<ul>
-		<li id="delfTrue">Truly Delete</li>
-		<li id="delfMpty">Empty Trash</li>
-	</ul>
-</div>
-<div class="contextMenu" id="upldMenu">
-	<ul>
-		<li id="H5w">H5win</li>
-		<li id="H5o">H5ovr</li>
-		<li id="L4w">L4win</li>
-		<li id="L4o">L4ovr</li>
-		<li id="Chk">Chunked</li>
-	</ul>
-</div>
-<div class="contextMenu" id="fileCtxt">
-	<ul>
-		<li id="cfi_edt">Edit</li>
-		<li id="cfi_del">Delete</li>
-		<li id="cfi_dld">Download</li>
-		<li id="cfi_dup">Duplicate</li>
-		<li id="cfi_ren">Rename</li>
-		<li id="cfi_zip">Zip</li>
-	</ul>
-</div>
-<div class="contextMenu" id="foldCtxt">
-	<ul>
-		<li id="cfo_del">Delete</li>
-		<li id="cfo_dld">Download</li>
-		<li id="cfo_dup">Duplicate</li>
-		<li id="cfo_ren">Rename</li>
-		<li id="cfo_zip">Zip</li>
-	</ul>
+<div style="display:none">
+	<div id="aMsgDlog" title="Message:"><span class="aMsg">{msg}</span></div>
+	<div id="aSchDlog" title="Search:"><input type="hidden" name="cmd" value="{cmd}" /><input type="text" name="sterm" value="{trm}" size="55" maxlength="80" /></div>
+	<div id="fRenDlog" title="Rename:"><input type="hidden" name="oldnm" value="{old}" /><input type="text" name="nunam" value="{new}" size="55" maxlength="80" /></div>
+	<div id="fNamDlog" title="{ttl}"><input type="hidden" name="act" value="{act}" /><input type="text" name="fref" size="55" maxlength="80" /></div>
+	<div id="fCpmDlog" title="CopMov:"><input type="hidden" name="act" value="{act}" /><input type="hidden" name="cpmfnm" value="{cpm}" /><p>From: {cpm}</p>To: <input type="text" name="cpm2nam" value="{cpm}" size="70" maxlength="100" /></div>
+	<div class="contextMenu" id="cppaMenu">
+		<ul>
+			<li id="cppaClr">Clear</li>
+			<li id="cppaDsp">Display</li>
+		</ul>
+	</div>
+	<div class="contextMenu" id="delfMenu">
+		<ul>
+			<li id="delfTrue">Truly Delete</li>
+			<li id="delfMpty">Empty Trash</li>
+		</ul>
+	</div>
+	<div class="contextMenu" id="upldMenu">
+		<ul>
+			<li id="H5w">H5win</li>
+			<li id="H5o">H5ovr</li>
+			<li id="L4w">L4win</li>
+			<li id="L4o">L4ovr</li>
+			<li id="Chk">Chunked</li>
+		</ul>
+	</div>
+	<div class="contextMenu" id="fileCtxt">
+		<ul>
+			<li id="cfi_edt">Edit</li>
+			<li id="cfi_del">Delete</li>
+			<li id="cfi_dld">Download</li>
+			<li id="cfi_dup">Duplicate</li>
+			<li id="cfi_ren">Rename</li>
+			<li id="cfi_zip">Zip</li>
+		</ul>
+	</div>
+	<div class="contextMenu" id="foldCtxt">
+		<ul>
+			<li id="cfo_del">Delete</li>
+			<li id="cfo_dld">Download</li>
+			<li id="cfo_dup">Duplicate</li>
+			<li id="cfo_ren">Rename</li>
+			<li id="cfo_zip">Zip</li>
+		</ul>
+	</div>
 </div>
 <script>
 	var $table = $('#ftbl'),
