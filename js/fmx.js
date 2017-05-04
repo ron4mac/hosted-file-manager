@@ -548,12 +548,6 @@ function bump_mcount (mid, num) {
 	}
 }
 
-function fileDragin (e) {
-		e.stopPropagation();
-		e.preventDefault();
-		e.target.className = (e.type == "dragover" ? "hover" : "");
-}
-
 // context menu actions
 function cm_del (itm, fld) {
 	var fle = $(itm).parents('tr').attr('data-fref');
@@ -678,7 +672,9 @@ $(function() {
 	});
 
 	// let's try file drag-n-drop
-	$('#filsform').on('dragover', fileDragin);
-	$('#filsform').on('dragleave', fileDragin);
-	$('#filsform').on('drop',function(e){ var fils = e.originalEvent.dataTransfer.files; fileDragin(e); upldAction.H5o(function(){ fupQadd2(fils); }); });
+	var $form = $('#filsform');
+	$form.on('drag dragstart dragend dragover dragenter dragleave drop', function(e) { e.preventDefault(); e.stopPropagation(); })
+	.on('dragover dragenter', function() { $form.addClass('upld-body'); })
+	.on('dragleave dragend drop', function() { $form.removeClass('upld-body'); })
+	.on('drop', function(e) { var fils = e.originalEvent.dataTransfer.files; upldAction.H5o(function(){ fupQadd2(fils); }); });
 });

@@ -192,6 +192,7 @@ if ($pDir) {
 		<th class='left tpad'>Description</th>
 		</tr>
 		</thead>
+		<tbody>
 <?php
 $dFiles = array();
 if ($drsrc = @opendir($rDir)) {
@@ -207,72 +208,71 @@ if ($drsrc = @opendir($rDir)) {
 }
 
 if ($dFiles) {
-sort($dFiles);
-foreach ($dFiles as $fle) {
-	$fPth = "$rDir/$fle";
-	$fs = lstat($fPth);
-	if (!$fs) {
-		echo '<tr><td>Can not stat '.$rDir.'/'.$fle.'</td></tr>';
-		continue;
+	sort($dFiles);
+	foreach ($dFiles as $fle) {
+		$fPth = "$rDir/$fle";
+		$fs = lstat($fPth);
+		if (!$fs) {
+			echo '<tr><td>Can not stat '.$rDir.'/'.$fle.'</td></tr>';
+			continue;
+		}
+		$isLnk = ($fs[2] & 0xA000)==0xA000;
+		$rlnk = '';
+		if ($isLnk) {
+			$fs = @stat($fPth);
+			$rlnk = readlink($fPth);
+		}
+		$afle = ($pDir ? "$pDir/" : '') . $fle;
+		$efle = urlencode($afle);
+		if ($fs[2] & 040000) {
+			echo "<tr data-fref='$fle'>";
+			$dt = strftime("%b %d, %Y  %l:%M%P", $fs[9]);
+			if (is_writable($fPth)) {
+				echo '<td><input type="checkbox" class="fsel" name="files[]" value="'.$fle.'/" /></td>';
+			} else {
+				echo '<td>&nbsp;</td>';
+			}
+			echo '<td class="diricon foldCtxt"> </td>';
+			echo '<td class="foldCtxt"><a href="index.php?dir='.$efle.'">'.$fle.'</a>'.($isLnk ? " &rarr; $rlnk" : '').'</td>';
+			echo '<td class="tpad">'.$dt.'</td>';
+			echo '<td class="right tpad">--</td>';
+			echo '<td class="tpad"><a href="#" data-act="finf"><img src="'.$appB.'graphics/info10x10.gif" width="10" height="10" alt="" /></a></td>';
+			echo '</tr>'."\n";
+			}
+		else {
+			echo "<tr data-fref='$fle'>";
+			$ufle = htmlspecialchars($fle);
+			$fnp = explode('.',$ufle);
+			$ufle = str_replace(' ','&nbsp;',$ufle);
+			$flext = array_pop($fnp);
+			$filedt = preg_match('/php|js|html|htm|pl|cgi|css|ini|xml|sql|txt|csv|htaccess/i', $flext);
+			$imgedt = preg_match('/jpg|jpeg|png|gif|bmp/i', $flext);
+			$sz = $fs[7];
+			if ($sz > 1048575) {$sz = sprintf('%.1f', ($sz / 1048576)) . 'm';}
+			elseif ($sz > 1023) {$sz = sprintf('%.1f', ($sz / 1024)) . 'k';}
+			$dt = strftime("%b %d, %Y  %l:%M%P", $fs[9]);
+			if (is_writable($fPth)) {
+				echo '<td><input type="checkbox" class="fsel" name="files[]" value="'.$fle.'" /></td>';
+			} else {
+				echo '<td>&nbsp;</td>';
+			}
+			if ($filedt) {
+				echo '<td class="filedticon fileCtxt" onclick="doFileAction(\'fedt\',this,event)">&nbsp;</td>';
+			} elseif ($imgedt) {
+				echo '<td class="imgedticon fileCtxt" onclick="doFileAction(\'iedt\',this,event)">&nbsp;</td>';
+			} else {
+				echo '<td class="filicon fileCtxt">&nbsp;</td>';
+			}
+			print '<td class="fileCtxt"><a href="#" data-act="fvue">'.$ufle.'</a>'.($isLnk ? " &rarr; $rlnk" : '').'</td>';
+			echo '<td class="tpad">'.$dt.'</td>';
+			echo '<td class="right tpad">'.$sz.'</td>';
+			echo '<td class="tpad"><a href="#" data-act="finf"><img src="'.$appB.'graphics/info10x10.gif" width="10" height="10" alt="" /></a></td>';
+			echo '</tr>'."\n";
+			}
 	}
-	$isLnk = ($fs[2] & 0xA000)==0xA000;
-	$rlnk = '';
-	if ($isLnk) {
-		$fs = @stat($fPth);
-		$rlnk = readlink($fPth);
-	}
-	$afle = ($pDir ? "$pDir/" : '') . $fle;
-	$efle = urlencode($afle);
-	if ($fs[2] & 040000) {
-		echo "<tr data-fref='$fle'>";
-		$dt = strftime("%b %d, %Y  %l:%M%P", $fs[9]);
-		if (is_writable($fPth)) {
-			echo '<td><input type="checkbox" class="fsel" name="files[]" value="'.$fle.'/" /></td>';
-		} else {
-			echo '<td>&nbsp;</td>';
-		}
-		echo '<td class="diricon foldCtxt"> </td>';
-		echo '<td class="foldCtxt"><a href="index.php?dir='.$efle.'">'.$fle.'</a>'.($isLnk ? " &rarr; $rlnk" : '').'</td>';
-		echo '<td class="tpad">'.$dt.'</td>';
-		echo '<td class="right tpad">--</td>';
-		echo '<td class="tpad"><a href="#" data-act="finf"><img src="'.$appB.'graphics/info10x10.gif" width="10" height="10" alt="" /></a></td>';
-		echo '</tr>'."\n";
-		}
-	else {
-		echo "<tr data-fref='$fle'>";
-		$ufle = htmlspecialchars($fle);
-		$fnp = explode('.',$ufle);
-		$ufle = str_replace(' ','&nbsp;',$ufle);
-		$flext = array_pop($fnp);
-		$filedt = preg_match('/php|js|html|htm|pl|cgi|css|ini|xml|sql|txt|csv|htaccess/i', $flext);
-		$imgedt = preg_match('/jpg|jpeg|png|gif|bmp/i', $flext);
-		$sz = $fs[7];
-		if ($sz > 1048575) {$sz = sprintf('%.1f', ($sz / 1048576)) . 'm';}
-		elseif ($sz > 1023) {$sz = sprintf('%.1f', ($sz / 1024)) . 'k';}
-		$dt = strftime("%b %d, %Y  %l:%M%P", $fs[9]);
-		if (is_writable($fPth)) {
-			echo '<td><input type="checkbox" class="fsel" name="files[]" value="'.$fle.'" /></td>';
-		} else {
-			echo '<td>&nbsp;</td>';
-		}
-		if ($filedt) {
-			echo '<td class="filedticon fileCtxt" onclick="doFileAction(\'fedt\',this,event)">&nbsp;</td>';
-		} elseif ($imgedt) {
-			echo '<td class="imgedticon fileCtxt" onclick="doFileAction(\'iedt\',this,event)">&nbsp;</td>';
-		} else {
-			echo '<td class="filicon fileCtxt">&nbsp;</td>';
-		}
-		print '<td class="fileCtxt"><a href="#" data-act="fvue">'.$ufle.'</a>'.($isLnk ? " &rarr; $rlnk" : '').'</td>';
-		echo '<td class="tpad">'.$dt.'</td>';
-		echo '<td class="right tpad">'.$sz.'</td>';
-		echo '<td class="tpad"><a href="#" data-act="finf"><img src="'.$appB.'graphics/info10x10.gif" width="10" height="10" alt="" /></a></td>';
-		echo '</tr>'."\n";
-		}
-}
-} else {
-	echo '<tbody></tbody>';
 }
 ?>
+		</tbody>
 	</table>
 </form>
 <div id="footerPop">
