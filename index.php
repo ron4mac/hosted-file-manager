@@ -131,13 +131,13 @@ if ($pDir) {
 				<li><a href="#" data-mnu="utrz" data-req="2">untar/gz</a></li>
 			</ul>
 		</li>
-		<li><a href="#" data-mnu="cppa" data-req="2" class="cppaMenu">copy/paste</a></li>
+		<li><a href="#" id="cppaMenu" data-mnu="cppa" data-req="2" class="cppaMenu">copy/paste</a></li>
 		<!-- <li><a href="#" data-mnu="delf" data-req="2">delete</a></li> -->
 		<li><a href="#" data-mnu="trsh" data-req="2" class="delfMenu">delete<?=$trshc?></a></li>
 		<li><a href="#" data-mnu="dnld" data-req="2">download</a><div class="dnldprg"> rr</div></li>
 		<li><a href="#" data-mnu="dupl" data-req="2">duplicate</a></li>
-		<li><a href="#" data-mnu="mark" data-req="2" class="markMenu">mark</a></li>
-		<li><a href="#" data-mnu="mvto" data-req="2" class="mvtoMenu">move/to</a></li>
+		<li><a href="#" id="markMenu" data-mnu="mark" data-req="2" class="markMenu">mark</a></li>
+		<li><a href="#" id="mvtoMenu" data-mnu="mvto" data-req="2" class="mvtoMenu">move/to</a></li>
 		<li>
 			<a href="#" data-mnu="mnu">new</a>
 			<ul class="fallback">
@@ -206,6 +206,7 @@ if ($drsrc = @opendir($rDir)) {
 	echo '<span style="color:red">Could not read directory: '.$dDir.'<br />Error: '.$error['message'].'</span>';	//Error("Could not read directory $rDir: $!");
 }
 
+if ($dFiles) {
 sort($dFiles);
 foreach ($dFiles as $fle) {
 	$fPth = "$rDir/$fle";
@@ -268,6 +269,9 @@ foreach ($dFiles as $fle) {
 		echo '</tr>'."\n";
 		}
 }
+} else {
+	echo '<tbody></tbody>';
+}
 ?>
 	</table>
 </form>
@@ -308,10 +312,10 @@ foreach ($dFiles as $fle) {
 	<div id="fRenDlog" title="Rename:"><input type="hidden" name="oldnm" value="{old}" /><input type="text" name="nunam" value="{new}" size="55" maxlength="80" /></div>
 	<div id="fNamDlog" title="{ttl}"><input type="hidden" name="act" value="{act}" /><input type="text" name="fref" size="55" maxlength="80" /></div>
 	<div id="fCpmDlog" title="CopMov:"><input type="hidden" name="act" value="{act}" /><input type="hidden" name="cpmfnm" value="{cpm}" /><p>From: {cpm}</p>To: <input type="text" name="cpm2nam" value="{cpm}" size="70" maxlength="100" /></div>
-	<div class="contextMenu" id="cppaMenu">
+	<div class="contextMenu" id="clrdMenu">
 		<ul>
-			<li id="cppaClr">Clear</li>
-			<li id="cppaDsp">Display</li>
+			<li id="clrdClr">Clear</li>
+			<li id="clrdDsp">Display</li>
 		</ul>
 	</div>
 	<div class="contextMenu" id="delfMenu">

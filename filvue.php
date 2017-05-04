@@ -2,6 +2,7 @@
 require_once('functions.php');
 $fref = urldecode($_GET['fref']);
 $ffref = $baseDir.$fref;
+$effref = str_replace(' ','\ ',$ffref);
 $fcon = '';
 $mtyp = $mtyp_arg = isset($_GET['mtyp']) ? escapeshellcmd($_GET['mtyp']) : '';
 if (!$mtyp) $mtyp = FileMimeType($ffref);
@@ -9,19 +10,19 @@ list($x,$y) = preg_split('/\//',$mtyp.'/');
 switch ($y) {
 	case 'zip':
 		$mtyp = 'text/plain';
-		$fcon = `unzip -l $ffref`;
+		$fcon = `unzip -l $effref`;
 		break;
 	case 'x-gzip':
 		$mtyp = 'text/plain';
-		$fcon = `tar -tzvf $ffref`;
+		$fcon = `tar -tzvf $effref`;
 		break;
 	case 'x-tar':
 		$mtyp = 'text/plain';
-		$fcon = `tar -tvf $ffref`;
+		$fcon = `tar -tvf $effref`;
 		break;
 	case 'x-bzip2':
 		$mtyp = 'text/plain';
-		$fcon = `tar -tjvf $ffref`;
+		$fcon = `tar -tjvf $effref`;
 		break;
 	default:
 		if ($x=='image') {
