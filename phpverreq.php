@@ -37,8 +37,7 @@ $Others = array();
 $Highest = '0';
 
 // Get function/method table
-$Functions = unserialize(file_get_contents('phpfuncs.ary'));
-
+$Functions = json_decode(file_get_contents('phpfuncs.json'), true);
 
 // Retrieve list of PHP files
 RetrieveFiles($dir2chk);

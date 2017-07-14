@@ -1,5 +1,5 @@
 <?php
-require_once('functions.php');
+require_once 'functions.php';
 $fref = urldecode($_GET['fref']);
 $ffref = $baseDir.$fref;
 $effref = str_replace(' ','\ ',$ffref);
@@ -23,6 +23,43 @@ switch ($y) {
 	case 'x-bzip2':
 		$mtyp = 'text/plain';
 		$fcon = `tar -tjvf $effref`;
+		break;
+	case 'rfc822':
+		$mtyp = 'text/plain';
+		if (function_exists('mailparse_msg_parse_file')) {
+			$fcon = 'CAN DO MAIL PARSE';
+			$mmsg = file_get_contents($ffref);
+			$mres = mailparse_msg_create();
+			mailparse_msg_parse($mres, $mmsg);
+			$mstr = mailparse_msg_get_structure($mres);
+			$fcon = '';
+			foreach ($mstr as $st) {
+				$section = mailparse_msg_get_part($mres, $st); 
+				$info = mailparse_msg_get_part_data($section);
+			//	$fcon .= print_r($info, true);
+				if ($info['content-type'] == 'text/plain') {
+					$fcon .= "@SECTION {$st}@\n";
+					$spb = $info['starting-pos-body'];
+					$epb = $info['ending-pos-body'];
+					$fcon .= substr($mmsg, $spb, $epb-$spb)."\n";
+				}
+			}
+			mailparse_msg_free($mres);
+		} else {
+			$fcon = 'MAIL PARSE NOT AVAILABLE';
+		}
+		break;
+		require_once 'rfc822.php';
+		$pcr = new PlancakeEmailParser(file_get_contents($ffref));
+		$fcon = $pcr->getBody();
+		$mtyp = $pcr->getHeader('content-type') ?: 'text/plain';
+		if ($mtyp != 'text/html') {
+			$mtyp = 'text/plain';
+		}
+		if (!$fcon) {
+			$mtyp = 'text/html';
+			$fcon = $pcr->getHTMLBody();
+		}
 		break;
 	default:
 		if ($x=='image') {

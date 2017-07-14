@@ -106,7 +106,7 @@ fclose($fh_res);
 			}
 			$cmd = 'mv --backup=numbered -t "'.$todir.'" "'.$fpth.'"';
 			system($cmd, $irslt);
-			$rslt += $irslt;
+			$rslt .= $irslt ?: '';
 		}
 		if ($rslt) echo $cmd.$rslt;
 		break;
