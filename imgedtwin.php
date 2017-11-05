@@ -1,12 +1,12 @@
 <?php
 //echo'<pre>';var_dump($_POST);echo'</pre>';
-require_once('functions.php');
+require_once 'functions.php';
 include 'cfg.php';
 $fref = urldecode($_POST['fref']);
 if (!$fref) {
 	if (!isset($_POST['imgfil'])) { die('Error: no image'); }
 	$fref = $_POST['imgfil'];
-	require_once('imager.php');
+	require_once 'imager.php';
 	$imgObj = new ImageCR($baseDir.$fref);
 
 	if (isset($_POST['rotdeg'])) {

@@ -1,6 +1,37 @@
 <?php
 include 'fmx.ini';
 include 'cfg.php';
+
+function cmpFn ($a, $b)
+{
+	return strcmp($a[0], $b[0]);
+}
+function cmpFm ($a, $b)
+{
+	if ($a[1] && $b[1]) {
+		$am = $a[1][9];
+		$bm = $b[1][9];
+		if ($am == $bm) { return 0; }
+		return ($am < $bm) ? -1 : 1;
+	}
+	return 0;
+}
+
+function cmpFnd ($a, $b)
+{
+	return strcmp($b[0], $a[0]);
+}
+function cmpFmd ($a, $b)
+{
+	if ($a[1] && $b[1]) {
+		$am = $a[1][9];
+		$bm = $b[1][9];
+		if ($am == $bm) { return 0; }
+		return ($am < $bm) ? 1 : -1;
+	}
+	return 0;
+}
+
 if ($fmxInJoomla) {
 	defined('_JEXEC') or die('Restricted access');
 	JHtml::stylesheet('components/com_fmx/fmx/css/css.php');
@@ -81,6 +112,7 @@ if (isset($_POST['cmdlin'])) {
 <title>Files :: <?php echo $rootD?></title>
 <meta charset="UTF-8">
 <meta name="google" content="notranslate">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
 <link rel="stylesheet" type="text/css" href="css/css.php" />
 <script src="<?=$jqlink?>"></script>
 <script src="js/js.php" type="text/javascript"></script>
@@ -111,11 +143,13 @@ if ($pDir) {
 	if (dirname($pDir)!='.') {
 		$aRef .= '?dir=' . urlencode(dirname($pDir));
 	}
-	$parntBut = '<a href="'.$aRef.'" title="Up to parent"><img src="'.$appB.'icons/arrow-ret.png" width="16" height="16" alt="" /></a>';
+//	$parntBut = '<a href="'.$aRef.'" title="Up to parent"><img src="'.$appB.'icons/arrow-ret.png" width="16" height="16" alt="" /></a>';
+	$parntBut = '<a href="'.$aRef.'" title="Up to parent"><i class="fa fa-chevron-up" style="color:blue;font-size:large"></i></a>';
 } else {
 	print $rootD;
 	$parntBut = '&nbsp;';
 }
+$srtBy = isset($_GET['O']) ? $_GET['O'] : 'n';
 ?>
 </span>
 <hr style="margin:6px 0" />
@@ -186,8 +220,31 @@ if ($pDir) {
 		<tr>
 		<td><input type="checkbox" onchange="allSelect(event,this)" /></td>
 		<td><?=$parntBut?></td>
-		<th class='left'>Name</th>
-		<th class='left tpad'>Last Modified</th>
+<?php
+	if ($srtBy[0] == 'n') {
+		$mlab = '<a href="#" onclick="refreshFilstO(\'m\')">Last Modified</a>';
+		if ($srtBy == 'nd') {
+			$nsrtd = '<i class="fa fa-sort-down"></i>';
+			$nsrtc = 'n';
+		} else {
+			$nsrtd = '<i class="fa fa-sort-up"></i>';
+			$nsrtc = 'nd';
+		}
+		$nlab = 'Name <a href="#" onclick="refreshFilstO(\''.$nsrtc.'\')">'.$nsrtd.'</a> ';
+	} elseif ($srtBy[0] == 'm') {
+		$nlab = '<a href="#" onclick="refreshFilstO(\'n\')">Name</a>';
+		if ($srtBy == 'md') {
+			$msrtd = '<i class="fa fa-sort-down"></i>';
+			$msrtc = 'm';
+		} else {
+			$msrtd = '<i class="fa fa-sort-up"></i>';
+			$msrtc = 'md';
+		}
+		$mlab = 'Last Modified <a href="#" onclick="refreshFilstO(\''.$msrtc.'\')">'.$msrtd.'</a> ';
+	}
+?>
+		<th class='left'><?=$nlab?></th>
+		<th class='left tpad'><?=$mlab?></th>
 		<th class='right tpad'>Size</th>
 		<th class='left tpad'>Description</th>
 		</tr>
@@ -198,7 +255,8 @@ $dFiles = array();
 if ($drsrc = @opendir($rDir)) {
 	while (false !== ($entry = readdir($drsrc))) {
 		if ($entry != "." && $entry != "..") {
-			$dFiles[] = $entry;
+			$fs = lstat("$rDir/$entry");
+			$dFiles[] = array($entry, $fs);
 		}
 	}
 	closedir($drsrc);
@@ -208,10 +266,11 @@ if ($drsrc = @opendir($rDir)) {
 }
 
 if ($dFiles) {
-	sort($dFiles);
-	foreach ($dFiles as $fle) {
-		$fPth = "$rDir/$fle";
-		$fs = lstat($fPth);
+	usort($dFiles, 'cmpF'.$srtBy);
+	foreach ($dFiles as $flear) {
+		$fle = $flear[0];
+		$fPth = "$rDir/{$fle}";
+		$fs = $flear[1];	//lstat($fPth);
 		if (!$fs) {
 			echo '<tr><td>Can not stat '.$rDir.'/'.$fle.'</td></tr>';
 			continue;
@@ -308,10 +367,9 @@ if ($dFiles) {
 </div>
 <div style="display:none">
 	<div id="aMsgDlog" title="Message:"><span class="aMsg">{msg}</span></div>
-	<div id="aSchDlog" title="Search:"><input type="hidden" name="cmd" value="{cmd}" /><input type="text" name="sterm" value="{trm}" size="55" maxlength="80" /></div>
-	<div id="fRenDlog" title="Rename:"><input type="hidden" name="oldnm" value="{old}" /><input type="text" name="nunam" value="{new}" size="55" maxlength="80" /></div>
-	<div id="fNamDlog" title="{ttl}"><input type="hidden" name="act" value="{act}" /><input type="text" name="fref" size="55" maxlength="80" /></div>
-	<div id="fCpmDlog" title="CopMov:"><input type="hidden" name="act" value="{act}" /><input type="hidden" name="cpmfnm" value="{cpm}" /><p>From: {cpm}</p>To: <input type="text" name="cpm2nam" value="{cpm}" size="70" maxlength="100" /></div>
+	<div id="aSchDlog" title="Search:"><input type="hidden" name="cmd" value="{cmd}" /><input type="text" class="dlgitxt" name="sterm" value="{trm}" maxlength="80" /></div>
+	<div id="fRenDlog" title="Rename:"><input type="hidden" name="oldnm" value="{old}" /><input type="text" class="dlgitxt" name="nunam" value="{new}" maxlength="80" /></div>
+	<div id="fNamDlog" title="{ttl}"><input type="hidden" name="act" value="{act}" /><input type="text" class="dlgitxt" name="fref" maxlength="80" /></div>
 	<div class="contextMenu" id="clrdMenu">
 		<ul>
 			<li id="clrdClr">Clear</li>

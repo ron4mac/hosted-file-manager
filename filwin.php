@@ -1,5 +1,5 @@
 <?php
-require_once('functions.php');
+require_once 'functions.php';
 $fref = $_GET['fref'];
 $mtyp = FileMimeType($baseDir.$fref);
 $fvurl = 'filvue.php?fref=' . urlencode($fref);

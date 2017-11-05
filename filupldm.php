@@ -1,5 +1,5 @@
 <?php
-require_once('functions.php');
+require_once 'functions.php';
 ?>
 <div id="uplfrm" style="margin:12px">
 <p style="color:red">Maximum upload size: <?php echo ini_get('post_max_size') ?></p>

@@ -3,6 +3,15 @@ function refreshFilst () {
 	window.location = window.location.href.split("#")[0];
 }
 
+function refreshFilstO (so) {
+	var wlp = window.location.href.split("#")[0].split("?");
+	if (wlp[1]) {
+		window.location = wlp[0] + "?" + wlp[1].split("&")[0] + "&O=" + so;
+	} else {
+		window.location = wlp[0] + "?O=" + so;
+	}
+}
+
 function postAndRefresh (parms) {
 	$.post(fmx_AJ, parms, function(data,textStatus,jqXHR) {
 			if (data) { alert(data); }
@@ -71,23 +80,6 @@ var fNamDlg = {
 			var parms = {
 				act: frm.act.value,
 				fref: curDir + frm.fref.value.trim()
-				};
-			myCloseDlg(this);
-			postAndRefresh(parms);
-			}
-		}
-	};
-
-var fCpmDlg = {
-	cselect: '#fCpmDlog',
-	buttons: {
-		'{CM}': function() {
-			var frm = document.myUIform;
-			if (!frm.cpm2nam.value.trim()) { alert("Please enter a valid path"); return; }
-			var parms = {
-				act: frm.act.value,
-				fref: frm.cpmfnm.value,
-				tonm: frm.cpm2nam.value.trim()
 				};
 			myCloseDlg(this);
 			postAndRefresh(parms);

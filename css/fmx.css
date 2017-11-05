@@ -89,6 +89,11 @@ div.dnldprg {
 	display: none;
 }
 
+.dlgitxt {
+	width: 100%;
+	box-sizing: border-box;
+}
+
 #ftbl img {
 	border: none;
 }

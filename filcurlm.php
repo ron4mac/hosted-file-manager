@@ -1,5 +1,5 @@
 <?php
-require_once('functions.php');
+require_once 'functions.php';
 $isTo = isset($_GET['t']) && $_GET['t'];
 $curl_msg = $isTo ? 'Send a file to a web location' : 'Get a file from a web location';
 $btnttl = $isTo ? 'Send file' : 'Get file';

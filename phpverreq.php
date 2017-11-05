@@ -10,7 +10,7 @@
 // All Rights Reserved
 //-------------------------------------------------------------------
 
-require_once('functions.php');
+require_once 'functions.php';
 $dir2chk = $baseDir . urldecode($_GET['dir']);
 
 // So the script doesn't time out on large operations

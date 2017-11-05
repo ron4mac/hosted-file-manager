@@ -1,6 +1,6 @@
 <?php
 include 'fmx.ini';
-require_once('functions.php');
+require_once 'functions.php';
 
 $fref = isset($_POST['fref']) ? $baseDir.doUnescape($_POST['fref']) : '';
 
@@ -211,12 +211,12 @@ fclose($fh_res);
 		fclose($fh);
 		break;
 	case 'jxtr':
-		require_once('joomext.php');
+		require_once 'joomext.php';
 		$joomext = new Joomext($fref);
 		$joomext->pull(escapeshellcmd($_POST['dir']));
 		break;
 	case 'fmxi':
-		require_once('updater.php');
+		require_once 'updater.php';
 		$newver = checkForUpdate();
 		$msg = 'FMX Version: ' . $fmxVersion;
 		$msg .= '<br />PHP Version: ' . phpversion();
@@ -234,7 +234,7 @@ fclose($fh_res);
 		break;
 	case 'updt':
 		$newver = escapeshellcmd($_POST['nver']);
-		require_once('updater.php');
+		require_once 'updater.php';
 		if ($newver) {
 			performUpdate($newver);
 			break;
@@ -280,7 +280,7 @@ function recursiveDelete ($pstr) {
 function mmizFile ($path) {
 	$pinf = pathinfo($path);
 	if (!isset($pinf['extension']) || $pinf['extension'] != 'js') return;
-	$min = json_decode(`curl -s -d compilation_level=SIMPLE_OPTIMIZATIONS -d output_format=json -d output_info=compiled_code -d output_info=errors -d output_info=warnings --data-urlencode "js_code@{$path}" http://closure-compiler.appspot.com/compile`);
+	$min = json_decode(`curl -s -d compilation_level=SIMPLE_OPTIMIZATIONS -d output_format=json -d output_info=compiled_code -d output_info=errors -d output_info=warnings --data-urlencode "js_code@{$path}" https://closure-compiler.appspot.com/compile`);
 	if (isset($min->errors)) {
 		foreach ($min->errors as $cperr) {
 			echo $cperr->type;

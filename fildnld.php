@@ -1,5 +1,5 @@
 <?php
-require_once('functions.php');
+require_once 'functions.php';
 $fref = $baseDir . doUnescape($_GET['fle']);
 if (file_exists($fref)) {
 	header('Content-Description: File Transfer');

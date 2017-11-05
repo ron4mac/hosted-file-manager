@@ -1,7 +1,7 @@
 <?php
 error_reporting(-1);
 ini_set('display_errors', 'Off');
-require_once('functions.php');
+require_once 'functions.php';
 include 'cfg.php';
 $utmpdir = dirname($_SERVER['DOCUMENT_ROOT']).'/tmp/';
 

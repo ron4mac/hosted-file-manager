@@ -83,7 +83,7 @@ $allowed_extensions = array('db','db3','sqlite','sqlite3');
 
 /*====== below here added for FMX ======*/
 
-require_once('../functions.php');
+require_once '../functions.php';
 
 if (isset($fmxVersion) && (isset($rmtuser) || isset($userN))) $password = '';
 if (isset($dev_mode) and $dev_mode) $debug = true;

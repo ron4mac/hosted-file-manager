@@ -1,5 +1,5 @@
 <?php
-require_once('functions.php');
+require_once 'functions.php';
 include 'cfg.php';
 $uploadMaxFilesize = ini_get('upload_max_filesize');
 $uploadMaxFilesizeBytes = return_bytes($uploadMaxFilesize);

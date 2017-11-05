@@ -1,6 +1,6 @@
 <?php
 error_reporting(-1);
-require_once('functions.php');
+require_once 'functions.php';
 $error_types = array(
 	1=>'The uploaded file exceeds the upload_max_filesize directive in php.ini.',
 	'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.',

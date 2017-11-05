@@ -1,5 +1,5 @@
 <?php
-require_once('functions.php');
+require_once 'functions.php';
 
 if (isset($_POST['savef'])) {
 	$fref = doUnescape($_POST['fref']);

@@ -1,5 +1,5 @@
 <?php
-require_once('functions.php');
+require_once 'functions.php';
 $gitdir = $baseDir . urldecode($_GET['dir']);
 chdir($gitdir);
 $msg = ''; $rslt = '';
@@ -8,12 +8,16 @@ if (isset($_POST['setuser'])) {
 	$rslt = `git config --local user.email {$_POST['uemail']}`;
 }
 if (isset($_POST['act'])) {
+	$file = $_POST['f'];
 	switch ($_POST['act']) {
 		case 'rev':
-			$rslt = `git checkout {$_POST['f']}`;
+			$rslt = `git checkout {$file}`;
 			break;
 		case 'del':
-			$rslt = `git rm -r {$_POST['f']}`;
+			$rslt = `git rm -r {$file}`;
+			break;
+		case 'dif':
+			$rslt = `git diff {$file}`;
 			break;
 	}
 }
@@ -73,7 +77,8 @@ function statusAction ()
 	//	list($m, $f, $ff) = explode(' ', $stat.'', 3);
 		switch ($m) {
 			case ' M':
-				$html .= '<a href="javascript:postAct({act:\'rev\', f: \''.urlencode($f).'\'})">revert</a> '.$f.'<br />';
+				$html .= '<a href="javascript:postAct({act:\'rev\', f: \''.urlencode($f).'\'})">revert</a> '.$f;
+				$html .= ' <a href="javascript:postAct({act:\'dif\', f: \''.urlencode($f).'\'})">diff</a><br />';
 				break;
 			case '??':
 				$html .= '<a href="?act=del&f='.urlencode($f).'">delete</a> '.$f.'<br />';
@@ -115,10 +120,11 @@ function statusAction ()
 		/*.syncform {line-height:1.5em;}*/
 		.userform {line-height:1.5em; border:1px dotted #AAA; background-color:#FEE; padding:6px;}
 		.cmmsg {width:40em;}
-		.rslt {border:1px solid #CCC; background-color:#FEF; padding:0 6px}
-		.stat {border:1px solid #CCC; background-color:#FFE; padding:0 6px 10px 6px}
-		.cnfg {border:1px solid #CCC; background-color:#EFF; padding:0 6px}
+		.rslt {border:1px solid #CCC; background-color:#FEF; padding:0 6px;}
+		.stat {border:1px solid #CCC; background-color:#FFE; padding:0 6px 10px 6px;}
+		.cnfg {border:1px solid #CCC; background-color:#EFF; padding:0 6px;}
 		.remo {border:1px solid #CCC; background-color:#F0F0F0; padding:0 6px; line-height:1.5em;}
+		xmp {margin:4px 0;}
 	</style>
 </head>
 <body>

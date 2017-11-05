@@ -14,7 +14,7 @@ if ($fmxInJoomla) {
 $cookie = $_COOKIE[$cooknam];
 if (!$cookie) { exit('Unauthorized'); }
 $baseDir = convert_uudecode($cookie).'/';
-$fmxVersion = '3.1.4 - May 2017';
+$fmxVersion = '3.1.5 - October 2017';
 
 function FileMimeType ($fpath) {
 	$mtyp = 'text/plain';
@@ -55,8 +55,8 @@ function fmx_getJoomlaUserId() {
 	define( 'JPATH_BASE', realpath(dirname(__FILE__).'/../../..' ));
 	define( 'DS', DIRECTORY_SEPARATOR );
 
-	require_once ( JPATH_BASE .DS.'includes'.DS.'defines.php' );
-	require_once ( JPATH_BASE .DS.'includes'.DS.'framework.php' );
+	require_once JPATH_BASE.DS.'includes'.DS.'defines.php';
+	require_once JPATH_BASE.DS.'includes'.DS.'framework.php';
 	$app = JFactory::getApplication('site');
 	$app->initialise();
 	return JFactory::getUser()->id;
