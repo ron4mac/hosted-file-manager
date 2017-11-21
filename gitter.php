@@ -3,6 +3,31 @@ require_once 'functions.php';
 $gitdir = $baseDir . urldecode($_GET['dir']);
 chdir($gitdir);
 $msg = ''; $rslt = '';
+if (isset($_GET['dnld'])) {
+	$brch = `git rev-parse --abbrev-ref HEAD`;
+	if (!($std = sys_get_temp_dir())) {
+		header($_SERVER["SERVER_PROTOCOL"]." 404 No temporary directory");
+		exit;
+	}
+	$temp_file = tempnam($std, 'GIT');
+	$rslt = `git archive --format zip -o {$temp_file} {$brch}`;
+	if (file_exists($temp_file)) {
+		header('Content-Description: File Transfer');
+		header('Content-Type: application/octet-stream');
+		header('Content-Disposition: attachment; filename='.basename($gitdir).'.zip');
+		header('Expires: 0');
+		header('Cache-Control: must-revalidate');
+		header('Pragma: public');
+		header('Content-Length: ' . filesize($temp_file));
+		@ob_clean();
+		@flush();
+		readfile($temp_file);
+		@unlink($temp_file);
+		exit;
+	}
+	header($_SERVER["SERVER_PROTOCOL"]." 404 No acrhive created");
+	exit;
+}
 if (isset($_POST['setuser'])) {
 	$rslt = `git config --local user.name {$_POST['uname']}`;
 	$rslt = `git config --local user.email {$_POST['uemail']}`;
@@ -17,7 +42,7 @@ if (isset($_POST['act'])) {
 			$rslt = `git rm -r {$file}`;
 			break;
 		case 'dif':
-			$rslt = `git diff {$file}`;
+			$rslt = str_replace('xmp>','.xmp>',`git diff {$file}`);
 			break;
 	}
 }
@@ -115,6 +140,18 @@ function statusAction ()
 		document.body.appendChild(form);
 		form.submit();
 	}
+	function doDnld ()
+	{
+		var dlframe = document.createElement("iframe");
+		// set source to desired file
+		dlframe.src = "gitter.php?<?=$_SERVER['QUERY_STRING']?>&dnld=1";
+		// This makes the IFRAME invisible to the user.
+		dlframe.style.display = "none";
+		// Add the IFRAME to the page.  This will trigger the download
+		document.body.appendChild(dlframe);
+		//console.log(data); //alert("Data Loaded: " + data);
+		return false;
+	}
 	</script>
 	<style>
 		/*.syncform {line-height:1.5em;}*/
@@ -139,6 +176,7 @@ function statusAction ()
 	<?php if ($msg) { echo $msg.'<br />'; } ?>
 	<form name="gitsync" class="syncform" method="post">
 	Branch: <select name="brchsel"><?php echo $opts; ?></select>
+	<button onclick="return doDnld()">Download</button>
 	<?php if ($rslt): ?>
 	<br /><br />Result
 	<div class="rslt">
