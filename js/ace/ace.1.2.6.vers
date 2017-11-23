@@ -1,1 +1,0 @@
-In worker-javascript.js the maxerr value for jshint is patched to 9999

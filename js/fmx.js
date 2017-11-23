@@ -596,7 +596,7 @@ $(function() {
 	sessionStorage.fmx_curD = curDir;
 
 	$("#fmnu [data-mnu]").click(function(e) {e.preventDefault(); doMenuAction($(this).attr('data-mnu'),e); });
-	$("#trmfrm [data-mnu]").click(function(e) {e.preventDefault(); doMenuAction($(this).attr('data-mnu'),e); });
+	$("#footerPopContent [data-mnu]").click(function(e) {e.preventDefault(); doMenuAction($(this).attr('data-mnu'),e); });
 	$("#ftbl [data-act]").click(function(e) {e.preventDefault(); doFileAction($(this).attr('data-act'),this,e); });
 	$('nav li ul').hide().removeClass('fallback');
 	$('nav li').hover(function () {

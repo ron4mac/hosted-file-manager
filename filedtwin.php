@@ -50,8 +50,10 @@ $scrptFilPrts = explode('/',__FILE__);
 <head>
 <title><?php echo $fref; ?></title>
 <link rel="stylesheet" type="text/css" href="css/sdrop.css" />
-<script src="js/ace/ace.js" data-ace-base="js/ace" type="text/javascript" charset="utf-8"></script>
-<script src="js/ace/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
+<!-- <script src="js/ace/ace.js" data-ace-base="js/ace" type="text/javascript" charset="utf-8"></script> -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/ace.js" type="text/javascript" charset="utf-8"></script>
+<!-- <script src="js/ace/ext-language_tools.js" type="text/javascript" charset="utf-8"></script> -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
 <?php if(!$mode): ?>
 <script src="js/ace/ext-modelist.js" type="text/javascript" charset="utf-8"></script>
 <?php endif; ?>
@@ -134,10 +136,13 @@ div.cntrl {float:left;margin-right:10px;}
 <script type="text/javascript">
 var eData = document.getElementById('editBox');
 var editor = ace.edit("editor");
+editor.$blockScrolling = Infinity;
 editor.setShowPrintMargin(false);
 editor.getSession().setUseSoftTabs(false);
 editor.getSession().setValue(eData.value);
-editor.setTheme("ace/theme/rjcode");
+//ace.config.set('themePath', 'js/ace');
+//editor.setTheme("ace/theme/rjcode");
+editor.setTheme("ace/theme/sqlserver");
 <?php if ($mode): ?>
 	editor.getSession().setMode("ace/mode/<?=$mode?>");
 <?php else: ?>
