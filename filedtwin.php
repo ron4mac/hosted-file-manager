@@ -1,5 +1,6 @@
 <?php
 require_once 'functions.php';
+include 'cfg.php';
 
 if (isset($_POST['savef'])) {
 	$fref = doUnescape($_POST['fref']);
@@ -44,18 +45,21 @@ switch (strtolower($fext)) {
 		$mode = '';
 }
 $scrptFilPrts = explode('/',__FILE__);
+
+$aceBase = '//cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/';
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 <title><?php echo $fref; ?></title>
 <link rel="stylesheet" type="text/css" href="css/sdrop.css" />
-<!-- <script src="js/ace/ace.js" data-ace-base="js/ace" type="text/javascript" charset="utf-8"></script> -->
-<script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/ace.js" type="text/javascript" charset="utf-8"></script>
-<!-- <script src="js/ace/ext-language_tools.js" type="text/javascript" charset="utf-8"></script> -->
-<script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
+<script src="<?=$aceBase?>ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="<?=$aceBase?>ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
+<?php if(!isset($acetheme)): ?>
+<script src="<?=$aceBase?>ext-themelist.js" type="text/javascript" charset="utf-8"></script>
+<?php endif; ?>
 <?php if(!$mode): ?>
-<script src="js/ace/ext-modelist.js" type="text/javascript" charset="utf-8"></script>
+<script src="<?=$aceBase?>ext-modelist.js" type="text/javascript" charset="utf-8"></script>
 <?php endif; ?>
 <script type="text/javascript">
 ace.require("ace/ext/language_tools");
@@ -77,6 +81,10 @@ function kbdHelp () {
 		editor.showKeyboardShortcuts()
 	})
 }
+function modeSel (elm) {
+	//alert(elm.innerHTML);
+	editor.getSession().setMode('ace/mode/'+elm.innerHTML);
+}
 </script>
 <style>
 html, body {width:100%;height:100%;margin:0;padding:0;}
@@ -94,17 +102,22 @@ div.cntrl {float:left;margin-right:10px;}
 					<li onclick="editor.renderer.setShowGutter(!editor.renderer.getShowGutter())">Toggle Gutter</li>
 					<li>Code Mode
 						<ul>
-							<li onclick="editor.getSession().setMode('ace/mode/javascript')">javascript</li>
-							<li onclick="editor.getSession().setMode('ace/mode/html')">html</li>
-							<li onclick="editor.getSession().setMode('ace/mode/php')">php</li>
-							<li onclick="editor.getSession().setMode('ace/mode/css')">css</li>
-							<li onclick="editor.getSession().setMode('ace/mode/perl')">perl</li>
-							<li onclick="editor.getSession().setMode('ace/mode/xml')">xml</li>
-							<li onclick="editor.getSession().setMode('ace/mode/json')">json</li>
-							<li onclick="editor.getSession().setMode('ace/mode/mysql')">mysql</li>
+							<li onclick="modeSel(this)">javascript</li>
+							<li onclick="modeSel(this)">html</li>
+							<li onclick="modeSel(this)">php</li>
+							<li onclick="modeSel(this)">css</li>
+							<li onclick="modeSel(this)">perl</li>
+							<li onclick="modeSel(this)">xml</li>
+							<li onclick="modeSel(this)">json</li>
+							<li onclick="modeSel(this)">mysql</li>
 						</ul>
 					</li>
 					<li onclick="kbdHelp()">Command Guide</li>
+<?php if (!isset($acetheme)): ?>
+					<li>Theme
+						<ul id="thmlst"></ul>
+					</li>
+<?php endif; ?>
 				</ul>
 			</li>
 		</ul>
@@ -134,21 +147,39 @@ div.cntrl {float:left;margin-right:10px;}
 	</form>
 	<div id="editor"></div>
 <script type="text/javascript">
+<?php if (!isset($acetheme)): ?>
+var themelist = ace.require("ace/ext/themelist");
+var thmMnu = document.getElementById('thmlst');
+var thmn, thm;
+for (thmn in themelist.themes) {
+	thm = themelist.themes[thmn];
+	thmMnu.innerHTML += '<li title="'+thm.name+'" onclick="editor.setTheme(\''+thm.theme+'\');">'+thm.caption+'</li>';
+}
+<?php endif; ?>
 var eData = document.getElementById('editBox');
 var editor = ace.edit("editor");
 editor.$blockScrolling = Infinity;
 editor.setShowPrintMargin(false);
 editor.getSession().setUseSoftTabs(false);
 editor.getSession().setValue(eData.value);
-//ace.config.set('themePath', 'js/ace');
-//editor.setTheme("ace/theme/rjcode");
-editor.setTheme("ace/theme/sqlserver");
+<?php
+$atheme = '';
+if (isset($acetheme)) {
+	if ($acetheme[0] == '/') {
+		$acetheme = substr($acetheme, 1);
+		echo "ace.config.set('themePath', 'js/ace');\n";
+	}
+	$atheme = $acetheme;
+	echo "editor.setTheme(\"ace/theme/{$atheme}\")\n";
+}
+?>
+//editor.setTheme("ace/theme/<?=$atheme?>");
 <?php if ($mode): ?>
-	editor.getSession().setMode("ace/mode/<?=$mode?>");
+editor.getSession().setMode("ace/mode/<?=$mode?>");
 <?php else: ?>
-	var modelist = ace.require("ace/ext/modelist");
-	var mobj = modelist.getModeForPath("<?php echo $fref; ?>");
-	editor.getSession().setMode(mobj.mode);
+var modelist = ace.require("ace/ext/modelist");
+var mobj = modelist.getModeForPath("<?php echo $fref; ?>");
+editor.getSession().setMode(mobj.mode);
 <?php endif; ?>
 editor.setOptions({
 	enableBasicAutocompletion: true,

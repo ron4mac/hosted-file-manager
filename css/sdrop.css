@@ -2,8 +2,9 @@ ul#navc { margin: 6px 4px 0 4px; }
 ul.drop a { display:block; color: #fff; text-decoration: none; }
 ul.drop, ul.drop li, ul.drop ul { list-style: none; margin: 0; padding: 0; color: #555; }
 ul.drop { position: relative; z-index: 597; float: left; }
-ul.drop li { float: left; vertical-align: middle; zoom: 1; }
-ul.drop li.hover, ul.drop li:hover { position: relative; z-index: 599; cursor: default; background: #1e7c9a; }
+ul.drop li { float: left; vertical-align: middle; zoom: 1; padding-left: 4px; }
+ul.drop li.hover, ul.drop li:hover { position: relative; z-index: 599; cursor: default; background: #DDD; }
+ul.drop li[onclick] { cursor: pointer; }
 ul.drop ul { visibility: hidden; position: absolute; top: 100%; left: 0; z-index: 598; width: 195px; background: #FFF; border: 1px solid #555; }
 ul.drop ul li { float: none; }
 ul.drop ul ul { top: -2px; left: 100%; }

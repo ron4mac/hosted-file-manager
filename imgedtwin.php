@@ -33,7 +33,7 @@ $iurl = 'filproxy.php?f='.urlencode($fref);
 <head>
 	<title>Image Edit :: <?php echo $fref?></title>
 	<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
-	<link rel="stylesheet" href="css/Jcrop.min.css" type="text/css" />
+	<link rel="stylesheet" href="css/Jcrop<?=$jsver?>.css" type="text/css" />
 	<style>
 		.content { padding:12px; }
 		.lft20 { margin-left:1.5em; }
