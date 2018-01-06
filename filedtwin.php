@@ -185,6 +185,10 @@ editor.setOptions({
 	enableBasicAutocompletion: true,
 	enableSnippets: true
 });
+editor.session.on('changeMode', function(e, session){
+	// increase # errs shown by jslint
+	session.$worker.send("changeOptions", [{maxerr: 9999}]);
+});
 editor.focus();
 </script>
 </body>
