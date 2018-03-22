@@ -221,8 +221,12 @@ fclose($fh_res);
 		$msg = 'FMX Version: ' . $fmxVersion;
 		$msg .= '<br />PHP Version: ' . phpversion();
 		$msg .= '<br />MySql(i) Client Version: ' . mysqli_get_client_info();
-		$sql3v = SQLite3::version();
-		$msg .= '<br />SQLite3 Version: ' . $sql3v['versionString'];
+		if (class_exists('SQLite3')) {
+			$sql3v = SQLite3::version();
+			$msg .= '<br />SQLite3 Version: ' . $sql3v['versionString'];
+		} else {
+			$msg .= '<br />SQLite3 not available';
+		}
 		$msg .= '<br /><br />';
 		if ($newver) {
 			$vinf = explode('|', $newver);
