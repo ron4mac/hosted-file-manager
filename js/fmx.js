@@ -428,7 +428,7 @@ function doEditImage (fpath) {
 function doFileAction (act,elem,evt) {
 	if (evt) { evt.preventDefault();evt.stopPropagation(); }
 	var fName = $(elem).parents('tr').attr('data-fref');
-	var fileoi = encodeURI(curDir+fName);
+	var fileoi = encodeURIComponent(curDir+fName);
 	var parms;
 	switch (act) {
 		case 'finf':
