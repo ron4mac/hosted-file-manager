@@ -48,8 +48,15 @@ if (isset($_POST['act'])) {
 }
 
 if (isset($_POST['commit'])) {
-	$rslt .= `git add .`;
-	$rslt .= `git commit -a -m "{$_POST['cmmsg']}"`;
+	if (isset($_POST['COS'])) {
+		foreach ($_POST['ftc'] as $ftc) {
+			$rslt .= `git add "{$ftc}"`;
+		}
+		$rslt .= `git commit -m "{$_POST['cmmsg']}"`;
+	} else {
+		$rslt .= `git add .`;
+		$rslt .= `git commit -a -m "{$_POST['cmmsg']}"`;
+	}
 }
 
 if (isset($_POST['pull'])) $rslt .= `git pull --rebase`;
@@ -89,7 +96,10 @@ if ($brch) {
 	$opts = '<option value="master">master</option>';
 }
 
-
+function ckBox ($v, $n=null)
+{
+	return '<input type="checkbox"'.($n ? (' name="'.$n.'"') : '').' value="'.$v.'"> ';
+}
 
 function statusAction ()
 {
@@ -102,11 +112,11 @@ function statusAction ()
 	//	list($m, $f, $ff) = explode(' ', $stat.'', 3);
 		switch ($m) {
 			case ' M':
-				$html .= '<a href="javascript:postAct({act:\'rev\', f: \''.urlencode($f).'\'})">revert</a> '.$f;
+				$html .= ckBox($f, 'ftc[]').'<a href="javascript:postAct({act:\'rev\', f: \''.urlencode($f).'\'})">revert</a> '.$f;
 				$html .= ' <a href="javascript:postAct({act:\'dif\', f: \''.urlencode($f).'\'})">diff</a><br />';
 				break;
 			case '??':
-				$html .= '<a href="?act=del&f='.urlencode($f).'">delete</a> '.$f.'<br />';
+				$html .= ckBox($f, 'ftc[]').'<a href="?act=del&f='.urlencode($f).'">delete</a> '.$f.'<br />';
 				break;
 			default:
 				$html .= bin2hex($m) . " $f<br />";
@@ -176,7 +186,7 @@ function statusAction ()
 	<?php if ($msg) { echo $msg.'<br />'; } ?>
 	<form name="gitsync" class="syncform" method="post">
 	Branch: <select name="brchsel"><?php echo $opts; ?></select>
-	<button onclick="return doDnld()">Download</button>
+	<button onclick="return doDnld()" title="Download the archive zip from Github">Download</button>
 	<?php if ($rslt): ?>
 	<br /><br />Result
 	<div class="rslt">
@@ -188,10 +198,12 @@ function statusAction ()
 	<br />Status
 	<div class="stat">
 		<xmp><?php echo `git fetch origin; git status`; ?></xmp>
-		<?php echo statusAction(); ?>
+		<?php $sact = statusAction(); echo $sact; ?>
 	</div>
-	<input type="submit" name="commit" value="Commit" /> &nbsp;&nbsp;Msg: <input type="text" id="cmmsg" name="cmmsg" class="cmmsg" />
-	<br /><br />Remote
+	<?php if($sact): ?>
+	<input type="submit" name="commit" value="Commit" /> &nbsp;&nbsp;<?=ckBox('1', 'COS')?> Only selected &nbsp;&nbsp;Msg: <input type="text" id="cmmsg" name="cmmsg" class="cmmsg" /><br />
+	<?php endif; ?>
+	<br />Remote
 	<div class="remo">
 		<input type="submit" name="pull" value="Pull" />
 		<div class="push">

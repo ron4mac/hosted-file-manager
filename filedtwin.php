@@ -46,7 +46,7 @@ switch (strtolower($fext)) {
 }
 $scrptFilPrts = explode('/',__FILE__);
 
-$aceBase = '//cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/';
+$aceBase = '//cdnjs.cloudflare.com/ajax/libs/ace/1.4.1/';
 ?>
 <!DOCTYPE html>
 <html>

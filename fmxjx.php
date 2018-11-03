@@ -9,7 +9,7 @@ switch ($_POST['act']) {
 		$todir = $baseDir.escapeshellcmd($_POST['todr']);
 		$path = escapeshellcmd($_POST['dir']);
 		$files = $_POST['files'];
-		$rslt = '';
+		$rslt = 0;
 		foreach ($files as $fle) {
 			system('cp -a "' . "$baseDir$path/".rtrim(doUnescape($fle),' /') . '" "'.$todir.'"',$irslt);
 			$rslt += $irslt;
@@ -195,7 +195,7 @@ fclose($fh_res);
 		$todir = $baseDir.escapeshellcmd($_POST['todr']);
 		$path = escapeshellcmd($_POST['dir']);
 		$files = $_POST['files'];
-		$rslt = '';
+		$rslt = 0;
 		foreach ($files as $fle) {
 			$cmd = 'mv -b -t "'.$todir.'" "'."$baseDir$path/".rtrim(doUnescape($fle),' /').'"';
 			system($cmd, $irslt);
