@@ -220,7 +220,7 @@ fclose($fh_res);
 		$newver = checkForUpdate();
 		$msg = 'FMX Version: ' . $fmxVersion;
 		$msg .= '<br />PHP Version: ' . phpversion();
-		$msg .= '<br />MySql(i) Client Version: ' . mysqli_get_client_info();
+		$msg .= '<br />MySql(i) Client Version: ' . str_replace('$','',mysqli_get_client_info());
 		if (class_exists('SQLite3')) {
 			$sql3v = SQLite3::version();
 			$msg .= '<br />SQLite3 Version: ' . $sql3v['versionString'];

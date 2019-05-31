@@ -66,18 +66,10 @@ switch ($y) {
 			$mtyp = 'text/html';
 			$fcon = '<!DOCTYPE html><html><head>
 <style>
-* {
-	padding: 0;
-	margin: 0;
-}
-.fit {
-	max-width: 100%;
-	max-height: 100%;
-}
-.center {
-	display: block;
-	margin: auto;
-}
+* { padding: 0; margin: 0; }
+html { background-color:darkgray }
+.fit { max-width: 100%; max-height: 100%; }
+.center { display: block; margin: auto; }
 </style>
 </head>';
 			$fcon .= '<body><img class="center fit" src="filproxy.php?f='.urlencode($fref).'" /></body></html>';
@@ -114,10 +106,13 @@ switch ($y) {
 			include 'md/MarkdownExtra.inc.php';
 			$mtyp = 'text/html';
 			$fcon = \Michelf\MarkdownExtra::defaultTransform(file_get_contents($ffref));
+		} elseif ($mtyp == 'text/plain' && pathinfo($ffref, PATHINFO_EXTENSION) == 'json') {
+			//$fcon = print_r(json_decode(file_get_contents($ffref), true), true);
+			$fcon = json_encode(json_decode(file_get_contents($ffref), true), JSON_PRETTY_PRINT);
 		}
 		else $fcon = file_get_contents($ffref);
 		break;
 }
+
 header("Content-Type: $mtyp");
 echo $fcon ? $fcon : ('Failed to open: '.$fref);
-?>

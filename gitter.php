@@ -111,6 +111,7 @@ function statusAction ()
 		$f = substr($stat, 3);
 	//	list($m, $f, $ff) = explode(' ', $stat.'', 3);
 		switch ($m) {
+			case ' D':
 			case ' M':
 				$html .= ckBox($f, 'ftc[]').'<a href="javascript:postAct({act:\'rev\', f: \''.urlencode($f).'\'})">revert</a> '.$f;
 				$html .= ' <a href="javascript:postAct({act:\'dif\', f: \''.urlencode($f).'\'})">diff</a><br />';
