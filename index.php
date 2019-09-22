@@ -307,7 +307,8 @@ if ($dFiles) {
 			$filedt = preg_match('/php|js|html|htm|pl|cgi|css|ini|xml|sql|txt|csv|htaccess/i', $flext);
 			$imgedt = preg_match('/jpg|jpeg|png|gif|bmp/i', $flext);
 			$sz = $fs[7];
-			if ($sz > 1048575) {$sz = sprintf('%.1f', ($sz / 1048576)) . 'm';}
+			if ($sz > 1073741824) {$sz = sprintf('%.1f', ($sz / 1073741824)). 'g';}
+			elseif ($sz > 1048575) {$sz = sprintf('%.1f', ($sz / 1048576)) . 'm';}
 			elseif ($sz > 1023) {$sz = sprintf('%.1f', ($sz / 1024)) . 'k';}
 			$dt = strftime("%b %d, %Y  %l:%M%P", $fs[9]);
 			if (is_writable($fPth)) {
@@ -340,7 +341,7 @@ if ($dFiles) {
 		<form name="cliterm" method="post">
 		<input type="hidden" name="dir" value="<?php echo $pDir ?>" />
 		<input type="hidden" name="mcmdlin" value="" />
-		Command: <input type="text" id="cmdlin" name="cmdlin" size="80" maxlength="200" />
+		Command: <input type="text" id="cmdlin" name="cmdlin" size="80" maxlength="512" />
 		<input type="button" name="doCmd" value="Do it" onclick="fils2up()" />
 		<a href="#" data-mnu="cmcs" data-req="0">?</a>
 		</form>
