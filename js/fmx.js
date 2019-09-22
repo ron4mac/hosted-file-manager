@@ -302,6 +302,11 @@ function doMenuAction (cmd,evt) {
 				if ($(slctd[0]).parent().next().hasClass('foldCtxt')) { zcmd += "-r "; }
 				destfn = curfn.replace(/\s/g,'_');
 				trmFrm.cmdlin.value = zcmd+destfn+'.zip "'+curfn+'"';
+				if (evt.shiftKey) {
+					var xyz = prompt('COMMAND:',trmFrm.cmdlin.value+' -x "*/sv_*" -x "*/.git*"');
+					if (xyz) { trmFrm.cmdlin.value = xyz; }
+					else break;
+				}
 			} else if (cmd=='uzip') {
 				trmFrm.cmdlin.value = 'unzip "'+curfn+'"';
 			} else if (cmd=='tarz') {
