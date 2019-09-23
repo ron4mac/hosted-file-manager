@@ -40,6 +40,7 @@ if (isset($_POST['act'])) {
 			break;
 		case 'del':
 			$rslt = `git rm -r {$file}`;
+			@unlink($file);
 			break;
 		case 'dif':
 			$rslt = str_replace('xmp>','.xmp>',`git diff {$file}`);
@@ -117,7 +118,8 @@ function statusAction ()
 				$html .= ' <a href="javascript:postAct({act:\'dif\', f: \''.urlencode($f).'\'})">diff</a><br />';
 				break;
 			case '??':
-				$html .= ckBox($f, 'ftc[]').'<a href="?act=del&f='.urlencode($f).'">delete</a> '.$f.'<br />';
+				$html .= ckBox($f, 'ftc[]').'<a href="javascript:postAct({act:\'del\', f: \''.urlencode($f).'\'})">delete</a> '.$f.'<br />';
+			//	$html .= ckBox($f, 'ftc[]').'<a href="?act=del&f='.urlencode($f).'">delete</a> '.$f.'<br />';
 				break;
 			default:
 				$html .= bin2hex($m) . " $f<br />";
