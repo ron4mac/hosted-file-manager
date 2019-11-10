@@ -119,7 +119,6 @@ function statusAction ()
 				break;
 			case '??':
 				$html .= ckBox($f, 'ftc[]').'<a href="javascript:postAct({act:\'del\', f: \''.urlencode($f).'\'})">delete</a> '.$f.'<br />';
-			//	$html .= ckBox($f, 'ftc[]').'<a href="?act=del&f='.urlencode($f).'">delete</a> '.$f.'<br />';
 				break;
 			default:
 				$html .= bin2hex($m) . " $f<br />";
