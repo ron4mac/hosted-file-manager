@@ -73,7 +73,7 @@ var upload_winpop = {$popW};
 	} else {
 		$basDir = isset($_COOKIE[$cooknam]) ? convert_uudecode($_COOKIE[$cooknam]) : false;
 		if (!$basDir) {
-			$basDir = trim(`cd ~;pwd`);
+			$basDir = trim(`cd ~;pwd`);	$basDir = dirname($_SERVER['DOCUMENT_ROOT']);
 			$rootcook = setcookie($cooknam,convert_uuencode($basDir));
 			}
 	}
@@ -117,6 +117,7 @@ if (isset($_POST['cmdlin'])) {
 <script src="<?=$jqlink?>"></script>
 <script src="js/js.php" type="text/javascript"></script>
 <script type="text/javascript">
+var fmx_docroot = '<?php echo dirname($_SERVER['DOCUMENT_ROOT']); ?>';
 var fmx_appPath = '';
 var fmx_AJ='fmxjx.php';
 var curDir='<?php echo $pDir; ?>/';
@@ -375,6 +376,13 @@ if ($dFiles) {
 		<ul>
 			<li id="clrdClr">Clear</li>
 			<li id="clrdDsp">Display</li>
+		</ul>
+	</div>
+	<div class="contextMenu" id="clrdMenuSL">
+		<ul>
+			<li id="clrdClr">Clear</li>
+			<li id="clrdDsp">Display</li>
+			<li id="symLnk">SymLink</li>
 		</ul>
 	</div>
 	<div class="contextMenu" id="delfMenu">

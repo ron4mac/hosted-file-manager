@@ -1,6 +1,6 @@
 <?php
 require_once 'functions.php';
-$fref = $baseDir . doUnescape($_GET['fle']);
+$fref = $baseDir . $_GET['fle'];
 if (file_exists($fref)) {
 	header('Content-Description: File Transfer');
 	header('Content-Type: application/octet-stream');
@@ -39,4 +39,3 @@ if ($fd = fopen($fref, 'r')) {
 	if (isset($_GET['rad']) && $_GET['rad']=='Y') unlink($fref);
 } else print_r($_GET);
 exit;
-?>

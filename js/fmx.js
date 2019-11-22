@@ -1,5 +1,4 @@
 function refreshFilst () {
-	//window.location.reload();
 	window.location = window.location.href.split("#")[0];
 }
 
@@ -16,7 +15,8 @@ function postAndRefresh (parms) {
 	$.post(fmx_AJ, parms, function(data,textStatus,jqXHR) {
 			if (data) { alert(data); }
 			else { refreshFilst(); }
-			});
+		}
+	);
 }
 
 var aMsgDlg = {
@@ -590,7 +590,31 @@ function cm_zip (itm, fld) {
 	trmFrm.cmdlin.value = zcmd+destfn+'.zip "'+curfn+'"';
 	trmFrm.submit();
 }
-	
+function cm_slnk () {
+	if (!sessionStorage.fmx_mrkd) {
+		alert("Mark something to link first");
+		return;
+	}
+	var itms = sessionStorage.fmx_mrkd.split("\u0000");
+	if (itms.length != 1) {
+		alert("Can SymLink to only one location at a time");
+		return;
+	}
+	var fpts = itms[0].split("&");
+	var prts = fpts[0].split("=");
+	var dir = prts[1].replace(/%2F/g,'/');
+	prts = fpts[1].split("=");
+	var fil = prts[1].replace(/%2F/g,'/');
+	var lnkn = prompt("Link to marked:", "");
+	if (lnkn===null) return;
+	var parms = {
+		act: 'slnk',
+		fref: dir+'/'+fil,
+		tref: curDir,
+		alnk: lnkn
+		};
+	postAndRefresh(parms);
+}
 
 // initialize session settings and the UI
 $(function() {
@@ -626,10 +650,11 @@ $(function() {
 			'delfMpty': function(t) { doMenuAction('mpty', null); }
 		}
 	});
-	$('a.markMenu').contextMenu('clrdMenu', {
+	$('a.markMenu').contextMenu('clrdMenuSL', {
 		bindings: {
 			'clrdClr': function(t) { sessionStorage.removeItem("fmx_mrkd"); bump_mcount('#markMenu', -1); },
-			'clrdDsp': function(t) { display_cmmStorage(sessionStorage.fmx_mrkd); }
+			'clrdDsp': function(t) { display_cmmStorage(sessionStorage.fmx_mrkd); },
+			'symLnk': function(t) { cm_slnk(); }
 		}
 	});
 	$('a.mvtoMenu').contextMenu('clrdMenu', {

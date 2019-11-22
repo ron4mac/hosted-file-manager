@@ -14,7 +14,7 @@ if ($fmxInJoomla) {
 $cookie = $_COOKIE[$cooknam];
 if (!$cookie) { exit('Unauthorized'); }
 $baseDir = convert_uudecode($cookie).'/';
-$fmxVersion = '3.2.5 - Nov 2019';
+$fmxVersion = '3.2.6 - Nov 2019';
 
 function FileMimeType ($fpath) {
 	$mtyp = 'text/plain';
@@ -43,11 +43,6 @@ function return_bytes ($val) {
 		case 'k': $val *= 1024;
 	}
 	return $val;
-}
-
-function doUnescape ($inp) {
-	if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc()) return stripslashes($inp);
-	else return $inp;
 }
 
 function fmx_getJoomlaUserId() {

@@ -3,10 +3,10 @@ require_once 'functions.php';
 include 'cfg.php';
 
 if (isset($_POST['savef'])) {
-	$fref = doUnescape($_POST['fref']);
+	$fref = $_POST['fref'];
 	if (!$fref) exit(0);
 	$fpath = $baseDir . $fref;
-	$fcon = doUnescape($_POST['fcontent']);
+	$fcon = $_POST['fcontent'];
 	$rslt = file_put_contents($fpath, str_replace("\r\n","\n",$fcon));
 	header("X-XSS-Protection: 0");
 	if ($rslt === FALSE) echo 'FAILED TO SAVE :O(';
@@ -14,7 +14,7 @@ if (isset($_POST['savef'])) {
 	exit(0);
 }
 
-$fref = doUnescape($_GET['fref']);
+$fref = $_GET['fref'];
 $fpath = $baseDir . $fref;
 if (!file_exists($fpath)) {
 	echo 'FILE DOES NOT EXIST: '.$fpath;
