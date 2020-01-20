@@ -1,5 +1,6 @@
 <?php
 require_once 'functions.php';
+
 $fref = urldecode($_GET['fref']);
 $ffref = $baseDir.$fref;
 $effref = str_replace(' ','\ ',$ffref);
@@ -47,6 +48,13 @@ switch ($y) {
 			mailparse_msg_free($mres);
 		} else {
 			$fcon = 'MAIL PARSE NOT AVAILABLE';
+			include 'mparse/mime_parser.php';
+			if (class_exists('mime_parser_class')) {
+				$mtyp = 'text/html';
+				$fcon = my_mail_parse($ffref);
+			} else {
+				$fcon .= '<br>MIME_PARSER NOT AVAILABLE';
+			}
 		}
 		break;
 		require_once 'rfc822.php';
