@@ -14,9 +14,10 @@ if ($fmxInJoomla) {
 $cookie = $_COOKIE[$cooknam];
 if (!$cookie) { exit('Unauthorized'); }
 $baseDir = convert_uudecode($cookie).'/';
-$fmxVersion = '3.2.7 - Jan 2020';
+$fmxVersion = '3.2.8 - Apr 2020';
 
-function FileMimeType ($fpath) {
+function FileMimeType ($fpath)
+{
 	$mtyp = 'text/plain';
 	if (function_exists('finfo_file')) {
 		$finfo = finfo_open(FILEINFO_MIME_TYPE);
@@ -33,7 +34,8 @@ function FileMimeType ($fpath) {
 	return $mtyp;
 }
 
-function return_bytes ($val) {
+function return_bytes ($val)
+{
 	$val = trim($val);
 	$last = strtolower($val[strlen($val)-1]);
 	$val = (int) $val;
@@ -45,7 +47,17 @@ function return_bytes ($val) {
 	return $val;
 }
 
-function fmx_getJoomlaUserId() {
+function int2kmg (int $val)
+{
+	$sz = $val;
+	if ($sz > 1073741824) {$sz = sprintf('%.1f', ($sz / 1073741824)). 'g';}
+	elseif ($sz > 1048575) {$sz = sprintf('%.1f', ($sz / 1048576)) . 'm';}
+	elseif ($sz > 1023) {$sz = sprintf('%.1f', ($sz / 1024)) . 'k';}
+	return $sz;
+}
+
+function fmx_getJoomlaUserId ()
+{
 	define( '_JEXEC', 1 );
 	define( 'JPATH_BASE', realpath(dirname(__FILE__).'/../../..' ));
 	define( 'DS', DIRECTORY_SEPARATOR );

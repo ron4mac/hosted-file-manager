@@ -2,7 +2,24 @@
 require_once 'functions.php';
 $gitdir = $baseDir . urldecode($_GET['dir']);
 chdir($gitdir);
+
+function getUrl ($wc=false)
+{
+	global $msg;
+	$cfgf = file_get_contents('.git/config');
+	if (!$cfgf) { $msg = 'config file is missing'; return; }
+	$lins = explode("\n", $cfgf);
+	foreach ($lins as $lin) {
+		if (preg_match('#^\surl = (.*)$#', $lin, $mtch)) {
+			if (!$wc) return $mtch[1];
+			return str_replace('://', '://'.trim($_POST['user']).':'.trim($_POST['pass']).'@', $mtch[1]);
+		}
+	}
+	$msg = 'pattern not found';
+}
+
 $msg = ''; $rslt = '';
+
 if (isset($_GET['dnld'])) {
 	$brch = `git rev-parse --abbrev-ref HEAD`;
 	if (!($std = sys_get_temp_dir())) {
@@ -28,10 +45,12 @@ if (isset($_GET['dnld'])) {
 	header($_SERVER["SERVER_PROTOCOL"]." 404 No acrhive created");
 	exit;
 }
+
 if (isset($_POST['setuser'])) {
 	$rslt = `git config --local user.name {$_POST['uname']}`;
 	$rslt = `git config --local user.email {$_POST['uemail']}`;
 }
+
 if (isset($_POST['act'])) {
 	$file = $_POST['f'];
 	switch ($_POST['act']) {
@@ -43,7 +62,7 @@ if (isset($_POST['act'])) {
 			@unlink($file);
 			break;
 		case 'dif':
-			$rslt = str_replace('xmp>','.xmp>',`git diff {$file}`);
+			$rslt = str_replace('xmp>','.xmp>',`git diff -w {$file}`);
 			break;
 	}
 }
@@ -60,32 +79,26 @@ if (isset($_POST['commit'])) {
 	}
 }
 
-if (isset($_POST['pull'])) $rslt .= `git pull --rebase`;
+if (isset($_POST['pull'])) {
+	$remote = getUrl(!empty($_POST['user']));
+	if ($remote) $rslt .= `git pull --rebase {$remote}`;
+}
 
 if (isset($_POST['push'])) {
-	while (true) {
-		$cfgf = file_get_contents('.git/config');
-		if (!$cfgf) { $msg = 'config file is missing'; break; }
-		$ncfg = $cfgf;
-		$ptrn = '#\[remote "([^"]+)"\][^\[]+\t+url = https://#';
-		if (!preg_match($ptrn, $ncfg, $mtchs)) { $msg = 'pattern not found'; break; }
-		//var_dump($mtchs);
-		$remote = $mtchs[1];
-		$brchsel = trim($_POST['brchsel']);
-		$ncfg = preg_replace('#url = https://#', 'url = https://'.$_POST['user'].':'.$_POST['pass'].'@', $ncfg, 1);
-		file_put_contents('.git/config', $ncfg);
+	$remote = getUrl(true);
+	$brchsel = trim($_POST['brchsel']);
+	if ($remote && $brchsel) {
 		if (isset($_POST['force'])) {
 			$rslt .= `git push --force {$remote} {$brchsel}`;
 		} else {
 			$rslt .= `git push {$remote} {$brchsel}`;
 		}
-		file_put_contents('.git/config', $cfgf);
-		break;
 	}
 }
 
 $uname = `git config --local user.name`;
 $brch = `git branch`;
+
 if ($brch) {
 	$bchs = explode("\n", trim($brch));
 	$opts = '';
@@ -127,6 +140,7 @@ function statusAction ()
 	}
 	return $html;
 }
+
 ?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">

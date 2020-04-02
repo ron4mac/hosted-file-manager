@@ -318,6 +318,13 @@ function doMenuAction (cmd,evt) {
 			trmFrm.submit();
 		}
 		break;
+	case 'mgzp':
+		if (oneItem()) {
+			curfn = /*curDir+*/$(slctd[0]).parents('tr').attr('data-fref');
+			var fileoi = encodeURIComponent(curDir+curfn);
+			doManageZip(fileoi);
+		}
+		break;
 	case 'webv':
 		if (oneItem()) {
 			curfn = $(slctd[0]).parents('tr').attr('data-fref');
@@ -428,6 +435,10 @@ function doEditFile (fpath) {
 }
 function doEditImage (fpath) {
 	popPost(fmx_appPath+"imgedtwin.php", {"fref":fpath}, "imgedt", screen.availHeight, Math.min(1200,screen.availWidth));
+}
+function doManageZip (fpath) {
+	var feurl = fmx_appPath+'zipmngr.php?fref='+fpath;
+	editWindow = pop(feurl,screen.availHeight*0.75,screen.availWidth*0.5);
 }
 
 function doFileAction (act,elem,evt) {
@@ -630,6 +641,22 @@ $(function() {
 	$('nav li ul').hide().removeClass('fallback');
 	$('nav li').hover(function () {
 		$('ul', this).stop(true,true).fadeToggle(100);
+	});
+
+	// checkbox/checkall interaction
+	$(".fsel").click(function () {
+		if (this.checked) {
+			var isAllChecked = 0;
+			$(".fsel").each(function() {
+				if (!this.checked)
+					isAllChecked = 1;
+			});
+			if (isAllChecked === 0) {
+				$("#checkAll").prop("checked", true);
+			}
+		} else {
+			$("#checkAll").prop("checked", false);
+		}
 	});
 
 	// attach menu counts

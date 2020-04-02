@@ -164,6 +164,8 @@ $srtBy = isset($_GET['O']) ? $_GET['O'] : 'n';
 				<li><a href="#" data-mnu="uzip" data-req="2">unzip</a></li>
 				<li><a href="#" data-mnu="tarz" data-req="2">tar/gz</a></li>
 				<li><a href="#" data-mnu="utrz" data-req="2">untar/gz</a></li>
+				<li class="mnusep"></li>
+				<li><a href="#" data-mnu="mgzp" data-req="2">View</a></li>
 			</ul>
 		</li>
 		<li><a href="#" id="cppaMenu" data-mnu="cppa" data-req="2" class="cppaMenu">copy/paste</a></li>
@@ -219,7 +221,7 @@ $srtBy = isset($_GET['O']) ? $_GET['O'] : 'n';
 	<table id="ftbl">
 		<thead>
 		<tr>
-		<td><input type="checkbox" onchange="allSelect(event,this)" /></td>
+		<td><input type="checkbox" id="checkAll" onchange="allSelect(event,this)" /></td>
 		<td><?=$parntBut?></td>
 <?php
 	if ($srtBy[0] == 'n') {
