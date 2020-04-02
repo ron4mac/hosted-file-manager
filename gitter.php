@@ -12,7 +12,7 @@ function getUrl ($wc=false)
 	foreach ($lins as $lin) {
 		if (preg_match('#^\surl = (.*)$#', $lin, $mtch)) {
 			if (!$wc) return $mtch[1];
-			return str_replace('://', '://'.trim($_POST['user']).':'.trim($_POST['pass']).'@', $mtch[1]);
+			return str_replace('://', '://'.urlencode(trim($_POST['user'])).':'.urlencode(trim($_POST['pass'])).'@', $mtch[1]);
 		}
 	}
 	$msg = 'pattern not found';
