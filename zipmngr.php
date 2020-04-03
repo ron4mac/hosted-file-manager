@@ -46,13 +46,21 @@ function display_entry ()
 	$fnam = $za->getNameIndex($idx);
 
 	$dsp = new EntryView(basename($fnam));
+	$dsp->addScript('
+	function dnld_entry (e) {
+		e.preventDefault();
+		var dlURL = "zipmngr.php?fref='.$fref.'&act=dnld&idx=" + '.$idx.';
+		var dlframe = document.createElement("iframe");
+		dlframe.src = dlURL;
+		dlframe.style.display = "none";
+		document.body.appendChild(dlframe);
+	}');
 
-	$body = <<<EOT
+	$body = '
 	<div class="navbar">
 		<a href="#" onclick="window.history.back();">&lt;&lt; Back</a>
-		<a href="#" onclick="alert('Not Implemented')">Download</a>
-	</div>
-EOT;
+		<a href="#" onclick="dnld_entry(event)">Download</a>
+	</div>';
 
 	$fext = pathinfo($fnam, PATHINFO_EXTENSION);
 	$mode = empty($modes[$fext]) ? $fext : $modes[$fext];
@@ -65,6 +73,7 @@ EOT;
 	editor.setTheme("ace/theme/'.$acetheme.'");
 	editor.session.setMode("ace/mode/'.$mode.'");
 	editor.setReadOnly(true);
+	editor.setShowPrintMargin(false);
 	</script>';
 
 	$dsp->display($body, '', $botscr);
@@ -82,13 +91,13 @@ function display_archive ()
 
 	$dsp = new ArchiveView(basename($fpath));
 
-	$addScr = <<<EOT
+	$addScr = '
 	function dnld_entry (e) {
 		e.preventDefault();
 		var slctd = $(".slctd")[0];
 		var idx = slctd.getAttribute("data-idx");
 		if (idx === null) { alert("Please select a file first."); return; }
-		var dlURL = 'zipmngr.php?fref={$fref}&act=dnld&idx=' + idx;
+		var dlURL = "zipmngr.php?fref='.$fref.'&act=dnld&idx=" + idx;
 		var dlframe = document.createElement("iframe");
 		dlframe.src = dlURL;
 		dlframe.style.display = "none";
@@ -109,20 +118,18 @@ function display_archive ()
 	}
 	$(function() {
 		$(".rTableRow").click(function(){ iSelect(this) });
-	});
-EOT;
+	});';
 	$dsp->addScript($addScr);
 
-	$body = <<<EOT
-<div class="navbar">
-	<a href="#" onclick="dnld_entry(event)">Extract</a>
-	<a href="#" onclick="view_entry(event)">View</a>
-</div>
-<form action="" id="actfrm" method="post">
-	<input type="hidden" id="act" name="act" value="" />
-	<input type="hidden" id="idx" name="idx" value="" />
-</form>
-EOT;
+	$body = '
+	<div class="navbar">
+		<a href="#" onclick="dnld_entry(event)">Extract</a>
+		<a href="#" onclick="view_entry(event)">View</a>
+	</div>
+	<form action="" id="actfrm" method="post">
+		<input type="hidden" id="act" name="act" value="" />
+		<input type="hidden" id="idx" name="idx" value="" />
+	</form>';
 
 	$zip = zip_open($fpath);
 	if (!is_resource($zip)) {
@@ -133,11 +140,9 @@ EOT;
 	$ndx = 0;
 	$body .= '<div class="rTable main">';
 	while (($ntry = zip_read($zip)) && ($ntry !== false)) {
-//		$body .= '<div class="rTableRow" data-idx="'.$ndx.'">';
 		if (is_resource($ntry)) {
 			$nam = zip_entry_name($ntry);
 			if (substr($nam, -1) == '/') {
-//				$body .= '<div class="rTableRow" data-idx="-'.$ndx.'">';
 				$body .= '<div class="rTableRow">';
 				$body .= '<div class="rTableCell zdir numr">'.$ndx.'</div><div class="rTableCell zdir"></div><div class="rTableCell zdir">'.$nam.'</div>';
 			} else {
@@ -175,7 +180,7 @@ abstract class Display
 	public function __construct ($t)
 	{
 		$this->title = $t;
-		$this->style = <<<EOT
+		$this->style = '
 	body {margin: 0;}
 	.navbar {
 		overflow: hidden;
@@ -197,9 +202,7 @@ abstract class Display
 	.navbar a:hover {
 		background: #ddd;
 		color: black;
-	}
-EOT;
-		
+	}';
 	}
 
 	public function addScript ($scr, $inl=true)
@@ -244,7 +247,7 @@ class ArchiveView extends Display
 	public function __construct ($t)
 	{
 		parent::__construct($t);
-		$this->style .= <<<EOT
+		$this->style .= '
 	.main { padding: 16px; margin-top: 31px; }
 	.fpath { width:100%; }
 	.rTable { display: table; border-collapse: collapse; }
@@ -255,8 +258,7 @@ class ArchiveView extends Display
 	.rTableCell, .rTableHead { display: table-cell; padding: 3px 10px; border: 1px solid #999; }
 	.numr { text-align: right; }
 	.zdir { background-color: #CCC; }
-	.slctd { background-color: #E0E0FF; }
-EOT;
+	.slctd { background-color: #E0E0FF; }';
 	}
 }
 
