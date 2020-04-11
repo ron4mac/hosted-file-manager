@@ -437,7 +437,7 @@ function doEditImage (fpath) {
 	popPost(fmx_appPath+"imgedtwin.php", {"fref":fpath}, "imgedt", screen.availHeight, Math.min(1200,screen.availWidth));
 }
 function doManageZip (fpath) {
-	var feurl = fmx_appPath+'zipmngr.php?fref='+fpath;
+	var feurl = fmx_appPath+'arcview.php?fref='+fpath;
 	editWindow = pop(feurl,screen.availHeight*0.75,screen.availWidth*0.5);
 }
 
