@@ -50,9 +50,9 @@ if (!empty($_GET['act'])) {
 
 function display_entry ($av)
 {
-	global $fref, $fpath, $aceBase, $acetheme;
+	global $fref, $aceBase, $acetheme;
 
-	$modes = ['js'=>'javascript'];
+	$modes = ['js'=>'javascript','pl'=>'perl','cgi'=>'perl'];
 	$idx = $_POST['idx'];
 	$pth = $_POST['pth'];
 	$fext = pathinfo($pth, PATHINFO_EXTENSION);
@@ -105,7 +105,7 @@ if (!empty($_POST['act'])) {
 
 function display_archive ($av)
 {
-	global $fref, $fpath, $jqlink, $cpl;
+	global $fref, $fpath, $jqlink;
 
 	$dsp = new MyArchiveView(basename($fpath));
 
@@ -167,7 +167,7 @@ display_archive($arcvue);
 
 
 
-class MyArcView
+abstract class MyArcView
 {
 	protected $fpath;
 	protected $nss = 0;
@@ -186,7 +186,8 @@ class MyArcView
 		$dnam = substr($name, $this->nss);
 		if ($isdir) {
 			echo '<div class="rTableRow">';
-			echo '<div class="rTableCell zdir numr">'.$ndx.'</div><div class="rTableCell zdir"></div><div class="rTableCell zdir">'.$dnam.'</div>';
+			echo '<div class="rTableCell zdir numr">'.$ndx.'</div><div class="rTableCell zdir"></div>';
+			echo '<div class="rTableCell zdir">'.$dnam.'</div>';
 		} else {
 			echo '<div class="rTableRow" data-idx="'.$ndx.'">';
 			echo '<div class="rTableCell numr">'.$ndx;
@@ -279,8 +280,6 @@ class MyTgzView extends MyArcView
 
 	private function doDir ($dir, &$ndx)
 	{
-		global $cpl;
-
 		foreach ($dir as $child) {
 			$nam = $child->getPathname();
 			if ($child->isDir()) {

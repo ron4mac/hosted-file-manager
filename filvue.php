@@ -48,25 +48,13 @@ switch ($y) {
 			mailparse_msg_free($mres);
 		} else {
 			$fcon = 'MAIL PARSE NOT AVAILABLE';
-			include 'mparse/mime_parser.php';
-			if (class_exists('mime_parser_class')) {
+			include 'mparse/emlvue.php';
+			if (class_exists('MySimpleMailParse')) {
 				$mtyp = 'text/html';
 				$fcon = my_mail_parse($ffref);
 			} else {
-				$fcon .= '<br>MIME_PARSER NOT AVAILABLE';
+				$fcon .= '<br>EMAIL_PARSER NOT AVAILABLE';
 			}
-		}
-		break;
-		require_once 'rfc822.php';
-		$pcr = new PlancakeEmailParser(file_get_contents($ffref));
-		$fcon = $pcr->getBody();
-		$mtyp = $pcr->getHeader('content-type') ?: 'text/plain';
-		if ($mtyp != 'text/html') {
-			$mtyp = 'text/plain';
-		}
-		if (!$fcon) {
-			$mtyp = 'text/html';
-			$fcon = $pcr->getHTMLBody();
 		}
 		break;
 	default:

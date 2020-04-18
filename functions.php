@@ -14,7 +14,7 @@ if ($fmxInJoomla) {
 $cookie = $_COOKIE[$cooknam];
 if (!$cookie) { exit('Unauthorized'); }
 $baseDir = convert_uudecode($cookie).'/';
-$fmxVersion = '3.2.9 - Apr 2020';
+$fmxVersion = '3.3.0 - Apr 2020';
 
 function FileMimeType ($fpath)
 {
