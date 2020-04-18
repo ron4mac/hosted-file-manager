@@ -19,10 +19,12 @@ class MySimpleMailParse
 		// last section should have the targeted headers
 		$s = end($this->sections);
 		if (empty($s['headers'][$header])) return null;
-		return $s['headers'][$header];
+		$h = $s['headers'][$header];
+		if (substr($h,0,2)=='=?') $h = iconv_mime_decode($h);
+		return $h;
 	}
 
-	public function body ($part=0)
+	public function getBody ($part=0, &$ishtml)
 	{
 		$secn = 0;
 		foreach ($this->sections as $i => $s)
@@ -36,6 +38,7 @@ class MySimpleMailParse
 			}
 		}
 		$sect = $this->sections[$secn];
+		$ishtml = strpos($ct,'text/html') !== false;
 		$cte = empty($sect['headers']['content-transfer-encoding']) ? '' : strtolower($sect['headers']['content-transfer-encoding']);
 		$pt = empty($sect['headers']['content-type']) ? false : strpos($sect['headers']['content-type'],'text/plain') !== false;
 		$cis = $pt ? '<br>' : '';
@@ -113,8 +116,8 @@ class MySimpleMailParse
 function my_mail_parse ($fref)
 {
 	$msmp = new MySimpleMailParse($fref);		//file_put_contents('MSMP.log',print_r($msmp,true));
-//	echo'<xmp>';var_dump($msmp);echo'</xmp>';
 
+	// form the email header: date,from,to,etc
 	$head = '<style>.msmh_{font-weight:bold}</style>';
 	$head .= '<div><span class="msmh_">Date:</span> '.$msmp->getHeaderValue('date').'</div>';
 	$head .= '<div><span class="msmh_">From:</span> '.htmlspecialchars($msmp->getHeaderValue('from')).'</div>';
@@ -126,18 +129,17 @@ function my_mail_parse ($fref)
 	$head .= '<div><span class="msmh_">Subject:</span> '.htmlspecialchars($msmp->getHeaderValue('subject')).'</div>';
 	$head .= '<hr>';
 
-
-	$body = $msmp->body(1);
-//	preg_match('#<img(.+)src#i',$body,$mtch);		echo'<xmp>';var_dump($mtch);echo'</xmp>';
-//	preg_match('#<\s*img(.*?) src\s*=\s*(["\'])(.+?)\2#i',$body,$mtch);		echo'<xmp>';var_dump($mtch);echo'</xmp>';
-	// twart getting remote images
+	// get the email body
+	$ishtml = false;
+	$body = $msmp->getBody(1, $ishtml);
+/*
+	// twart getting remote images, etc
 	$body = preg_replace('#<\s*img(.*?) src\s*=\s*(["\'])(.+?)\2#i','<img$1 src="graphics/holder.gif"',$body);
-//	preg_match_all('#\{([^}]*?)background-(.*?)url\s*\(\s*(["\'])(.+?)\3#i',$body,$mtch);		echo'<xmp>';var_dump($mtch);echo'</xmp>';
 	$body = preg_replace('#url\s*\(\s*(["\']?)(.+?)\1?\)#i','url(graphics/holdery.gif)',$body);
 	$body = preg_replace('#background\s*=\s*(["\'])(.+?)\1#i','background="graphics/holdery.gif"',$body);
 	$body = preg_replace('#src\s*=\s*(["\'])http(.+?)\1#i','src="graphics/holdery.gif"',$body);
 	$body = preg_replace('#srcset\s*=\s*(["\'])http(.+?)\1#i','srcset="graphics/holdery.gif"',$body);
-
+*/
 /*
 	$p = 0;
 	$ha = [];
@@ -147,6 +149,16 @@ function my_mail_parse ($fref)
 	}
 	$body .= '<xmp>' . implode("\n",$ha) . '</xmp>';
 */
+
+	if ($ishtml) {
+		// use washtml from roundcube
+		include 'utils.php';
+		include 'washtml.php';
+		$oerl = error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);	// insulate the r-cube notices and warnings
+		$washer = new rcube_washtml(['blocked_src'=>'graphics/holdery.gif']);
+		$body = $washer->wash($body);
+		error_reporting($oerl);
+	}
 
 	return $head.$body;
 }
