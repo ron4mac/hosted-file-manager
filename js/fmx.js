@@ -373,10 +373,6 @@ function doMenuAction (cmd,evt) {
 			pop(fvurl,screen.availHeight,screen.availWidth*0.8);
 		}
 		break;
-	case 'pvck':
-		parms = '?dir='+curDir;
-		pop(fmx_appPath+'phpverreq.php'+parms,screen.availHeight,1200);
-		break;
 	case 'fmxi':
 		parms = {act: 'fmxi'};
 		$.post(fmx_AJ, parms, function(data,textStatus,jqXHR) {

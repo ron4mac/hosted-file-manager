@@ -208,7 +208,6 @@ $srtBy = isset($_GET['O']) ? $_GET['O'] : 'n';
 				<li><a href="#" data-mnu="jxtr" data-req="1">jextract</a></li>
 				<li><a href="#" data-mnu="mmiz" data-req="0">minify(.js)</a></li>
 				<li><a href="#" data-mnu="sql3" data-req="0">sqlite3</a></li>
-				<li><a href="#" data-mnu="pvck" data-req="0">phpVerReq</a></li>
 			</ul>
 		</li>
 		<li><a href="#" data-mnu="fmxi" data-req="0">?</a></li>
