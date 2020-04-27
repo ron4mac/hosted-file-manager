@@ -90,15 +90,13 @@ var fNamDlg = {
 // file upload methods
 var upldAction = {
 	// HTML5 w/progress in a popup window
-	H5w: function(){ popUp(fmx_appPath+'filupld5d.php'); },
+	H5w: function(){ popUp(fmx_appPath+'filupld5.php'); },
 	// HTML5 w/progress in a div overlay
-	H5o: function(cbf){ $('#upload').jqm({ajax:fmx_appPath+'filupld5dm.php', ajaxText:'Loading...', onLoad: cbf, onHide: function(h){refreshFilst();}, target:'.upldr', overlay:5}).jqmShow(); },
+	H5o: function(cbf){ $('#upload').jqm({ajax:fmx_appPath+'filupld5.php?o=1', ajaxText:'Loading...', onLoad: cbf, onHide: function(h){refreshFilst();}, target:'.upldr', overlay:5}).jqmShow(); },
 	// legacy HTML in a popup window
 	L4w: function(){ popUp(fmx_appPath+'filupld.php'); },
 	// legacy HTML in a div overlay
-	L4o: function(){ $('#upload').jqm({ajax:fmx_appPath+'filupldm.php', ajaxText:'Loading...', onHide: function(h){refreshFilst();}, target:'.upldr',overlay:5}).jqmShow(); },
-	// chunked upload for very large files
-	Chk: function(){ popUp(fmx_appPath+'upchunk.php'); }
+	L4o: function(){ $('#upload').jqm({ajax:fmx_appPath+'filupld.php?o=1', ajaxText:'Loading...', onHide: function(h){refreshFilst();}, target:'.upldr',overlay:5}).jqmShow(); },
 	};
 
 function downloadFile (A, cdl, asf) {

@@ -12,6 +12,7 @@ switch ($fInfo) {
 	case 'application/zip':
 		$arcvue = new MyZipView($fpath);
 		break;
+	case 'application/x-tar':
 	case 'application/x-gzip':
 		$arcvue = new MyTgzView($fpath);
 		break;

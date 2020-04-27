@@ -14,3 +14,6 @@ $aceBase = '//cdnjs.cloudflare.com/ajax/libs/ace/1.4.1/';
 // If no theme is entered here, the editor will provide a dropdown selection list
 //   - hover over the list name to see the string that should be entered below
 $acetheme = 'sqlserver';
+
+// link to font awesome
+$fontawsm = '//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css';

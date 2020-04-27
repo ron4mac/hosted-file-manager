@@ -112,7 +112,7 @@ if (isset($_POST['cmdlin'])) {
 <title>Files :: <?php echo $rootD?></title>
 <meta charset="UTF-8">
 <meta name="google" content="notranslate">
-<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome<?=$jsver?>.css" />
+<link rel="stylesheet" href="<?php echo $fontawsm; ?>" />
 <link rel="stylesheet" type="text/css" href="css/css.php" />
 <script src="<?=$jqlink?>"></script>
 <script src="js/js.php" type="text/javascript"></script>
@@ -398,7 +398,6 @@ if ($dFiles) {
 			<li id="H5o">H5ovr</li>
 			<li id="L4w">L4win</li>
 			<li id="L4o">L4ovr</li>
-			<li id="Chk">Chunked</li>
 		</ul>
 	</div>
 	<div class="contextMenu" id="fileCtxt">
