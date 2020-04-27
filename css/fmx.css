@@ -10,16 +10,15 @@ span.pathbread {
 
 #ftbl {
 	border: none;
-	width: 100%;
+/*	width: 100%;*/
 }
 
 #ftbl thead, #ftbl tbody {
-	display: block;
+/*	display: block;*/
 }
 
 #ftbl tbody {
 	min-height: 2em;
-/*	max-height: 600px; */
 	overflow-y: auto;
 	overflow-x: hidden;
 }
@@ -59,31 +58,23 @@ div#fmnu a {
 }
 
 td.filicon {
-	background-image: url(../icons/document.png);
-	background-repeat: no-repeat;
-	background-position: center center;
-	width: 16px;
+	color:#BBB;
+	text-align:center;
 }
 td.filedticon {
-	background-image: url(../icons/document_edit.png);
-	background-repeat: no-repeat;
-	background-position: center center;
-	width: 16px;
+	color: #777;
+	text-align:center;
 	cursor: pointer;
 }
 td.imgedticon {
-	background-image: url(../icons/image_edit.png);
-	background-repeat: no-repeat;
-	background-position: center center;
-	width: 16px;
+	color: #800;
+	text-align:center;
 	cursor: pointer;
 }
-
 td.diricon {
-	background-image: url(../icons/folder-hor.png);
-	background-repeat: no-repeat;
-	background-position: center center;
-	width: 16px;
+	font-size:medium;
+	color:#DB0;
+	text-align:center;
 }
 
 div.dnldprg {
@@ -142,12 +133,9 @@ input[type="checkbox"] {
 	/*padding: 1em;*/
 }
 #footerPopButton {
-	background: url(../icons/burger.png) top left no-repeat transparent;
 	position: absolute;
 	top: -38px;
 	right: 20px;
-	width: 32px;
-	height: 32px;
 	border: none;
 	cursor: pointer;
 }

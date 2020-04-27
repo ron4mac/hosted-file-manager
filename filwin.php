@@ -38,7 +38,7 @@ function winResized() {
 window.onresize = winResized;
 </script>
 <style>
-iframe#fvue {clear:both;overflow:hidden;width:100%;margin-top:6px;border:1px solid #E0E0E0;}
+iframe#fvue {clear:both;overflow:hidden;width:100%;margin-top:6px;border:1px solid #E0E0E0;box-sizing:border-box}
 div.mtsel {float:right;}
 img.wacti {float:right;margin-top:2px;margin-right:10px;}
 </style>

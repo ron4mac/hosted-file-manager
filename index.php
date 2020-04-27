@@ -144,7 +144,6 @@ if ($pDir) {
 	if (dirname($pDir)!='.') {
 		$aRef .= '?dir=' . urlencode(dirname($pDir));
 	}
-//	$parntBut = '<a href="'.$aRef.'" title="Up to parent"><img src="'.$appB.'icons/arrow-ret.png" width="16" height="16" alt="" /></a>';
 	$parntBut = '<a href="'.$aRef.'" title="Up to parent"><i class="fa fa-chevron-up" style="color:blue;font-size:large"></i></a>';
 } else {
 	print $rootD;
@@ -293,11 +292,11 @@ if ($dFiles) {
 			} else {
 				echo '<td>&nbsp;</td>';
 			}
-			echo '<td class="diricon foldCtxt"> </td>';
+			echo '<td class="diricon foldCtxt"><i class="fa fa-folder" aria-hidden="true"></i></td>';
 			echo '<td class="foldCtxt"><a href="index.php?dir='.$efle.'">'.$fle.'</a>'.($isLnk ? " &rarr; $rlnk" : '').'</td>';
 			echo '<td class="tpad">'.$dt.'</td>';
 			echo '<td class="right tpad">--</td>';
-			echo '<td class="tpad"><a href="#" data-act="finf"><img src="'.$appB.'graphics/info10x10.gif" width="10" height="10" alt="" /></a></td>';
+			echo '<td class="tpad"><a href="#" data-act="finf"><i class="fa fa-info-circle" aria-hidden="true"></i></a></td>';
 			echo '</tr>'."\n";
 			}
 		else {
@@ -319,16 +318,16 @@ if ($dFiles) {
 				echo '<td>&nbsp;</td>';
 			}
 			if ($filedt) {
-				echo '<td class="filedticon fileCtxt" onclick="doFileAction(\'fedt\',this,event)">&nbsp;</td>';
+				echo '<td class="filedticon fileCtxt" onclick="doFileAction(\'fedt\',this,event)"><i class="fa fa-file" aria-hidden="true"></td>';
 			} elseif ($imgedt) {
-				echo '<td class="imgedticon fileCtxt" onclick="doFileAction(\'iedt\',this,event)">&nbsp;</td>';
+				echo '<td class="imgedticon fileCtxt" onclick="doFileAction(\'iedt\',this,event)"><i class="fa fa-file-image-o" aria-hidden="true"></i></td>';
 			} else {
-				echo '<td class="filicon fileCtxt">&nbsp;</td>';
+				echo '<td class="filicon fileCtxt"><i class="fa fa-file" aria-hidden="true"></i></td>';
 			}
 			print '<td class="fileCtxt"><a href="#" data-act="fvue">'.$ufle.'</a>'.($isLnk ? " &rarr; $rlnk" : '').'</td>';
 			echo '<td class="tpad">'.$dt.'</td>';
 			echo '<td class="right tpad">'.$sz.'</td>';
-			echo '<td class="tpad"><a href="#" data-act="finf"><img src="'.$appB.'graphics/info10x10.gif" width="10" height="10" alt="" /></a></td>';
+			echo '<td class="tpad"><a href="#" data-act="finf"><i class="fa fa-info-circle" aria-hidden="true"></i></a></td>';
 			echo '</tr>'."\n";
 			}
 	}
@@ -338,7 +337,7 @@ if ($dFiles) {
 	</table>
 </form>
 <div id="footerPop">
-	<div id="footerPopButton"></div>
+	<i id="footerPopButton" class="fa fa-bars fa-2x" aria-hidden="true"></i>
 	<div id="footerPopContent">
 		<form name="cliterm" method="post">
 		<input type="hidden" name="dir" value="<?php echo $pDir ?>" />
