@@ -64,10 +64,32 @@ function logIt ($msg) {
 	file_put_contents('log.txt', "{$msg}\n", FILE_APPEND);
 }
 
+// recursively delete a directory
+function delTree ($dir) {
+	$files = array_diff(scandir($dir), ['.','..']);
+	foreach ($files as $file) {
+		$pth = "$dir/$file";
+		(is_dir($pth)) ? delTree($pth) : @unlink($pth);
+	}
+	@rmdir($dir);
+}
+
+// remove defunct files from a given list
+function cleanupFiles ($fray) {
+	foreach ($fray as $f) {
+		if (substr($f,-1)=='/') {
+			delTree(substr($f,0,-1));
+		} else {
+			@unlink($f);
+		}
+	}
+}
+
 function installUpdate ($fpath) {	// NEED TO GET PATH TO INSTALL
-	$f2p = array('.user.ini','fmx.ini');	//files to preserve if they already exist
+	$f2p = ['.user.ini','fmx.ini'];	//files to preserve if they already exist
 	$zip = new ZipArchive;
 	$res = $zip->open($fpath);
+	$fils2clean = [];
 	if ($res === TRUE) {
 		for ($i = 0; $i < $zip->numFiles; $i++ ) {
 			$stat = $zip->statIndex( $i );
@@ -79,11 +101,16 @@ function installUpdate ($fpath) {	// NEED TO GET PATH TO INSTALL
 			} elseif ($fp) {
 				if (in_array($fp, $f2p) && file_exists($fp)) continue;
 				$fc = $zip->getFromIndex($i);
-				file_put_contents($fp, $fc);
+				if (basename($fp)=='clean.json') {
+					$fils2clean = json_decode($fc, true);
+				} else {
+					file_put_contents($fp, $fc);
+				}
 				//logIt("PUT: {$fp}");
 			}
 		}
 		$zip->close();
+		cleanupFiles($fils2clean);
 	} else {
 		echo 'failed, code:' . $res;
 	}
