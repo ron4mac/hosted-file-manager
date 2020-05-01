@@ -1,30 +1,31 @@
 <?php
-//echo'<pre>';var_dump($_POST);echo'</pre>';
+//file_put_contents('IMGED.LOG',print_r($_POST,true).print_r($_FILES,true),FILE_APPEND);
+
 require_once 'functions.php';
 include 'cfg.php';
-$fref = urldecode($_POST['fref']);
-if (!$fref) {
-	if (!isset($_POST['imgfil'])) { die('Error: no image'); }
-	$fref = $_POST['imgfil'];
-	require_once 'imager.php';
-	$imgObj = new ImageCR($baseDir.$fref);
 
-	if (isset($_POST['rotdeg'])) {
-		$imgObj->rotate($_POST['rotdeg']);
-	}
-	if (isset($_POST['reszit'])) {
-		$meth = 'sampled';
-		$imgObj->copySample($_POST['x'], $_POST['y'], $_POST['reszw'], $_POST['reszh'], $_POST['w'], $_POST['h']);
+if (!empty($_FILES['croppedImage'])) {
+	$upf = $_FILES['croppedImage'];
+	if ($upf['error'] == UPLOAD_ERR_OK) {
+		$tmp_name = $upf['tmp_name'];
+		if (is_uploaded_file($tmp_name)) {
+			if (!move_uploaded_file($tmp_name, $baseDir.$_POST['fpath'])) {
+				echo '<p class="failure">Error: failed to place file</p>';
+				//file_put_contents('IMGED.LOG','Error: failed to place file',FILE_APPEND);
+			}
+		} else {
+			echo '<p class="failure">Error: failed to upload</p>';
+			//file_put_contents('IMGED.LOG','Error: failed to upload',FILE_APPEND);
+		}
 	} else {
-		$meth = 'copied';
-		$imgObj->copy($_POST['x'], $_POST['y'], $_POST['w'], $_POST['h']);
+		echo'<p class="failure">File: '.htmlspecialchars($_POST['fpath']).'<br>Error: '.$upld_err_txt[$upf['error']].'</p>';
+		//file_put_contents('IMGED.LOG','File: '.htmlspecialchars($_POST['fpath']).' Error: '.$upld_err_txt[$upf['error']],FILE_APPEND);
 	}
-
-	if (isset($_POST['asfile']) && trim($_POST['asfile']) != '') {
-		$fref = $_POST['asfile'];
-	}
-	$imgObj->saveToFile($baseDir.$fref);
+	exit();
 }
+
+$fref = urldecode($_POST['fref']);
+$mtype = FileMimeType($baseDir.$fref);
 $imageSize = getimagesize($baseDir.$fref);
 $iurl = 'filproxy.php?f='.urlencode($fref);
 ?>
@@ -33,186 +34,135 @@ $iurl = 'filproxy.php?f='.urlencode($fref);
 <head>
 	<title>Image Edit :: <?php echo $fref?></title>
 	<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
-	<link rel="stylesheet" href="css/Jcrop<?=$jsver?>.css" type="text/css" />
+	<link rel="stylesheet" href="<?php echo $fontawsm; ?>" />
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.6/cropper.min.css" />
 	<style>
-		.content { padding:12px; }
+		.content { display:flex; }
 		.lft20 { margin-left:1.5em; }
 		.edtui { margin-bottom:10px; }
 		#sbbtns { float:right; }
 		#spinner { display:none;float:right; }
 		.tsize { width:4em; }
-		#target { /*width:100%;*/ max-width:100%;max-height:100%;/*display:block;margin:auto;*/ }
+		#target { /*width:100%;*/ max-width:100%;max-height:100%;min-width:60px;/*display:block;margin:auto;*/ }
+		.toolbar { background-color:#E0E0FF;padding:8px;border:1px solid #BBB; }
+		.panel { background-color:#BBB; }
+		.panel ul { list-style-type:none;line-height:1.3em;padding: 0 1em;}
+		.panel ul li { margin-bottom:6px; }
+		.editor { flex:100%;box-sizing:border-box; }
+		#snding { display:none; }
 	</style>
 	<script src="<?=$jqlink?>"></script>
-	<script src="js/jqcropper.js"></script>
-	<script src="js/Jcrop<?=$jsver?>.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.6/cropper.min.js"></script>
+	<script>
+		var imgfb = "<?php echo dirname($fref).'/'; ?>";
+		var imgfn = "<?php echo basename($fref); ?>";
+		var mtype = "<?php echo $mtype; ?>";
+		function setAspect (elem) {
+			let ration = elem.value.split(':');
+			let ratio = ration[1] ? ration[0]/ration[1] : 0;
+			cropper.setAspectRatio(ratio);
+		}
+		function setDatVal (elem, prp) {
+			cropper.setData({[prp]:elem.value*1});
+		}
+		function updateValD (e) {
+			cropX.value = Math.round(e.detail.x);
+			cropY.value = Math.round(e.detail.y);
+			cropW.value = Math.round(e.detail.width);
+			cropH.value = Math.round(e.detail.height);
+		}
+		function save2srvr (thfn) {
+			cropper.getCroppedCanvas().toBlob((blob) => {
+			  const formData = new FormData();
+			
+			formData.append('fpath', imgfb+thfn);
+			
+			  // Pass the image file name as the third parameter if necessary.
+			  formData.append('croppedImage', blob/*, 'example.png' */);
+			$('#snding').show();
+			  // Use `jQuery.ajax` method for example
+			  $.ajax('imgedtwin.php', {
+			    method: 'POST',
+			    data: formData,
+			    processData: false,
+			    contentType: false,
+			    success(data, textStatus, jqXHR) {
+			      console.log('Upload success');
+			      	$('#snding').hide();
+			    },
+			    error(jqXHR, textStatus, errorThrown) {
+			      console.log('Upload error');
+			    },
+			  });
+			}, mtype);
+		}
+		function saveAs () {
+			let asn = prompt("Save as:", imgfn);
+			if (asn) {
+				save2srvr(asn);
+			}
+		}
+		function download () {
+           let a = document.createElement('a');
+           let result = cropper.getCroppedCanvas();
+            a.href = result.toDataURL(mtype);
+            a.download = imgfn;
+            document.body.appendChild(a);
+            a.click();
+		}
+	</script>
 </head>
 <body>
-<script type="text/javascript">
-var img_rsiz = false;
-jQuery(function($){
-
-	var jcrop_api,
-		ratw = 1,
-		rath = 1;
-
-	$('#target').Jcrop({
-		//trueSize: [400,300],
-		bgOpacity: 0.3,
-		onChange: showCoords,
-		onSelect: function(c) { showCoords(c); updateCoords(c); },
-		onRelease: clearCoords
-	},function(){
-		jcrop_api = this;
-		var img = document.getElementById('target');
-		this.setOptions({trueSize: [img.naturalWidth,img.naturalHeight]});
-	});
-
-	$('#target').on('complete','img',function(e){
-		alert('done');
-		//jcrop_api.setSelect([x1,y1,x2,y2]);
-	});
-
-	$('#coords').on('change','input',function(e){
-		var x1 = $('#x1').val(),
-			x2 = $('#x2').val(),
-			y1 = $('#y1').val(),
-			y2 = $('#y2').val();
-		jcrop_api.setSelect([x1,y1,x2,y2]);
-	});
-
-	$('#aspect').change(function(e){
-		var ratio = $(this).val().split(':');
-		if (ratio[1]) {
-			ratw = ratio[0]; rath = ratio[1];
-			jcrop_api.setOptions({aspectRatio: +ratio[0]/+ratio[1]});
-		} else {
-			ratw = 1; rath = 1;
-			jcrop_api.setOptions({aspectRatio: 0});
-		}
-	});
-
-	$('#reszit').change(function(e){
-		img_rsiz = $(this).prop('checked');
-	});
-
-	$('#reszw').change(function(e){
-		$('#reszh').val(aAdjust($(this).val(),$('#reszh').val(),rath,ratw));
-	}).keyup(function(e){
-		$('#reszh').val(aAdjust($(this).val(),$('#reszh').val(),rath,ratw));
-	});
-
-	$('#reszh').change(function(e){
-		$('#reszw').val(aAdjust($(this).val(),$('#reszw').val(),ratw,rath));
-	}).keyup(function(e){
-		$('#reszw').val(aAdjust($(this).val(),$('#reszw').val(),ratw,rath));
-	});
-
-	$('#rotdeg').change(function(e){
-		var deg = $(this).val();
-		jcrop_api.rotate(deg);
-	}).keyup(function(e){
-		var deg = $(this).val();
-		jcrop_api.rotate(deg);
-	});
-
-});
-
-// calc value for aspec compensation
-function aAdjust(rto, cur, rn, rd)
-{
-	if (cur && (rn/rd == 1)) {
-		return rto;
-	} else if (rto) {
-		return Math.round(rto * rn / rd);
-	} else return "";
-}
-
-// Simple event handler, called from onChange and onSelect
-// event handlers, as per the Jcrop invocation above
-function showCoords(c)
-{
-	$('#x1').val(c.x);
-	$('#y1').val(c.y);
-	$('#x2').val(c.x2);
-	$('#y2').val(c.y2);
-	$('#w').val(c.w);
-	$('#h').val(c.h);
-	if (!img_rsiz) {
-		$('#reszw').val(Math.round(c.w));
-		$('#reszh').val(Math.round(c.h));
-	}
-};
-
-function clearCoords()
-{
-	$('#coords input').val('');
-	$('#reszw').val('');
-	$('#reszh').val('');
-};
-
-function updateCoords(c)
-{
-	$('#fx').val(c.x);
-	$('#fy').val(c.y);
-	$('#fw').val(c.w);
-	$('#fh').val(c.h);
-};
-
-function checkCoords()
-{
-	$('#sbbtns').hide();
-	$('#spinner').show();
-	return true;
-	if (parseInt($('#fw').val())) return true;
-	alert('Please select a crop region then press submit.');
-	return false;
-};
-
-function saveAsFile()
-{
-	var fps = $('#imgfil').val().split('/');
-	var newf = prompt("Save file as: ", fps.pop());
-	if (!newf) { return false; }
-	fps.push(newf);
-	$('#asfile').val(fps.join('/'));
-	return true;
-}
-
-
-</script>
-<div class="content">
-	<div class="edtui">
-		<form action="" method="post" onsubmit="return checkCoords();">
-			<label>Constraint: </label>
-			<select id="aspect">
+<div class="toolbar">
+	<label>Constraint:</label>&nbsp;<select id="aspect" onchange="setAspect(this)">
 				<option value="0">none</option>
 				<option value="4:3">4:3</option>
 				<option value="3:4">3:4</option>
 				<option value="7:5">7:5</option>
 				<option value="5:7">5:7</option>
 				<option value="16:9">16:9</option>
+				<option value="1:1">Square</option>
 			</select>
-			<label class="lft20">Rotate: </label>
-			<input type="number" id="rotdeg" name="rotdeg" class="tsize" />
-			<input type="hidden" id="fx" name="x" />
-			<input type="hidden" id="fy" name="y" />
-			<input type="hidden" id="fw" name="w" />
-			<input type="hidden" id="fh" name="h" />
-			<input type="hidden" id="dw" name="dw" />
-			<input type="hidden" id="dh" name="dh" />
-			<input type="hidden" id="imgfil" name="imgfil" value="<?php echo $fref; ?>" />
-			<input type="hidden" id="asfile" name="asfile" value="" />
-			<input type="checkbox" id="reszit" name="reszit" value="resz" class="lft20" /><label>Resize Image</label>
-			<label class="lft20">w:&nbsp;</label><input type="text" id="reszw" name="reszw" class="tsize" />
-			<label>h:&nbsp;</label><input type="text" id="reszh" name="reszh" class="tsize" />
-			<span class="lft20"><?php echo basename($fref).' ('.$imageSize[0].'x'.$imageSize[1].')'; ?></span>
-			<img id="spinner" src="graphics/spinner.gif" />
-			<div id="sbbtns">
-				<input type="submit" value="Save as ..." class="btn btn-large btn-inverse" onclick="return saveAsFile();" />
-				<input type="submit" value="Save Image Changes" class="btn btn-large btn-inverse" />
-			</div>
-		</form>
-	</div>
-	<img src="<?php echo $iurl; ?>" id="target" />
+	<button onclick="cropper.crop()">Crop start</button>
+	<button onclick="cropper.clear()">Crop stop</button>
+	<button onclick="cropper.rotate(-45)">Rotate Left</button>
+	<button onclick="cropper.rotate(45)">Rotate Right</button>
+	<button onclick="cropper.scale(.75,.75)">Scale .75</button>
+	<button onclick="cropper.scale(.5,.5)">Scale .5</button>
+	<button onclick="download()">Download</button>
+	<button onclick="saveAs()">Save as ...</button>
+	<button onclick="save2srvr(imgfn)">Save</button>
+	<i id="snding" class="fa fa-circle-o-notch fa-spin"></i>
 </div>
+<div class="content">
+	<div class="panel">
+		<ul>
+			<li>Crop x pos<br><input type="number" step="1" id="crpx" onchange="setDatVal(this,'x')" /></li>
+			<li>Crop y pos<br><input type="number" step="1" id="crpy" onchange="setDatVal(this,'y')" /></li>
+			<li>Crop width<br><input type="number" step="1" id="crpw" onchange="setDatVal(this,'width')" /></li>
+			<li>Crop height<br><input type="number" step="1" id="crph" onchange="setDatVal(this,'height')" /></li>
+			<li>Arribute 1<br><input type="number" step="1" id="a1" onchange="" /></li>
+			<li>Arribute 1<br><input type="number" step="1" id="a2" onchange="" /></li>
+			<li>Arribute 1<br><input type="number" step="1" id="a3" onchange="" /></li>
+			<li>Arribute 1<br><input type="number" step="1" id="a4" onchange="" /></li>
+			<li>Arribute 1<br><input type="number" step="1" id="a5" onchange="" /></li>
+			<li>Arribute 1<br><input type="number" step="1" id="a6" onchange="" /></li>
+		</ul>
+	</div>
+	<div class="editor">
+		<img src="<?php echo $iurl; ?>" id="target" />
+	</div>
+</div>
+<script>
+const image = document.getElementById('target');
+const cropper = new Cropper(image, {
+				autoCrop: false,
+				crop: function (e) { updateValD(e); }
+		});
+var cropX = document.getElementById("crpx");
+var cropY = document.getElementById("crpy");
+var cropW = document.getElementById("crpw");
+var cropH = document.getElementById("crph");
+</script>
+</body>
+</html>

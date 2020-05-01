@@ -19,16 +19,6 @@ function rearrange ($arr)
 
 $fpath = $_POST['fpath'];
 
-$error_types = array(
-	1=>'The uploaded file exceeds the upload_max_filesize directive in php.ini.',
-	'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.',
-	'The uploaded file was only partially uploaded.',
-	'No file was uploaded.',
-	6=>'Missing a temporary folder.',
-	'Failed to write file to disk.',
-	'A PHP extension stopped the file upload.'
-	);
-
 if (empty($_FILES['user_file'])) {
 	// process html5/js uploads iincluding chunked
 	require_once 'uplodr/upload.php';
@@ -50,7 +40,7 @@ if (empty($_FILES['user_file'])) {
 				move_uploaded_file($tmp_name, $baseDir.$fpath.$name);
 			} else echo '<p class="failure">Error: failed to upload</p>';
 		} elseif ($error !== 4 || $key == 0) {
-			echo'<p class="failure">File: '.htmlspecialchars($_FILES['user_file']['name'][$key]).'<br>Error: '.$error_types[$error].'</p>';
+			echo'<p class="failure">File: '.htmlspecialchars($_FILES['user_file']['name'][$key]).'<br>Error: '.$upld_err_txt[$error].'</p>';
 			$errcnt++;
 		}
 	}

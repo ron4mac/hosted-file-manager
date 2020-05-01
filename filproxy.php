@@ -7,4 +7,3 @@ if (!file_exists($fp)) die('nosuchfile: '.$fp);
 $mtype = FileMimeType($fp);
 header("Content-Type: $mtype");
 readfile($fp);
-?>

@@ -68,3 +68,18 @@ function fmx_getJoomlaUserId ()
 	$app->initialise();
 	return JFactory::getUser()->id;
 }
+
+//
+// some common variable/array values
+//
+$upld_err_txt = array(
+	1=>'The uploaded file exceeds the upload_max_filesize directive in php.ini.',
+	'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.',
+	'The uploaded file was only partially uploaded.',
+	'No file was uploaded.',
+	6=>'Missing a temporary folder.',
+	'Failed to write file to disk.',
+	'A PHP extension stopped the file upload.'
+	);
+
+
