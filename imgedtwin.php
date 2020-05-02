@@ -73,26 +73,27 @@ $iurl = 'filproxy.php?f='.urlencode($fref);
 		}
 		function save2srvr (thfn) {
 			cropper.getCroppedCanvas().toBlob((blob) => {
-			  const formData = new FormData();
+			const formData = new FormData();
 			
 			formData.append('fpath', imgfb+thfn);
 			
-			  // Pass the image file name as the third parameter if necessary.
-			  formData.append('croppedImage', blob/*, 'example.png' */);
+			// Pass the image file name as the third parameter if necessary.
+			formData.append('croppedImage', blob/*, 'example.png' */);
 			$('#snding').show();
-			  // Use `jQuery.ajax` method for example
-			  $.ajax('imgedtwin.php', {
-			    method: 'POST',
-			    data: formData,
-			    processData: false,
-			    contentType: false,
-			    success(data, textStatus, jqXHR) {
-			      console.log('Upload success');
-			      	$('#snding').hide();
-			    },
-			    error(jqXHR, textStatus, errorThrown) {
-			      console.log('Upload error');
-			    },
+			// Use `jQuery.ajax` method for example
+			$.ajax('imgedtwin.php', {
+				method: 'POST',
+				data: formData,
+				processData: false,
+				contentType: false,
+				success(data, textStatus, jqXHR) {
+					console.log('Upload success');
+					$('#snding').hide();
+				},
+				error(jqXHR, textStatus, errorThrown) {
+					console.log('Upload error');
+					$('#snding').hide();
+				},
 			  });
 			}, mtype);
 		}
@@ -103,26 +104,26 @@ $iurl = 'filproxy.php?f='.urlencode($fref);
 			}
 		}
 		function download () {
-           let a = document.createElement('a');
-           let result = cropper.getCroppedCanvas();
-            a.href = result.toDataURL(mtype);
-            a.download = imgfn;
-            document.body.appendChild(a);
-            a.click();
+			let a = document.createElement('a');
+			let result = cropper.getCroppedCanvas();
+			a.href = result.toDataURL(mtype);
+			a.download = imgfn;
+			document.body.appendChild(a);
+			a.click();
 		}
 	</script>
 </head>
 <body>
 <div class="toolbar">
 	<label>Constraint:</label>&nbsp;<select id="aspect" onchange="setAspect(this)">
-				<option value="0">none</option>
-				<option value="4:3">4:3</option>
-				<option value="3:4">3:4</option>
-				<option value="7:5">7:5</option>
-				<option value="5:7">5:7</option>
-				<option value="16:9">16:9</option>
-				<option value="1:1">Square</option>
-			</select>
+		<option value="0">none</option>
+		<option value="4:3">4:3</option>
+		<option value="3:4">3:4</option>
+		<option value="7:5">7:5</option>
+		<option value="5:7">5:7</option>
+		<option value="16:9">16:9</option>
+		<option value="1:1">Square</option>
+	</select>
 	<button onclick="cropper.crop()">Crop start</button>
 	<button onclick="cropper.clear()">Crop stop</button>
 	<button onclick="cropper.rotate(-45)">Rotate Left</button>
@@ -155,10 +156,7 @@ $iurl = 'filproxy.php?f='.urlencode($fref);
 </div>
 <script>
 const image = document.getElementById('target');
-const cropper = new Cropper(image, {
-				autoCrop: false,
-				crop: function (e) { updateValD(e); }
-		});
+const cropper = new Cropper(image, {autoCrop: false, crop: function(e) { updateValD(e); } });
 var cropX = document.getElementById("crpx");
 var cropY = document.getElementById("crpy");
 var cropW = document.getElementById("crpw");
