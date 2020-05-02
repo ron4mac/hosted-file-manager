@@ -1,4 +1,8 @@
 [
+"imager.php",
+"js/Jcrop.js",
+"js/Jcrop.min.js",
+"js/jqcropper.js",
 "icons/",
 "graphics/bgimage.gif",
 "graphics/info10x10.gif",
