@@ -66,6 +66,7 @@ function logIt ($msg) {
 
 // recursively delete a directory
 function delTree ($dir) {
+	if (!file_exists($dir)) return;
 	$files = array_diff(scandir($dir), ['.','..']);
 	foreach ($files as $file) {
 		$pth = "$dir/$file";
