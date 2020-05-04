@@ -5,29 +5,34 @@ require_once 'functions.php';
 include 'cfg.php';
 
 if (!empty($_FILES['croppedImage'])) {
-	$upf = $_FILES['croppedImage'];
-	if ($upf['error'] == UPLOAD_ERR_OK) {
-		$tmp_name = $upf['tmp_name'];
-		if (is_uploaded_file($tmp_name)) {
-			if (!move_uploaded_file($tmp_name, $baseDir.$_POST['fpath'])) {
-				echo '<p class="failure">Error: failed to place file</p>';
-				//file_put_contents('IMGED.LOG','Error: failed to place file',FILE_APPEND);
+	try {
+		$upf = $_FILES['croppedImage'];
+		if ($upf['error'] == UPLOAD_ERR_OK) {
+			$tmp_name = $upf['tmp_name'];
+			if (is_uploaded_file($tmp_name)) {
+				if (!move_uploaded_file($tmp_name, $baseDir.$_POST['fpath'])) {
+					throw new Exception('Error: failed to place file');
+				}
+			} else {
+				throw new Exception('Error: failed to upload');
 			}
 		} else {
-			echo '<p class="failure">Error: failed to upload</p>';
-			//file_put_contents('IMGED.LOG','Error: failed to upload',FILE_APPEND);
+			throw new Exception($upld_err_txt[$upf['error']], $upf['error']);
 		}
-	} else {
-		echo'<p class="failure">File: '.htmlspecialchars($_POST['fpath']).'<br>Error: '.$upld_err_txt[$upf['error']].'</p>';
-		//file_put_contents('IMGED.LOG','File: '.htmlspecialchars($_POST['fpath']).' Error: '.$upld_err_txt[$upf['error']],FILE_APPEND);
+	} catch (Exception $e) {
+		header('HTTP/1.0 406 '.$e->getMessage(), true, 406);
 	}
 	exit();
 }
 
 $fref = urldecode($_POST['fref']);
+$frefp = dirname($fref).'/';
+$fname = basename($fref);
+$fnamwe = pathinfo($fname, PATHINFO_FILENAME);
 $mtype = FileMimeType($baseDir.$fref);
 $imageSize = getimagesize($baseDir.$fref);
 $iurl = 'filproxy.php?f='.urlencode($fref);
+$appB = '';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -36,6 +41,8 @@ $iurl = 'filproxy.php?f='.urlencode($fref);
 	<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
 	<link rel="stylesheet" href="<?php echo $fontawsm; ?>" />
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.6/cropper.min.css" />
+	<link rel="stylesheet" href="css/jqModal.css" />
+	<link rel="stylesheet" href="css/fmxui.css" />
 	<style>
 		.content { display:flex; }
 		.lft20 { margin-left:1.5em; }
@@ -53,14 +60,42 @@ $iurl = 'filproxy.php?f='.urlencode($fref);
 	</style>
 	<script src="<?=$jqlink?>"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.6/cropper.min.js"></script>
+	<script src="js/jqModal<?php echo $jsver; ?>.js" type="text/javascript"></script>
+	<script src="js/fmxui<?php echo $jsver; ?>.js" type="text/javascript"></script>
 	<script>
-		var imgfb = "<?php echo dirname($fref).'/'; ?>";
-		var imgfn = "<?php echo basename($fref); ?>";
+		var imgfb = "<?php echo $frefp; ?>";
+		var imgfn = "<?php echo $fname; ?>";
+		var imgfnwe = "<?php echo $fnamwe; ?>";
 		var mtype = "<?php echo $mtype; ?>";
+		var curSx = 1;
+		var curSy = 1;
 		function setAspect (elem) {
 			let ration = elem.value.split(':');
 			let ratio = ration[1] ? ration[0]/ration[1] : 0;
 			cropper.setAspectRatio(ratio);
+		}
+		function setScale (elem) {
+			let sp = elem.value;
+			let sx = curSx<0 ? -sp : sp;
+			let sy = curSy<0 ? -sp : sp;
+			cropper.scale(sx, sy);
+			curSx = sx;
+			curSy = sy;
+			updImgVals();
+		}
+		function flip (v) {
+			if (v) {
+				curSy *= -1;
+				cropper.scaleY(curSy);
+			} else {
+				curSx *= -1;
+				cropper.scaleX(curSx);
+			}
+			updImgVals();
+		}
+		function setCnvVal (elem, prp) {
+			cropper.setCanvasData({[prp]:elem.value*1});
+			updImgVals();
 		}
 		function setDatVal (elem, prp) {
 			cropper.setData({[prp]:elem.value*1});
@@ -71,7 +106,12 @@ $iurl = 'filproxy.php?f='.urlencode($fref);
 			cropW.value = Math.round(e.detail.width);
 			cropH.value = Math.round(e.detail.height);
 		}
-		function save2srvr (thfn) {
+		function upSpinner (show) {
+			let csss = document.getElementById("snding");
+			csss.style.display = show ? "inline-block" : "none";
+		}
+		function save2srvr (thfn, mt) {
+			upSpinner(true);
 			cropper.getCroppedCanvas().toBlob((blob) => {
 			const formData = new FormData();
 			
@@ -79,8 +119,8 @@ $iurl = 'filproxy.php?f='.urlencode($fref);
 			
 			// Pass the image file name as the third parameter if necessary.
 			formData.append('croppedImage', blob/*, 'example.png' */);
-			$('#snding').show();
-			// Use `jQuery.ajax` method for example
+
+			// send to server
 			$.ajax('imgedtwin.php', {
 				method: 'POST',
 				data: formData,
@@ -88,29 +128,62 @@ $iurl = 'filproxy.php?f='.urlencode($fref);
 				contentType: false,
 				success(data, textStatus, jqXHR) {
 					console.log('Upload success');
-					$('#snding').hide();
+					upSpinner(false);
 				},
 				error(jqXHR, textStatus, errorThrown) {
-					console.log('Upload error');
-					$('#snding').hide();
+					console.log('Upload error',jqXHR, textStatus, errorThrown);
+					upSpinner(false);
+					alert(errorThrown);
 				},
 			  });
-			}, mtype);
+			}, mt || mtype);
 		}
-		function saveAs () {
-			let asn = prompt("Save as:", imgfn);
+		function doSaveAs (mt) {
+			let asn = prompt("Save as:", imgfnwe + "." + mt.split("/")[1]);
 			if (asn) {
-				save2srvr(asn);
+				save2srvr(asn, mt);
 			}
 		}
-		function download () {
+		function saveAs (e) {
+			myOpenDlg(e,mTypDlg,{[mtype.split("/")[1]]:'checked',action:'doSaveAs'});
+		}
+		function doDownload (mt) {
 			let a = document.createElement('a');
 			let result = cropper.getCroppedCanvas();
-			a.href = result.toDataURL(mtype);
-			a.download = imgfn;
-			document.body.appendChild(a);
+			a.href = result.toDataURL(mt);
+			a.download = imgfnwe + "." + mt.split("/")[1];
 			a.click();
 		}
+		function download (e) {
+			myOpenDlg(e,mTypDlg,{[mtype.split("/")[1]]:'checked',action:'doDownload'});
+		}
+		function updImgVals () {
+			let imgd = cropper.getImageData();
+			imgW.value = Math.round(imgd.naturalWidth);
+			imgH.value = Math.round(imgd.naturalHeight);
+		//	imgW.value = Math.round(imgd.width);
+		//	imgH.value = Math.round(imgd.height);
+			sclX.value = imgd.scaleX;
+			sclY.value = imgd.scaleY;
+			let cnvd = cropper.getCanvasData();
+			cnvW.value = Math.round(cnvd.naturalWidth);
+			cnvH.value = Math.round(cnvd.naturalHeight);
+		//	cnvW.value = Math.round(cnvd.width);
+		//	cnvH.value = Math.round(cnvd.height);
+		}
+		var mTypDlg = {
+			cselect: '#mTypDlog',
+			modal: true,
+			buttons: {
+				'Continue`prm': function() {
+					let frm = document.myUIform;
+					let act = frm.action.value;
+					let prm = frm.imime.value;
+					myCloseDlg(this);
+					setTimeout(function(){ window[act](prm); }, 100);
+					}
+				}
+			};
 	</script>
 </head>
 <body>
@@ -126,28 +199,36 @@ $iurl = 'filproxy.php?f='.urlencode($fref);
 	</select>
 	<button onclick="cropper.crop()">Crop start</button>
 	<button onclick="cropper.clear()">Crop stop</button>
-	<button onclick="cropper.rotate(-45)">Rotate Left</button>
-	<button onclick="cropper.rotate(45)">Rotate Right</button>
-	<button onclick="cropper.scale(.75,.75)">Scale .75</button>
-	<button onclick="cropper.scale(.5,.5)">Scale .5</button>
-	<button onclick="download()">Download</button>
+	<button onclick="cropper.rotate(-45);updImgVals()">Rotate Left</button>
+	<button onclick="cropper.rotate(45);updImgVals()">Rotate Right</button>
+	<button onclick="flip(true)">Flip V</button>
+	<button onclick="flip(false)">Flip H</button>
+	<select id="aspect" onchange="setScale(this)">
+		<option value="1">Scale 100%</option>
+		<option value=".75">Scale 75%</option>
+		<option value=".5">Scale 50%</option>
+		<option value=".25">Scale 25%</option>
+	</select>
+	<button onclick="download(event)">Download</button>
 	<button onclick="saveAs()">Save as ...</button>
 	<button onclick="save2srvr(imgfn)">Save</button>
-	<i id="snding" class="fa fa-circle-o-notch fa-spin"></i>
+	<i id="snding" class="fa fa-spinner fa-pulse"></i>
 </div>
 <div class="content">
 	<div class="panel">
 		<ul>
+			<li>Canvas width<br><input type="number" step="1" id="cnvW" onchange="setCnvVal(this,'width')" /></li>
+			<li>Canvas height<br><input type="number" step="1" id="cnvH" onchange="setCnvVal(this,'height')" /></li>
+			<li>Image width<br><input type="number" step="1" id="imgW" onchange="" /></li>
+			<li>Image height<br><input type="number" step="1" id="imgH" onchange="" /></li>
+			<li>Scale X<br><input type="number" step="1" id="sclX" onchange="" /></li>
+			<li>Scale Y<br><input type="number" step="1" id="sclY" onchange="" /></li>
 			<li>Crop x pos<br><input type="number" step="1" id="crpx" onchange="setDatVal(this,'x')" /></li>
 			<li>Crop y pos<br><input type="number" step="1" id="crpy" onchange="setDatVal(this,'y')" /></li>
 			<li>Crop width<br><input type="number" step="1" id="crpw" onchange="setDatVal(this,'width')" /></li>
 			<li>Crop height<br><input type="number" step="1" id="crph" onchange="setDatVal(this,'height')" /></li>
-			<li>Arribute 1<br><input type="number" step="1" id="a1" onchange="" /></li>
-			<li>Arribute 1<br><input type="number" step="1" id="a2" onchange="" /></li>
-			<li>Arribute 1<br><input type="number" step="1" id="a3" onchange="" /></li>
-			<li>Arribute 1<br><input type="number" step="1" id="a4" onchange="" /></li>
-			<li>Arribute 1<br><input type="number" step="1" id="a5" onchange="" /></li>
-			<li>Arribute 1<br><input type="number" step="1" id="a6" onchange="" /></li>
+		<!--	<li>Arribute 1<br><input type="number" step="1" id="a1" onchange="" /></li>
+			<li>Arribute 1<br><input type="number" step="1" id="a2" onchange="" /></li> -->
 		</ul>
 	</div>
 	<div class="editor">
@@ -156,11 +237,36 @@ $iurl = 'filproxy.php?f='.urlencode($fref);
 </div>
 <script>
 const image = document.getElementById('target');
-const cropper = new Cropper(image, {autoCrop: false, crop: function(e) { updateValD(e); } });
+const cropper = new Cropper(image, {
+	autoCrop: false,
+	crop: function(e) { updateValD(e); },
+	ready: function() { updImgVals(); }
+});
+var cnvW = document.getElementById("cnvW");
+var cnvH = document.getElementById("cnvH");
+var imgW = document.getElementById("imgW");
+var imgH = document.getElementById("imgH");
+var sclX = document.getElementById("sclX");
+var sclY = document.getElementById("sclY");
 var cropX = document.getElementById("crpx");
 var cropY = document.getElementById("crpy");
 var cropW = document.getElementById("crpw");
 var cropH = document.getElementById("crph");
 </script>
+<div id="element_to_pop_up" class="jqmWindow">
+	<div class="bpDlgHdr"><span class="bpDlgTtl">TITLE</span><span class="button jqmClose"><img src="<?=$appB?>css/closex.png" alt="close" /></span></div>
+	<div class="bpDlgCtn"><form class="bp-dctnt" name="myUIform" onsubmit="return false"></form></div>
+	<div class="bpDlgFtr"><div class="bp-bttns"></div></div>
+</div>
+<div style="display:none">
+	<div id="mTypDlog" title="Select the desired image format:">
+		<input type="radio" name="imime" value="image/png" {png} />&nbsp;<label>PNG</label><br>
+		<input type="radio" name="imime" value="image/jpeg" {jpeg} />&nbsp;<label>JPEG</label><br>
+	<!--	<input type="radio" name="imime" value="image/gif" {gif} />&nbsp;<label>GIF</label><br>
+		<input type="radio" name="imime" value="image/bmp" {bmp} />&nbsp;<label>BMP</label><br>
+		<input type="radio" name="imime" value="image/tiff" {tiff} />&nbsp;<label>TIFF</label><br> -->
+		<input type="hidden" name="action" value="{action}" />
+	</div>
+</div>
 </body>
 </html>
