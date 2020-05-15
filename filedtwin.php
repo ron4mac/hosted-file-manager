@@ -111,6 +111,7 @@ div.cntrl {float:left;margin-right:10px;}
 						</ul>
 					</li>
 					<li onclick="kbdHelp()">Command Guide</li>
+					<li onclick="editor.getSession().setUseWrapMode(true);">Soft Wrap</li>
 <?php if (!isset($acetheme)): ?>
 					<li>Theme
 						<ul id="thmlst"></ul>
@@ -160,6 +161,13 @@ editor.$blockScrolling = Infinity;
 editor.setShowPrintMargin(false);
 editor.getSession().setUseSoftTabs(false);
 editor.getSession().setValue(eData.value);
+editor.commands.addCommand({
+	name: 'softWrap',
+	bindKey: {win: 'Ctrl-\\',  mac: 'Command-\\'},
+	exec: function(editor) {
+		editor.getSession().setUseWrapMode(true);
+	}
+});
 <?php
 $atheme = '';
 if (isset($acetheme)) {

@@ -20,7 +20,7 @@ class MySimpleMailParse
 		$s = end($this->sections);
 		if (empty($s['headers'][$header])) return null;
 		$h = $s['headers'][$header];
-		if (substr($h,0,2)=='=?') $h = iconv_mime_decode($h);
+		if (substr(ltrim($h,'" '),0,2)=='=?') $h = iconv_mime_decode($h);
 		return $h;
 	}
 
