@@ -2,10 +2,6 @@
 include 'fmx.ini';
 include 'cfg.php';
 
-function cmpFn ($a, $b)
-{
-	return strcmp($a[0], $b[0]);
-}
 function cmpFm ($a, $b)
 {
 	if ($a[1] && $b[1]) {
@@ -17,19 +13,9 @@ function cmpFm ($a, $b)
 	return 0;
 }
 
-function cmpFnd ($a, $b)
-{
-	return strcmp($b[0], $a[0]);
-}
 function cmpFmd ($a, $b)
 {
-	if ($a[1] && $b[1]) {
-		$am = $a[1][9];
-		$bm = $b[1][9];
-		if ($am == $bm) { return 0; }
-		return ($am < $bm) ? 1 : -1;
-	}
-	return 0;
+	return cmpFm ($b, $a);
 }
 
 if ($fmxInJoomla) {
@@ -149,7 +135,7 @@ if ($pDir) {
 	print $rootD;
 	$parntBut = '&nbsp;';
 }
-$srtBy = isset($_GET['O']) ? $_GET['O'] : 'n';
+$srtBy = $_GET['O'] ?? 'n';
 ?>
 </span>
 <hr style="margin:6px 0" />
@@ -252,22 +238,31 @@ $srtBy = isset($_GET['O']) ? $_GET['O'] : 'n';
 		</thead>
 		<tbody>
 <?php
-$dFiles = array();
-if ($drsrc = @opendir($rDir)) {
-	while (false !== ($entry = readdir($drsrc))) {
-		if ($entry != "." && $entry != "..") {
-			$fs = lstat("$rDir/$entry");
-			$dFiles[] = array($entry, $fs);
+$dFiles = false;
+$dtop = $fmx_dirs_at_top ?? false;
+$dirs = $fils = [];
+$path = $rDir;
+$scn = @scandir($path, $srtBy == 'nd' ? SCANDIR_SORT_DESCENDING : 0);
+if ($scn !== false) {
+	$ntrys = array_diff($scn, ['.','..']);
+	$path .= '/';
+	foreach ($ntrys as $ntry) {
+		$nls = lstat($path.$ntry);
+		$nls = array_slice($nls, 0, 10);
+		if ($dtop && $nls[2] & 040000) {
+			$dirs[] = [$ntry, $nls];
+		} else {
+			$fils[] = [$ntry, $nls];
 		}
 	}
-	closedir($drsrc);
-} else {
+	$dFiles = array_merge($dirs, $fils);
+}
+if ($dFiles === false) {
 	$error = error_get_last();
 	echo '<span style="color:red">Could not read directory: '.$dDir.'<br />Error: '.$error['message'].'</span>';	//Error("Could not read directory $rDir: $!");
 }
-
 if ($dFiles) {
-	usort($dFiles, 'cmpF'.$srtBy);
+	if ($srtBy[0] == 'm') usort($dFiles, 'cmpF'.$srtBy);
 	foreach ($dFiles as $flear) {
 		$fle = $flear[0];
 		$fPth = "$rDir/{$fle}";

@@ -44,7 +44,9 @@ $appB = '';
 	<link rel="stylesheet" href="css/jqModal.css" />
 	<link rel="stylesheet" href="css/fmxui.css" />
 	<style>
-		.content { display:flex; }
+		html, body { height:100%;margin:0; }
+		#container { height:100vh;display:flex;flex-flow:column; }
+		.content { display:flex;height:100%; }
 		.lft20 { margin-left:1.5em; }
 		.edtui { margin-bottom:10px; }
 		#sbbtns { float:right; }
@@ -54,8 +56,10 @@ $appB = '';
 		.toolbar { background-color:#E0E0FF;padding:8px;border:1px solid #BBB; }
 		.panel { background-color:#BBB; }
 		.panel ul { list-style-type:none;line-height:1.3em;padding: 0 1em;}
-		.panel ul li { margin-bottom:6px; }
-		.editor { flex:100%;box-sizing:border-box; }
+		.panel ul li { margin-bottom:6px;height:100% }
+		.panel input ( width:100px; )
+		.editor { flex:100%;box-sizing:border-box;width:100%; }
+		.eeditor { width:100%;box-sizing:border-box; }
 		#snding { display:none; }
 	</style>
 	<script src="<?=$jqlink?>"></script>
@@ -187,6 +191,7 @@ $appB = '';
 	</script>
 </head>
 <body>
+<div id="container">
 <div class="toolbar">
 	<label>Constraint:</label>&nbsp;<select id="aspect" onchange="setAspect(this)">
 		<option value="0">none</option>
@@ -215,7 +220,7 @@ $appB = '';
 	<i id="snding" class="fa fa-spinner fa-pulse"></i>
 </div>
 <div class="content">
-	<div class="panel">
+	<div class="panel" id="panel">
 		<ul>
 			<li>Canvas width<br><input type="number" step="1" id="cnvW" onchange="setCnvVal(this,'width')" /></li>
 			<li>Canvas height<br><input type="number" step="1" id="cnvH" onchange="setCnvVal(this,'height')" /></li>
@@ -236,6 +241,10 @@ $appB = '';
 	</div>
 </div>
 <script>
+var valp = document.getElementById('panel');
+if (valp) {
+	valp.height = window.innerHeight - valp.offsetTop - 12 + "px";
+}
 const image = document.getElementById('target');
 const cropper = new Cropper(image, {
 	autoCrop: false,
@@ -267,6 +276,7 @@ var cropH = document.getElementById("crph");
 		<input type="radio" name="imime" value="image/tiff" {tiff} />&nbsp;<label>TIFF</label><br> -->
 		<input type="hidden" name="action" value="{action}" />
 	</div>
+</div>
 </div>
 </body>
 </html>

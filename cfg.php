@@ -1,4 +1,6 @@
 <?php
+// require PHP 7
+if (PHP_VERSION_ID < 70000) die('PHP version 7+ required');
 
 // Developer mode
 $dev_mode = false;
