@@ -81,13 +81,13 @@ html { background-color:darkgray }
 			$fhan = fopen($ffref,'r');
 			while (!feof($fhan)) {
 				$cnk = fread($fhan,8);
-				$l = htmlspecialchars($cnk, ENT_SUBSTITUTE, 'ISO-8859-1');
-				$l = preg_replace('/ /',"\xa0",$l);
-				$lin .= preg_replace('/[\x00-\x1F\x7F]/',"\xb7",$l);
+				$l = htmlspecialchars($cnk, ENT_SUBSTITUTE, 'UTF-8');
+				$l = preg_replace('/ /','&nbsp;',$l);
+				$lin .= preg_replace('/[\x00-\x1F\x7F]/','&#183;',$l);
 				$fcon .= bin2hex($cnk) . ' ';
 				if (!--$gc) {
 //					$fcon .= '  ' . $lin . "\n";
-					$fcon .= "\xa0\xa0\xa0".'</td><td>' . $lin . "</td></tr>\n<tr><td>";
+					$fcon .= '&nbsp;&nbsp;&nbsp;</td><td>' . $lin . "</td></tr>\n<tr><td>";
 					//$fcon .= "\n";
 					$lin = '';
 					$gc = 4;
