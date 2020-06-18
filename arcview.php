@@ -60,13 +60,15 @@ function display_entry ($av)
 
 	$dsp = new MyEntryView(basename($pth));
 	$dsp->addScript('
+	var dlFrame;
 	function dnld_entry (e) {
 		e.preventDefault();
+		if (dlFrame) document.body.removeChild(dlFrame);
 		var dlURL = "arcview.php?fref='.$fref.'&act=dnld&idx='.$idx.'&pth='.$pth.'";
-		var dlframe = document.createElement("iframe");
-		dlframe.src = dlURL;
-		dlframe.style.display = "none";
-		document.body.appendChild(dlframe);
+		dlFrame = document.createElement("iframe");
+		dlFrame.src = dlURL;
+		dlFrame.style.display = "none";
+		document.body.appendChild(dlFrame);
 	}');
 
 	$body = '
@@ -76,7 +78,7 @@ function display_entry ($av)
 	</div>';
 
 	if (in_array($fext, ['gif','jpg','jpeg','png','svg'])) {
-		$imgsrc = $_SERVER['HTTP_REFERER'].'&act=img&idx='.$idx;
+		$imgsrc = $_SERVER['HTTP_REFERER'].'&act=img&pth='.$pth.'&idx='.$idx;
 		$body .= '<div style="margin-top:31px"><image src="'.$imgsrc.'" /></div>';
 		$dsp->display($body);
 		exit();
@@ -111,17 +113,19 @@ function display_archive ($av)
 	$dsp = new MyArchiveView(basename($fpath));
 
 	$addScr = '
+	var dlFrame;
 	function dnld_entry (e) {
 		e.preventDefault();
+		if (dlFrame) document.body.removeChild(dlFrame);
 		var slctd = $(".slctd")[0];
 		var idx = slctd ? slctd.getAttribute("data-idx") : null;
 		if (idx === null) { alert("Please select a file first."); return; }
 		var pth = encodeURI($(".slctd div:nth-child(3)").html());
 		var dlURL = "arcview.php?fref='.$fref.'&act=dnld&idx=" + idx + "&pth=" + pth;
-		var dlframe = document.createElement("iframe");
-		dlframe.src = dlURL;
-		dlframe.style.display = "none";
-		document.body.appendChild(dlframe);
+		dlFrame = document.createElement("iframe");
+		dlFrame.src = dlURL;
+		dlFrame.style.display = "none";
+		document.body.appendChild(dlFrame);
 	}
 	function view_entry (e) {
 		e.preventDefault();

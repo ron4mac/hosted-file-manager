@@ -8,13 +8,18 @@ if (isset($_POST['savef'])) {
 	$fpath = $baseDir . $fref;
 	$fcon = $_POST['fcontent'];
 	$rslt = file_put_contents($fpath, str_replace("\r\n","\n",$fcon));
-	header("X-XSS-Protection: 0");
-	if ($rslt === FALSE) echo 'FAILED TO SAVE :O(';
-	else echo '<!DOCTYPE html><html><head><title></title><script>window.close();</script></head></html>';
-	exit(0);
+	if ($rslt === FALSE) {
+		echo 'FAILED TO SAVE :O(';
+		exit(1);
+	}
+	if ($_POST['savef'] == 'saveclose') {
+		header("X-XSS-Protection: 0");
+		echo '<!DOCTYPE html><html><head><title></title><script>window.close();</script></head></html>';
+		exit(0);
+	}
 }
 
-$fref = $_GET['fref'];
+$fref = $fref ?? $_GET['fref'];
 $fpath = $baseDir . $fref;
 if (!file_exists($fpath)) {
 	echo 'FILE DOES NOT EXIST: '.$fpath;
@@ -87,6 +92,7 @@ function modeSel (elm) {
 <style>
 html, body {width:100%;height:100%;margin:0;padding:0;}
 div.cntrl {float:left;margin-right:10px;}
+div.cntrlr {float:right;margin-right:10px;}
 .sbutton {border:1px solid #633;cursor:pointer;margin:0;}
 #editor { position: absolute;top:33px;right:0;bottom:0;left:0;}
 </style>
@@ -136,8 +142,11 @@ div.cntrl {float:left;margin-right:10px;}
 <!--			<div class="cntrl">
 				<input type="button" name="frmt" value="{}" class="sbutton" title="Format selected" onclick="autoFormatSelection()" />
 			</div> -->
-			<div class="cntrl">
-				<input type="submit" name="savef" value="Save" class="sbutton" title="Save changes" />
+			<div class="cntrlr">
+				<button type="submit" name="savef" value="saveclose" title="Save changes and close">Save & Close</button>
+			</div>
+			<div class="cntrlr">
+				<button type="submit" name="savef" value="saveonly" title="Save changes">Save</button>
 			</div>
 			<span><?php echo $fref; ?> (<?=$mode?>)</span>
 		</div>
