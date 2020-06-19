@@ -2,6 +2,25 @@
 require_once 'functions.php';
 include 'cfg.php';
 
+session_cache_limiter('');
+session_name('fmxfiledt');
+session_start();
+
+function fed_set_msg ($msg, $status = 'ok')
+{
+    $_SESSION['message'] = $msg;
+    $_SESSION['status'] = $status;
+}
+function fed_show_message ()
+{
+    if (isset($_SESSION['message'])) {
+        $class = isset($_SESSION['status']) ? $_SESSION['status'] : 'ok';
+        echo '<p class="message ' . $class . '">' . $_SESSION['message'] . '</p>';
+        unset($_SESSION['message']);
+        unset($_SESSION['status']);
+    }
+}
+
 if (isset($_POST['savef'])) {
 	$fref = $_POST['fref'];
 	if (!$fref) exit(0);
@@ -17,6 +36,7 @@ if (isset($_POST['savef'])) {
 		echo '<!DOCTYPE html><html><head><title></title><script>window.close();</script></head></html>';
 		exit(0);
 	}
+	fed_set_msg('The file was successfully saved.');
 }
 
 $fref = $fref ?? $_GET['fref'];
@@ -94,7 +114,13 @@ html, body {width:100%;height:100%;margin:0;padding:0;}
 div.cntrl {float:left;margin-right:10px;}
 div.cntrlr {float:right;margin-right:10px;}
 .sbutton {border:1px solid #633;cursor:pointer;margin:0;}
-#editor { position: absolute;top:33px;right:0;bottom:0;left:0;}
+#editor {position:absolute;top:33px;right:0;bottom:0;left:0;}
+.message{padding:16px 7px;border:1px solid #ddd;background-color:#fff}
+.message.ok{border-color:green;color:green}
+.message.error{border-color:red;color:red}
+.message.alert{border-color:orange;color:orange}
+p.message{position:absolute;top:0;right:6px;left:6px;text-align:center;z-index:900;transition:all .5s;margin:0;padding:.5em;}
+p.message.done{opacity:0;padding:0;margin:0;height:0};
 </style>
 </head>
 <body>
@@ -127,6 +153,7 @@ div.cntrlr {float:right;margin-right:10px;}
 			</li>
 		</ul>
 		<div id="ftbar" style="height:20px;padding:6px 6px;background-color:#FFA;border-bottom:1px solid #CCC">
+			<?php fed_show_message(); ?>
 			<div class="cntrl">
 				<input type="button" name="undo" value="&larr;" class="sbutton" title="Undo (cmd-Z)" onclick="editor.undo()" />
 			</div>
@@ -142,6 +169,9 @@ div.cntrlr {float:right;margin-right:10px;}
 <!--			<div class="cntrl">
 				<input type="button" name="frmt" value="{}" class="sbutton" title="Format selected" onclick="autoFormatSelection()" />
 			</div> -->
+			<div class="cntrlr">
+				<button onclick="event.preventDefault();event.stopPropagation();window.close()" title="Close">Close</button>
+			</div>
 			<div class="cntrlr">
 				<button type="submit" name="savef" value="saveclose" title="Save changes and close">Save & Close</button>
 			</div>
@@ -205,6 +235,8 @@ editor.session.on('changeMode', function(e, session){
 	session.$worker.send("changeOptions", [{maxerr: 9999}]);
 });
 editor.focus();
+const msgp = document.getElementsByClassName("message")[0];
+if (msgp) setTimeout(function(){msgp.className += " done";}, 3000);
 </script>
 </body>
 </html>
