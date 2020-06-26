@@ -638,9 +638,25 @@ $(function() {
 	});
 
 	// checkbox/checkall interaction
-	$(".fsel").click(function () {
+	let $chkboxes = $('.fsel');
+	let lastChecked = null;
+
+	$chkboxes.click(function (e) {
+		// shift click to extend selections
+		if (!lastChecked) {
+			lastChecked = this;
+			return;
+		}
+		if (e.shiftKey) {
+			let start = $chkboxes.index(this);
+			let end = $chkboxes.index(lastChecked);
+			$chkboxes.slice(Math.min(start,end), Math.max(start,end)+ 1).prop('checked', lastChecked.checked);
+		}
+		lastChecked = this;
+
+		// manage check-all state
 		if (this.checked) {
-			var isAllChecked = 0;
+			let isAllChecked = 0;
 			$(".fsel").each(function() {
 				if (!this.checked)
 					isAllChecked = 1;
@@ -715,9 +731,9 @@ $(function() {
 	});
 
 	// let's try file drag-n-drop
-	var $form = $('#filsform');
+	const $form = $('#filsform');
 	$form.on('drag dragstart dragend dragover dragenter dragleave drop', function(e) { e.preventDefault(); e.stopPropagation(); })
 	.on('dragover dragenter', function() { $form.addClass('upld-body'); })
 	.on('dragleave dragend drop', function() { $form.removeClass('upld-body'); })
-	.on('drop', function(e) { var fils = e.originalEvent.dataTransfer.files; upldAction.H5o(function(){ fupQadd2(fils); }); });
+	.on('drop', function(e) { let fils = e.originalEvent.dataTransfer.files; upldAction.H5o(function(){ fupQadd2(fils); }); });
 });
