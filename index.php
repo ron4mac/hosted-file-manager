@@ -95,7 +95,7 @@ $trshc = ($trshs && count($trshs)>2) ? ('('.(count($trshs)-2).')') : '';
 
 if (isset($_POST['cmdlin'])) {
 	$cmd = $_POST['cmdlin'];
-	if (get_magic_quotes_gpc()) { $cmd = stripslashes($cmd); }
+	if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc()) { $cmd = stripslashes($cmd); }
 	if (isset($_POST['mcmdlin']) && $_POST['mcmdlin']) { $cmd = str_replace('::',$basDir.'/',$_POST['mcmdlin']); }
 	chdir($rDir);
 	$rsptxt = `$cmd 2>&1`;

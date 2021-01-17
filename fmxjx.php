@@ -371,7 +371,7 @@ function alt_stat ($file) {
 	$p = $ss['mode'];
 	$t = decoct($ss['mode'] & 0170000); // File Encoding Bit
 
-	$str = (array_key_exists(octdec($t),$ts))?$ts[octdec($t)]{0}:'u';
+	$str = (array_key_exists(octdec($t),$ts))?$ts[octdec($t)][0]:'u';
 	$str .= (($p&0x0100)?'r':'-').(($p&0x0080)?'w':'-');
 	$str .= (($p&0x0040)?(($p&0x0800)?'s':'x'):(($p&0x0800)?'S':'-'));
 	$str .= (($p&0x0020)?'r':'-').(($p&0x0010)?'w':'-');

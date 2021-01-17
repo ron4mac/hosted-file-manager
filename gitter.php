@@ -1,18 +1,27 @@
 <?php
+
+define('GH_PAT', 'GH_PAT');
+
 require_once 'functions.php';
 $gitdir = $baseDir . urldecode($_GET['dir']);
 chdir($gitdir);
 
+$cookT = time()+86400*256;		//cookie to expire in 256 days
+
+$gh_auth = isset($_COOKIE[GH_PAT]) ? $_COOKIE[GH_PAT] : null;
+if ($gh_auth) setcookie(GH_PAT, $gh_auth, $cookT);	//refresh the cookie
+
 function getUrl ($wc=false)
 {
-	global $msg;
+	global $gh_auth, $msg;
+
 	$cfgf = file_get_contents('.git/config');
 	if (!$cfgf) { $msg = 'config file is missing'; return; }
 	$lins = explode("\n", $cfgf);
 	foreach ($lins as $lin) {
 		if (preg_match('#^\surl = (.*)$#', $lin, $mtch)) {
 			if (!$wc) return $mtch[1];
-			return str_replace('://', '://'.urlencode(trim($_POST['user'])).':'.urlencode(trim($_POST['pass'])).'@', $mtch[1]);
+			return str_replace('://', '://'.urlencode(trim($_POST['user'])).':'.urlencode(trim($gh_auth)).'@', $mtch[1]);
 		}
 	}
 	$msg = 'pattern not found';
@@ -63,6 +72,9 @@ if (isset($_POST['act'])) {
 			break;
 		case 'dif':
 			$rslt = str_replace('xmp>','.xmp>',`git diff -w {$file}`);
+			break;
+		case 'spat':
+			setcookie(GH_PAT, $file, $cookT);
 			break;
 	}
 }
@@ -178,6 +190,12 @@ function statusAction ()
 		//console.log(data); //alert("Data Loaded: " + data);
 		return false;
 	}
+	function getsetpat ()
+	{
+		var pat = prompt("Github Personal Access Token", "");
+		if (pat) postAct({act:'spat', f:pat});
+		return false;
+	}
 	</script>
 	<style>
 		/*.syncform {line-height:1.5em;}*/
@@ -224,7 +242,9 @@ function statusAction ()
 		<input type="submit" name="pull" value="Pull" />
 		<div class="push">
 			User: <input type="text" id="user" name="user" />
-			<br />Password: <input type="text" id="pass" name="pass" />
+			<?php if (!$gh_auth): ?>
+			<br /><a href="#" onclick="return getsetpat();" style="background-color:coral;padding:4px">Set your Personal Access Token</a>
+			<?php endif; ?>
 			<br /><input type="submit" name="push" value="Push" /> &nbsp;&nbsp;&nbsp;<input type="checkbox" name="force" />-Force!
 		</div>
 	</div>
