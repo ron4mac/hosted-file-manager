@@ -55,7 +55,7 @@ $maxSavedQueries = 10;
 //a list of custom functions that can be applied to columns in the databases
 //make sure to define every function below if it is not a core PHP function
 $custom_functions = array(
-	'md5', 'sha1', 'time', 'strtotime',
+	'md5', 'sha1', 'strtotime',
 	// add the names of your custom functions to this array
 	/* 'leet_text', */
 );
@@ -79,6 +79,9 @@ $debug = false;
 
 // the user is allowed to create databases with only these extensions
 $allowed_extensions = array('db','db3','sqlite','sqlite3');
+
+// BLOBs are displayed and edited as hex string
+$hexblobs = false;
 
 
 /*====== below here added for FMX ======*/
