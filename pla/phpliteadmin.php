@@ -609,18 +609,18 @@ class Database
 
 			switch(true)
 			{
-				case ((!isset($data['type']) || $data['type']!=2) && (FORCETYPE=="PDO" || (FORCETYPE==false && class_exists("PDO") && in_array("sqlite", PDO::getAvailableDrivers()) && ($ver==-1 || $ver==3)))):
-					$this->db = new PDO("sqlite:".$this->data['path']);
-					if($this->db!=NULL)
-					{
-						$this->type = "PDO";
-						break;
-					}
 				case ((!isset($data['type']) || $data['type']!=2) && (FORCETYPE=="SQLite3" || (FORCETYPE==false && class_exists("SQLite3") && ($ver==-1 || $ver==3)))):
 					$this->db = new SQLite3($this->data['path']);
 					if($this->db!=NULL)
 					{
 						$this->type = "SQLite3";
+						break;
+					}
+				case ((!isset($data['type']) || $data['type']!=2) && (FORCETYPE=="PDO" || (FORCETYPE==false && class_exists("PDO") && in_array("sqlite", PDO::getAvailableDrivers()) && ($ver==-1 || $ver==3)))):
+					$this->db = new PDO("sqlite:".$this->data['path']);
+					if($this->db!=NULL)
+					{
+						$this->type = "PDO";
 						break;
 					}
 				case (FORCETYPE=="SQLiteDatabase" || (FORCETYPE==false && class_exists("SQLiteDatabase") && ($ver==-1 || $ver==2))):
