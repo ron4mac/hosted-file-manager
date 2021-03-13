@@ -102,7 +102,7 @@ if (isset($_POST['cmdlin'])) {
 	// get rid of backspaced characters (found in man pages)
 	$rsptxt = preg_replace('/.\x08/','',$rsptxt);
 	// mostly because of a possible </textarea>, escape tags
-	$rsptxt = preg_replace(array('/<xmp/','/<\/xmp/'),array('<x m p','</x m p'),$rsptxt);		//removed since using <xmp> to wrap output
+	$rsptxt = preg_replace(['/<xmp/','/<\/xmp/'], ['<x m p','</x m p'], $rsptxt);		//removed since using <xmp> to wrap output
 	}
 ?>
 <?php if (!$fmxInJoomla): ?>

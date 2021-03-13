@@ -98,12 +98,13 @@ fclose($fh_res);
 		foreach ($files as $fle) {
 			$fod = rtrim($fle,' /');
 			$fpth = $path.'/'.$fod;
-			if (is_dir($fpth) && file_exists($todir."/$fod")) {
+			$tpth = $todir.'/'.$fod;
+			if (is_dir($fpth) && file_exists($tpth)) {
 				$nn = 1;
-				while (file_exists($todir."/$fod".'_'.$nn)) {
+				while (file_exists($pth.'_'.$nn)) {
 					$nn++;
 				}
-				rename($todir."/$fod", $todir."/$fod".'_'.$nn);
+				rename($tpth, $tpth.'_'.$nn);
 			}
 			$cmd = 'mv --backup=numbered -t '.escapeshellarg($todir).' '.escapeshellarg($fpth);
 			system($cmd, $irslt);
@@ -133,7 +134,7 @@ fclose($fh_res);
 		if (count($files)==1) {
 			$sfil = $files[0];
 			if ($sfil[strlen($sfil)-1]!=='/') {
-				echo json_encode(array("fpth" => $path."/$sfil"));
+				echo json_encode(['fpth' => $path."/$sfil"]);
 				break;
 			}
 		}
@@ -148,7 +149,7 @@ fclose($fh_res);
 			else { $zh->addFile("$baseDir$path/".$fle, $fle); }
 		}
 		$zh->close();
-		echo json_encode(array("fpth" => $zfn,"rad" => "Y"));
+		echo json_encode(['fpth' => $zfn,'rad' => 'Y']);
 		break;
 	case 'dupl':
 		$path_parts = pathinfo($fref);
@@ -166,7 +167,7 @@ fclose($fh_res);
 		$stat = alt_stat(trim($fileoi,"'"));	//@stat(trim($fileoi,"'"));
 		//system('stat --printf="%f %F<br />%A %U/%G<br />access: %x<br />modify: %y<br />change: %z" '.$fileoi,$rslt);
 		//if ($rslt) echo $rslt . '<br />' . $fileoi;
-		if (!$stat) die("Couldn't stat {$fileoi}");
+		if (!$stat) die('Could not stat '.$fileoi);
 		//echo serialize($stat);
 		echo 'Permissions: ' .$stat['perms']['human'];
 		echo '<br />Owner: ' .$stat['owner']['owner']['name'];
@@ -181,7 +182,7 @@ fclose($fh_res);
 		break;
 	case 'fvue':
 		$mtyp = FileMimeType($fref);
-		header("Content-Type: $mtyp");
+		header('Content-Type: '.$mtyp);
 		$fcon = nl2br(htmlspecialchars(file_get_contents($fref)));
 		echo $fcon;
 		break;
@@ -235,7 +236,7 @@ fclose($fh_res);
 		} else {
 			$msg .= 'There is no available FMX update.';
 		}
-		echo json_encode(array('updt' => $newver,'msg' => $msg));
+		echo json_encode(['updt' => $newver,'msg' => $msg]);
 		break;
 	case 'slnk':
 		$droot = dirname($_SERVER['DOCUMENT_ROOT']).'/';
@@ -324,13 +325,13 @@ function addDirToAcrhive ($base,$dirn,$zh) {
 		$dirName.= '/';
 	}
 
-	$dirStack = array($dirName);
+	$dirStack = [$dirName];
 	//Find the index where the last dir starts
 	$cutFrom = strrpos(substr($dirName, 0, -1), '/')+1;
 
 	while (!empty($dirStack)) { 
 		$currentDir = array_pop($dirStack);
-		$filesToAdd = array();
+		$filesToAdd = [];
 
 		$dir = dir($currentDir);
 		while (false !== ($node = $dir->read())) {
@@ -358,7 +359,7 @@ function alt_stat ($file) {
 	$ss = @stat($file);
 	if (!$ss) return false; //Couldnt stat file
 
-	$ts = array(
+	$ts = [
 		0140000 => 'ssocket',
 		0120000 => 'llink',
 		0100000 => '-file',
@@ -366,7 +367,7 @@ function alt_stat ($file) {
 		0040000 => 'ddir',
 		0020000 => 'cchar',
 		0010000 => 'pfifo'
-	);
+	];
 
 	$p = $ss['mode'];
 	$t = decoct($ss['mode'] & 0170000); // File Encoding Bit
@@ -379,58 +380,59 @@ function alt_stat ($file) {
 	$str .= (($p&0x0004)?'r':'-').(($p&0x0002)?'w':'-');
 	$str .= (($p&0x0001)?(($p&0x0200)?'t':'x'):(($p&0x0200)?'T':'-'));
 
-	$s = array(
-		'perms' => array(
-		'umask' => sprintf("%04o",@umask()),
-		'human' => $str,
-		'octal1' => sprintf("%o", ($ss['mode'] & 000777)),
-		'octal2' => sprintf("0%o", 0777 & $p),
-		'decimal' => sprintf("%04o", $p),
-		'fileperms' => @fileperms($file),
-		'mode1' => $p,
-		'mode2' => $ss['mode']),
-		'owner' => array(
+	$s = [
+		'perms' => [
+			'umask' => sprintf('%04o',@umask()),
+			'human' => $str,
+			'octal1' => sprintf('%o', ($ss['mode'] & 000777)),
+			'octal2' => sprintf('0%o', 0777 & $p),
+			'decimal' => sprintf('%04o', $p),
+			'fileperms' => @fileperms($file),
+			'mode1' => $p,
+			'mode2' => $ss['mode']
+		],
+		'owner' => [
 			'fileowner' => $ss['uid'],
 			'filegroup' => $ss['gid'],
 			'owner' => (function_exists('posix_getpwuid')) ? @posix_getpwuid($ss['uid']) : '',
 			'group' => (function_exists('posix_getgrgid')) ? @posix_getgrgid($ss['gid']) : ''
-		),
-		'file' => array(
+		],
+		'file' => [
 			'filename' => $file,
 			'realpath' => (@realpath($file) != $file) ? @realpath($file) : '',
 			'dirname' => @dirname($file),
 			'basename' => @basename($file)
-		),
-		'filetype' => array(
+		],
+		'filetype' => [
 			'type' => substr($ts[octdec($t)],1),
-			'type_octal' => sprintf("%07o", octdec($t)),
+			'type_octal' => sprintf('%07o', octdec($t)),
 			'is_file' => @is_file($file),
 			'is_dir' => @is_dir($file),
 			'is_link' => @is_link($file),
 			'is_readable' =>  @is_readable($file),
 			'is_writable' =>  @is_writable($file)
-		),
-		'device' => array(
+		],
+		'device' => [
 			'device' => $ss['dev'], //Device
 			'device_number' => $ss['rdev'], //Device number, if device.
 			'inode' => $ss['ino'], //File serial number
 			'link_count' => $ss['nlink'], //link count
 			'link_to' => (substr($ts[octdec($t)],1)=='link') ? @readlink($file) : ''
-		),
-		'size' => array(
+		],
+		'size' => [
 			'size' => $ss['size'], //Size of file, in bytes.
 			'blocks' => $ss['blocks'], //Number 512-byte blocks allocated
 			'block_size' =>  $ss['blksize'] //Optimal block size for I/O.
-		),
-		'time' => array(
+		],
+		'time' => [
 			'mtime' => $ss['mtime'], //Time of last modification
 			'atime' => $ss['atime'], //Time of last access.
 			'ctime' => $ss['ctime'], //Time of last status change
 			'accessed' => @date('d M Y H:i:s',$ss['atime']),
 			'modified' => @date('d M Y H:i:s',$ss['mtime']),
 			'created' => @date('d M Y H:i:s',$ss['ctime'])
-		)
-	);
+		]
+	];
  
 	clearstatcache();
 	return $s;

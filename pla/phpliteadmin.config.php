@@ -42,7 +42,7 @@ $theme = 'modern.css';	//'phpliteadmin.css';
 $language = 'en';
 
 // set default number of rows. You need to relog after changing the number
-$rowsNum = 30;
+$rowsNum = 100;
 
 // reduce string characters by a number bigger than 10
 $charsNum = 300;

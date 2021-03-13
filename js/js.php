@@ -1,11 +1,11 @@
 <?php
 include '../cfg.php';
-$jsfiles = array(
+$jsfiles = [
 	'jqModal'.$jsver.'.js',
 	'fmx'.$jsver.'.js',
 	'fmxui'.$jsver.'.js',
 	'jqContext'.$jsver.'.js'
-	);
+	];
 
 $lastmod = 0;
 $totsize = 0;

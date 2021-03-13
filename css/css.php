@@ -1,12 +1,12 @@
 <?php
 include '../cfg.php';
-$csfiles = array(
+$csfiles = [
 	'jqModal.css',
 	'fmx.css',
 	'fmxui.css',
 	'nav.css',
 	'context.css'
-	);
+	];
 
 $lastmod = 0;
 $totsize = 0;

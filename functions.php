@@ -14,7 +14,7 @@ if ($fmxInJoomla) {
 $cookie = $_COOKIE[$cooknam];
 if (!$cookie) { exit('Unauthorized'); }
 $baseDir = convert_uudecode($cookie).'/';
-$fmxVersion = '3.3.7 - February 2021';
+$fmxVersion = '3.3.8 - March 2021';
 
 function FileMimeType ($fpath)
 {
@@ -26,7 +26,7 @@ function FileMimeType ($fpath)
 	} elseif (function_exists('mime_content_type')) { 
 		$mtyp = mime_content_type($fpath);
 	} else {
-		$sfe = array();
+		$sfe = [];
 		$rslt = 0;
 		$sf = exec('file --mime-type -b '.$fpath, $sfe, $rslt);
 		if (!$rslt) $mtyp = $sf;
@@ -72,7 +72,7 @@ function fmx_getJoomlaUserId ()
 //
 // some common variable/array values
 //
-$upld_err_txt = array(
+$upld_err_txt = [
 	1=>'The uploaded file exceeds the upload_max_filesize directive in php.ini.',
 	'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.',
 	'The uploaded file was only partially uploaded.',
@@ -80,6 +80,6 @@ $upld_err_txt = array(
 	6=>'Missing a temporary folder.',
 	'Failed to write file to disk.',
 	'A PHP extension stopped the file upload.'
-	);
+	];
 
 

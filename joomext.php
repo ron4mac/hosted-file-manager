@@ -3,7 +3,7 @@ define('DS', DIRECTORY_SEPARATOR);
 
 class DirCheck
 {
-	protected $dirray = array();
+	protected $dirray = [];
 	protected $pfx = '';
 
 	public function __construct ($dirPath) {
@@ -45,7 +45,7 @@ class DirCheck
 
 	private function getDirTree ($dir) {
 		$d = dir($dir);
-		$x = array();
+		$x = [];
 		while (false !== ($r = $d->read())) {
 			if ($r != '.' && $r != '..') {
 				if (is_dir($dir.$r)) {
@@ -90,7 +90,7 @@ class Joomext
 
 	public function pull ($curdir)
 	{
-		if (!in_array($this->mfest, array('extension','install'))) {
+		if (!in_array($this->mfest, ['extension','install'])) {
 			echo 'Invalid manifest';
 			return;
 		}
