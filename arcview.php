@@ -209,21 +209,26 @@ class MyZipView extends MyArcView
 
 	public function list_contents ()
 	{
-		$zip = zip_open($this->fpath);
-		if (!is_resource($zip)) die('ERROR OPENING ZIP FILE: '.$this->fpath.'<br>ERROR: '.$zip);
-		$ndx = 0;
-		while (($ntry = zip_read($zip)) && ($ntry !== false)) {
-			if (is_resource($ntry)) {
-				$nam = zip_entry_name($ntry);
-				if (substr($nam, -1) == '/') {
-					$this->list_row($ndx, 0, $nam, true);
+		$zip = new ZipArchive();
+		$res = $zip->open($this->fpath);
+		if ($res === TRUE) {
+			$fcnt = $zip->numFiles;
+			for ($ix=0; $ix<$fcnt; $ix++) {
+				$ntry = $zip->statIndex($ix);
+				if (is_array($ntry)) {
+					$nam = $ntry['name'];
+					if (substr($nam, -1) == '/') {
+						$this->list_row($ix, 0, $nam, true);
+					} else {
+						$this->list_row($ix, $ntry['size'], $nam);
+					}
 				} else {
-					$this->list_row($ndx, zip_entry_filesize($ntry), $nam);
+					echo '<div class="rTableRow"><div class="rTableCell">Error: '.$ix.' : '.$ntry.'</div>';
 				}
-			} else {
-				echo '<div class="rTableRow"><div class="rTableCell">Error: '.$ndx.' : '.$ntry.'</div>';
 			}
-			$ndx++;
+			$zip->close();
+		} else {
+			die('ERROR OPENING ZIP FILE: '.$this->fpath.'<br>ERROR: '.$res);
 		}
 	}
 
