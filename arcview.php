@@ -14,6 +14,7 @@ switch ($fInfo) {
 		break;
 	case 'application/x-tar':
 	case 'application/x-gzip':
+	case 'application/gzip':
 		$arcvue = new MyTgzView($fpath);
 		break;
 	default:
