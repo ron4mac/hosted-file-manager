@@ -367,6 +367,7 @@ abstract class MyDisplay
 
 	public function display ($body, $xscrt='', $xscrb='')
 	{
+		header('Cache-Control: no-cache');
 		echo '<!DOCTYPE html><html><head>'."\n";
 		echo '<title>'.htmlspecialchars($this->title).'</title>';
 		echo "\n".'<style>'.$this->style.'</style>';

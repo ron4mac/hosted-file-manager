@@ -33,6 +33,7 @@ $mtype = FileMimeType($baseDir.$fref);
 $imageSize = getimagesize($baseDir.$fref);
 $iurl = 'filproxy.php?f='.urlencode($fref);
 $appB = '';
+header('Cache-Control: no-cache');
 ?>
 <!DOCTYPE html>
 <html lang="en">

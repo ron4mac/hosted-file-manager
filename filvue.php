@@ -63,7 +63,8 @@ switch ($y) {
 			$fcon = '<!DOCTYPE html><html><head>
 <style>
 * { padding: 0; margin: 0; }
-html { background-color:darkgray }
+html { background-color: darkgray}
+img { background-image: url(css/transback8.png); }
 .fit { max-width: 100%; max-height: 100%; }
 .center { display: block; margin: auto; }
 </style>
@@ -111,4 +112,5 @@ html { background-color:darkgray }
 }
 
 header("Content-Type: $mtyp");
+header('Cache-Control: no-cache');
 echo $fcon ? $fcon : ('Failed to open: '.$fref);

@@ -95,7 +95,7 @@ $trshc = ($trshs && count($trshs)>2) ? ('('.(count($trshs)-2).')') : '';
 
 if (isset($_POST['cmdlin'])) {
 	$cmd = $_POST['cmdlin'];
-	if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc()) { $cmd = stripslashes($cmd); }
+//	if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc()) { $cmd = stripslashes($cmd); }
 	if (isset($_POST['mcmdlin']) && $_POST['mcmdlin']) { $cmd = str_replace('::',$basDir.'/',$_POST['mcmdlin']); }
 	chdir($rDir);
 	$rsptxt = `$cmd 2>&1`;
@@ -106,6 +106,7 @@ if (isset($_POST['cmdlin'])) {
 	}
 ?>
 <?php if (!$fmxInJoomla): ?>
+<?php header('Cache-Control: no-cache'); ?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
 <head>
@@ -321,7 +322,7 @@ if ($dFiles) {
 			echo '</tr>'."\n";
 			}
 		else {
-			echo "<tr data-fref='$fle'>";
+			echo "<tr data-fref=\"$fle\">";
 			$ufle = htmlspecialchars($fle);
 			$fnp = explode('.',$ufle);
 			$ufle = str_replace(' ','&nbsp;',$ufle);

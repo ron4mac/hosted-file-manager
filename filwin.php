@@ -3,6 +3,7 @@ require_once 'functions.php';
 $fref = $_GET['fref'];
 $mtyp = FileMimeType($baseDir.$fref);
 $fvurl = 'filvue.php?fref=' . urlencode($fref);
+header('Cache-Control: no-cache');
 ?>
 <!DOCTYPE html>
 <html>

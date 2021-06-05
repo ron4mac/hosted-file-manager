@@ -7,6 +7,7 @@ $fw = empty($_GET['o']);	// is a request for full popup window content
 $done = $fw ? 'parent.opener.refreshFilst(); if (!errcnt) window.close();' : 'if (!errcnt) refreshFilst();';
 ?>
 <?php if ($fw): ?>
+<?php header('Cache-Control: no-cache'); ?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" class="upld-body">
 <head>

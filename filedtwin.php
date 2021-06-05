@@ -32,6 +32,7 @@ if (isset($_POST['savef'])) {
 		exit(1);
 	}
 	if ($_POST['savef'] == 'saveclose') {
+		header('Cache-Control: no-cache');
 		header("X-XSS-Protection: 0");
 		echo '<!DOCTYPE html><html><head><title></title><script>window.close();</script></head></html>';
 		exit(0);
@@ -70,6 +71,7 @@ switch (strtolower($fext)) {
 		$mode = '';
 }
 $scrptFilPrts = explode('/',__FILE__);
+header('Cache-Control: no-cache');
 ?>
 <!DOCTYPE html>
 <html>
