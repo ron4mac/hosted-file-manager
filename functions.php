@@ -14,7 +14,7 @@ if ($fmxInJoomla) {
 $cookie = $_COOKIE[$cooknam];
 if (!$cookie) { exit('Unauthorized'); }
 $baseDir = convert_uudecode($cookie).'/';
-$fmxVersion = '3.3.9 - April 2021';
+$fmxVersion = '3.4.0 - June 2021';
 
 function FileMimeType ($fpath)
 {
@@ -31,6 +31,8 @@ function FileMimeType ($fpath)
 		$sf = exec('file --mime-type -b '.$fpath, $sfe, $rslt);
 		if (!$rslt) $mtyp = $sf;
 	}
+	// workaround for php mis-interpretation of svg file
+	if ($mtyp=='image/svg') $mtyp = 'image/svg+xml';
 	return $mtyp;
 }
 

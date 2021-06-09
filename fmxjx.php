@@ -101,7 +101,7 @@ fclose($fh_res);
 			$tpth = $todir.'/'.$fod;
 			if (is_dir($fpth) && file_exists($tpth)) {
 				$nn = 1;
-				while (file_exists($pth.'_'.$nn)) {
+				while (file_exists($tpth.'_'.$nn)) {
 					$nn++;
 				}
 				rename($tpth, $tpth.'_'.$nn);
