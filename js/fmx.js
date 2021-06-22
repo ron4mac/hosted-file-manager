@@ -272,6 +272,9 @@ function doMenuAction (cmd,evt) {
 		// curl a file from a URL
 		$('#upload').jqm({ajax:fmx_appPath+'filcurlm.php', ajaxText:'Loading...', target:'.upldr',overlay:5}).jqmShow();
 		break;
+	case 'mdya':
+		pop(fmx_appPath+'media.php?sd=/'+sessionStorage.fmx_curD,screen.availHeight,1200);
+		break;
 	case 'upld':
 //		sessionStorage.fmx_curD = curDir;
 		if (doesSupportAjaxUploadWithProgress()) {

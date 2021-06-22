@@ -174,6 +174,7 @@ $srtBy = $_GET['O'] ?? 'n';
 		<li><a href="#" data-mnu="dnld" data-req="2">download</a><div class="dnldprg"> rr</div></li>
 		<li><a href="#" data-mnu="dupl" data-req="2">duplicate</a></li>
 		<li><a href="#" id="markMenu" data-mnu="mark" data-req="2" class="markMenu">mark</a></li>
+		<li><a href="#" data-mnu="mdya" data-req="0">media</a></li>
 		<li><a href="#" id="mvtoMenu" data-mnu="mvto" data-req="2" class="mvtoMenu">move/to</a></li>
 		<li>
 			<a href="#" data-mnu="mnu">new</a>
