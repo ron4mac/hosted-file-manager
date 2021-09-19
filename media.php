@@ -69,7 +69,8 @@ foreach ($files as $file) {
 		break;
 	case 'audio/':
 		// fancybox doesn't directly handle audio so force an iframe
-		$imgsl[$file] = ['javascript:;" data-type="iframe" data-src="'.$iurl, 'css/audio.svg'];
+	//	$imgsl[$file] = ['javascript:;" data-type="iframe" data-src="'.$iurl, 'css/audio.svg'];
+		$imgsl[$file] = [$iurl, 'css/audio.svg'];
 		break;
 	}
 }

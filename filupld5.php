@@ -3,6 +3,11 @@ require_once 'functions.php';
 include 'cfg.php';
 $uploadMaxFilesize = ini_get('upload_max_filesize');
 $uploadMaxFilesizeBytes = return_bytes($uploadMaxFilesize);
+$postMaxSize = ini_get('post_max_size');
+$postMaxSizeBytes = return_bytes($postMaxSize);
+$memoryLimit = ini_get('memory_limit');
+$memoryLimitBytes = return_bytes($memoryLimit);
+$maxChunkSize = min($uploadMaxFilesizeBytes,$postMaxSizeBytes,$memoryLimitBytes,67108864) - 1048576;
 $fw = empty($_GET['o']);	// is a request for full popup window content
 $done = $fw ? 'parent.opener.refreshFilst(); if (!errcnt) window.close();' : 'if (!errcnt) refreshFilst();';
 ?>
@@ -29,6 +34,7 @@ $done = $fw ? 'parent.opener.refreshFilst(); if (!errcnt) window.close();' : 'if
 			done: function (errcnt) { parent.opener.refreshFilst(); if (!errcnt) window.close(); }
 		};
 		var h5uOptions = {
+			maxchunksize: <?php echo $maxChunkSize; ?>,
 			payload: {'fpath':sessionStorage.fmx_curD, 'oefile':'1'},
 			doneFunc: function (okcnt, errcnt) { <?php echo $done; ?> }
 		};
@@ -38,7 +44,9 @@ $done = $fw ? 'parent.opener.refreshFilst(); if (!errcnt) window.close();' : 'if
 </head>
 <body>
 <?php endif; ?>
-	<p style="color:red">Maximum file size: <?php echo $uploadMaxFilesize; ?></p>
+<!-- <?php echo $uploadMaxFilesize,' :: ',$postMaxSize,' :: ',$memoryLimit.'<br>'; ?> -->
+<!-- <?php echo $uploadMaxFilesizeBytes,' :: ',$postMaxSizeBytes,' :: ',$memoryLimitBytes,' = ',$maxChunkSize; ?> -->
+	<!-- <p style="color:red">Maximum file size: <?php echo $uploadMaxFilesize; ?></p> -->
 	<input type="hidden" name="MAX_FILE_SIZE" id="MAX_FILE_SIZE" value="<?php echo $uploadMaxFilesizeBytes; ?>" />
 	<div id="uplodr"></div>
 	<script type="text/javascript">H5uSetup();</script>

@@ -709,8 +709,7 @@ $(function() {
 			'H5w': function(t) { upldAction.H5w(); },
 			'H5o': function(t) { upldAction.H5o(); },
 			'L4w': function(t) { upldAction.L4w(); },
-			'L4o': function(t) { upldAction.L4o(); },
-			'Chk': function(t) { upldAction.Chk(); }
+			'L4o': function(t) { upldAction.L4o(); }
 		}
 	});
 	$('td.fileCtxt').contextMenu('fileCtxt', {
