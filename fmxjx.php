@@ -118,7 +118,7 @@ fclose($fh_res);
 		if (!$trshs) break;
 		foreach ($trshs as $trsh) {
 			if ($trsh=='.' || $trsh=='..') continue;
-			recursiveDelete($trd.$trsh);
+			recursiveDelete($trd.$trsh, true);
 		}
 		break;
 	case 'delf':
@@ -273,14 +273,15 @@ fclose($fh_res);
 		echo $_POST['act'];
 }
 
-function recursiveDelete ($pstr) {
-	if (is_file($pstr)) { @unlink($pstr); }
+function recursiveDelete ($pstr, $dlnk=false) {
+	if ($dlnk && is_link($pstr)) { @unlink($pstr); }
+	elseif (is_file($pstr)) { @unlink($pstr); }
 	elseif (is_dir($pstr)) {
 		$dh = opendir($pstr);
 		while ($node = readdir($dh)) {
 			if ($node != '.' && $node != '..') {
 				$path = $pstr.'/'.$node;
-				recursiveDelete($path);
+				recursiveDelete($path, $dlnk);
 			}
 		}
 		closedir($dh);

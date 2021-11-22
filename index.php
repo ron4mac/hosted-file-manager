@@ -299,10 +299,13 @@ if ($dFiles) {
 			echo '<tr><td>Can not stat '.$rDir.'/'.$fle.'</td></tr>';
 			continue;
 		}
+		$lok = true;
 		$isLnk = ($fs[2] & 0xA000)==0xA000;
 		$rlnk = '';
 		if ($isLnk) {
 			$fs = @stat($fPth);
+			$lok = (bool)$fs;
+			$fs = $fs ?: [0,0,0,0,0,0,0,0,0,0];
 			$rlnk = readlink($fPth);
 		}
 		$afle = ($pDir ? "$pDir/" : '') . $fle;
@@ -316,7 +319,10 @@ if ($dFiles) {
 				echo '<td>&nbsp;</td>';
 			}
 			echo '<td class="diricon foldCtxt"><i class="fa fa-folder" aria-hidden="true"></i></td>';
-			echo '<td class="foldCtxt"><a href="index.php?dir='.$efle.'">'.$fle.'</a>'.($isLnk ? " &rarr; $rlnk" : '').'</td>';
+			echo '<td class="foldCtxt">';
+			if ($lok) { echo '<a href="index.php?dir='.$efle.'">'.$fle.'</a>'; }
+			else { echo $fle; }
+			echo ($isLnk ? " &rarr; $rlnk" : '').'</td>';
 			echo '<td class="tpad">'.$dt.'</td>';
 			echo '<td class="right tpad">--</td>';
 			echo '<td class="tpad"><a href="#" data-act="finf"><i class="fa fa-info-circle" aria-hidden="true"></i></a></td>';
@@ -347,7 +353,10 @@ if ($dFiles) {
 			} else {
 				echo '<td class="filicon fileCtxt"><i class="fa fa-file" aria-hidden="true"></i></td>';
 			}
-			print '<td class="fileCtxt"><a href="#" data-act="fvue">'.$ufle.'</a>'.($isLnk ? " &rarr; $rlnk" : '').'</td>';
+			echo '<td class="fileCtxt">';
+			if ($lok) { echo '<a href="#" data-act="fvue">'.$ufle.'</a>'; }
+			else { echo $ufle; }
+			echo ($isLnk ? " &rarr; $rlnk" : '').'</td>';
 			echo '<td class="tpad">'.$dt.'</td>';
 			echo '<td class="right tpad">'.$sz.'</td>';
 			echo '<td class="tpad"><a href="#" data-act="finf"><i class="fa fa-info-circle" aria-hidden="true"></i></a></td>';
