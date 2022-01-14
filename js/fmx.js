@@ -221,8 +221,9 @@ function doMenuAction (cmd,evt) {
 		}
 		break;
 	case 'mmiz':
-		if (hasSome()) {
-			postAndRefresh('act=mmiz&'+$("form[name='filst']").serialize());
+		if (oneItem()) {
+			fn = $(slctd[0]).parents('tr').attr('data-fref');
+			$('#upload').jqm({ajax:fmx_appPath+'jsmini.php?f='+encodeURIComponent(fn), ajaxText:'Loading...', target:'.upldr',overlay:5}).jqmShow();
 		}
 		break;
 	case 'mvto':

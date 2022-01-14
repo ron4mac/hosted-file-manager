@@ -186,12 +186,33 @@ fclose($fh_res);
 		$fcon = nl2br(htmlspecialchars(file_get_contents($fref)));
 		echo $fcon;
 		break;
-	case 'mmiz':
-		$path = escapeshellcmd($_POST['dir']);
-		$files = $_POST['files'];
-		foreach ($files as $fle) {
-			mmizFile("$baseDir$path/".rtrim($fle));
+	case 'jsmm':
+		$ccp = $_POST['CC'];
+		$ccp['js_code'] = file_get_contents($baseDir.$_POST['path'].$_POST['up_fn']);
+		$fdat = curly('https://closure-compiler.appspot.com/compile', $ccp);
+		$rdat = json_decode($fdat);
+		if (isset($rdat->errors)) {
+			foreach ($rdat->errors as $cperr) {
+				echo $cperr->type;
+				echo "\n".$cperr->error;
+				echo "\n\nLine: ".$cperr->lineno;
+				echo ' Char: '.$cperr->charno;
+				echo "\n".trim($cperr->line);
+			}
+			return;
 		}
+		if (isset($rdat->warnings)) {
+			foreach ($rdat->warnings as $cpwrn) {
+				echo $cpwrn->type;
+				echo "\n".$cpwrn->warning;
+				echo "\n\nLine: ".$cpwrn->lineno;
+				echo ' Char: '.$cpwrn->charno;
+				echo "\n".trim($cpwrn->line);
+			}
+		}
+		if (isset($rdat->compiledCode) && $rdat->compiledCode) {
+			file_put_contents($baseDir.$_POST['path'].$_POST['tofile'], $rdat->compiledCode);
+		} else echo 'Minification was not possible';
 		break;
 	case 'mvto':
 		$todir = escapeshellarg($baseDir.$_POST['todr']);
@@ -289,33 +310,6 @@ function recursiveDelete ($pstr, $dlnk=false) {
 	}
 }
 
-function mmizFile ($path) {
-	$pinf = pathinfo($path);
-	if (!isset($pinf['extension']) || $pinf['extension'] != 'js') return;
-	$min = json_decode(`curl -s -d compilation_level=SIMPLE_OPTIMIZATIONS -d output_format=json -d output_info=compiled_code -d output_info=errors -d output_info=warnings --data-urlencode "js_code@{$path}" https://closure-compiler.appspot.com/compile`);
-	if (isset($min->errors)) {
-		foreach ($min->errors as $cperr) {
-			echo $cperr->type;
-			echo "\n".$cperr->error;
-			echo "\n\nLine: ".$cperr->lineno;
-			echo ' Char: '.$cperr->charno;
-			echo "\n".trim($cperr->line);
-		}
-		return;
-	}
-	if (isset($min->warnings)) {
-		foreach ($min->warnings as $cpwrn) {
-			echo $cpwrn->type;
-			echo "\n".$cpwrn->warning;
-			echo "\n\nLine: ".$cpwrn->lineno;
-			echo ' Char: '.$cpwrn->charno;
-			echo "\n".trim($cpwrn->line);
-		}
-	}
-	if (isset($min->compiledCode))
-		file_put_contents($pinf['dirname'].'/'.$pinf['filename'].'.min.'.$pinf['extension'], $min->compiledCode);
-}
-
 function addDirToAcrhive ($base,$dirn,$zh) {
 	if (!is_dir($base.$dirn)) {
 		throw new Exception('Directory ' . $dirName . ' does not exist');
@@ -353,6 +347,21 @@ function addDirToAcrhive ($base,$dirn,$zh) {
 		}
 	}
 
+}
+
+function curly ($url, $data=[]) {
+	$ch = curl_init($url);
+	curl_setopt($ch, CURLOPT_PORT , 443);
+	curl_setopt($ch, CURLOPT_POST, 1);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	if ($data) curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+	$rData = curl_exec($ch);
+	if (curl_errno($ch)) {
+		echo 'Curl error: ' . curl_error($ch);
+		return;
+	}
+	curl_close($ch);
+	return $rData;
 }
 
 function alt_stat ($file) {

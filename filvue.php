@@ -74,7 +74,6 @@ img { background-image: url(css/transback8.png); }
 		}
 		if (!file_exists($ffref)) break;
 		if ($mtyp==='0x') {
-//			$mtyp = 'text/plain';
 			$mtyp = 'text/html';
 			$gc = 4;
 			$lin = '';
@@ -87,22 +86,20 @@ img { background-image: url(css/transback8.png); }
 				$lin .= preg_replace('/[\x00-\x1F\x7F]/','&#183;',$l);
 				$fcon .= bin2hex($cnk) . ' ';
 				if (!--$gc) {
-//					$fcon .= '  ' . $lin . "\n";
 					$fcon .= '&nbsp;&nbsp;&nbsp;</td><td>' . $lin . "</td></tr>\n<tr><td>";
 					//$fcon .= "\n";
 					$lin = '';
 					$gc = 4;
 					}
 				}
-//			if ($lin) $fcon .= '  ' . $lin . "\n";
 			if ($lin) $fcon .= '</td><td>' . $lin . "</td></tr>\n";
 			fclose($fhan);
 			$fcon .= '</table>';
 			}
 		elseif (pathinfo($ffref, PATHINFO_EXTENSION) == 'md' && $mtyp_arg !== 'text/plain') {
-			include 'md/MarkdownExtra.inc.php';
+			include 'mdview.php';
 			$mtyp = 'text/html';
-			$fcon = \Michelf\MarkdownExtra::defaultTransform(file_get_contents($ffref));
+			$fcon = \Michelf\Markdown::defaultTransform(file_get_contents($ffref));
 		} elseif ($mtyp == 'text/plain' && pathinfo($ffref, PATHINFO_EXTENSION) == 'json') {
 			//$fcon = print_r(json_decode(file_get_contents($ffref), true), true);
 			$fcon = json_encode(json_decode(file_get_contents($ffref), true), JSON_PRETTY_PRINT);
