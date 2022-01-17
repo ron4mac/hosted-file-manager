@@ -28,6 +28,7 @@
 "upload5.php",
 "phpfuncs.json",
 "phpverreq.php",
+"md/",
 "mparse/mime_parser.php",
 "mparse/rfc822_addresses.php",
 "zipmngr.php"
