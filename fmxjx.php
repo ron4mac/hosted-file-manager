@@ -189,8 +189,9 @@ fclose($fh_res);
 	case 'jsmm':
 		$ccp = $_POST['CC'];
 		$ccp['js_code'] = file_get_contents($baseDir.$_POST['path'].$_POST['up_fn']);
-		$fdat = curly('https://closure-compiler.appspot.com/compile', $ccp);
-		$rdat = json_decode($fdat);
+		$pdat = http_build_query($ccp).'&output_info=compiled_code&output_info=warnings&output_info=errors&output_info=statistics';
+		$fdat = curld('https://closure-compiler.appspot.com/compile', $pdat);
+		$rdat = json_decode($fdat);		//file_put_contents('RDAT.txt', print_r($rdat, true));
 		if (isset($rdat->errors)) {
 			foreach ($rdat->errors as $cperr) {
 				echo $cperr->type;
@@ -349,12 +350,12 @@ function addDirToAcrhive ($base,$dirn,$zh) {
 
 }
 
-function curly ($url, $data=[]) {
+function curld ($url, $data='') {
 	$ch = curl_init($url);
 	curl_setopt($ch, CURLOPT_PORT , 443);
 	curl_setopt($ch, CURLOPT_POST, 1);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	if ($data) curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+	if ($data) curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 	$rData = curl_exec($ch);
 	if (curl_errno($ch)) {
 		echo 'Curl error: ' . curl_error($ch);

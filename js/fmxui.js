@@ -1,3 +1,4 @@
+"use strict";
 // creates UI dialogs using jqModal
 
 // apply esc and return keys to the modal

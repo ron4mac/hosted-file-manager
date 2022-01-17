@@ -1,3 +1,6 @@
+/* jshint unused: true */
+/* globals $,fmx_AJ,myOpenDlg,myCloseDlg,curDir,fmx_appPath,fupQadd2 */
+"use strict";
 function refreshFilst () {
 	window.location = window.location.href.split("#")[0];
 }
@@ -12,7 +15,7 @@ function refreshFilstO (so) {
 }
 
 function postAndRefresh (parms) {
-	$.post(fmx_AJ, parms, function(data,textStatus,jqXHR) {
+	$.post(fmx_AJ, parms, function(data) {
 			if (data) { alert(data); }
 			else { refreshFilst(); }
 		}
@@ -92,11 +95,11 @@ var upldAction = {
 	// HTML5 w/progress in a popup window
 	H5w: function(){ popUp(fmx_appPath+'filupld5.php'); },
 	// HTML5 w/progress in a div overlay
-	H5o: function(cbf){ $('#upload').jqm({ajax:fmx_appPath+'filupld5.php?o=1', ajaxText:'Loading...', onLoad: cbf, onHide: function(h){refreshFilst();}, target:'.upldr', overlay:5}).jqmShow(); },
+	H5o: function(cbf){ $('#upload').jqm({ajax:fmx_appPath+'filupld5.php?o=1', ajaxText:'Loading...', onLoad: cbf, onHide: refreshFilst, target:'.upldr', overlay:5}).jqmShow(); },
 	// legacy HTML in a popup window
 	L4w: function(){ popUp(fmx_appPath+'filupld.php'); },
 	// legacy HTML in a div overlay
-	L4o: function(){ $('#upload').jqm({ajax:fmx_appPath+'filupld.php?o=1', ajaxText:'Loading...', onHide: function(h){refreshFilst();}, target:'.upldr',overlay:5}).jqmShow(); },
+	L4o: function(){ $('#upload').jqm({ajax:fmx_appPath+'filupld.php?o=1', ajaxText:'Loading...', onHide: refreshFilst, target:'.upldr',overlay:5}).jqmShow(); },
 	};
 
 function downloadFile (A, cdl, asf) {
@@ -197,7 +200,7 @@ function doMenuAction (cmd,evt) {
 		if (hasSome()) {
 			parms = 'act=dnld&'+$("form[name='filst']").serialize();
 			$('div.dnldprg').css('display','inline');
-			$.post(fmx_AJ, parms, function(data,textStatus,jqXHR) {
+			$.post(fmx_AJ, parms, function(data) {
 				$('div.dnldprg').css('display','none');
 				if (data) { downloadFile(data.fpth,data.rad=='Y',false); }
 				else { alert('download not available'); }
@@ -222,7 +225,7 @@ function doMenuAction (cmd,evt) {
 		break;
 	case 'mmiz':
 		if (oneItem()) {
-			fn = $(slctd[0]).parents('tr').attr('data-fref');
+			var fn = $(slctd[0]).parents('tr').attr('data-fref');
 			$('#upload').jqm({ajax:fmx_appPath+'jsmini.php?f='+encodeURIComponent(fn), ajaxText:'Loading...', target:'.upldr',overlay:5}).jqmShow();
 		}
 		break;
@@ -305,7 +308,7 @@ function doMenuAction (cmd,evt) {
 				destfn = curfn.replace(/\s/g,'_');
 				trmFrm.cmdlin.value = zcmd+destfn+'.zip "'+curfn+'"';
 				if (evt.shiftKey) {
-					var xyz = prompt('COMMAND:',trmFrm.cmdlin.value+' -x "*/sv_*" -x "*/.git*"');
+					let xyz = prompt('COMMAND:',trmFrm.cmdlin.value+' -x "*/sv_*" -x "*/.git*"');
 					if (xyz) { trmFrm.cmdlin.value = xyz; }
 					else break;
 				}
@@ -331,7 +334,7 @@ function doMenuAction (cmd,evt) {
 		if (oneItem()) {
 			curfn = $(slctd[0]).parents('tr').attr('data-fref');
 			if (evt.shiftKey) {
-				var xyz = prompt('URL:',curfn);
+				let xyz = prompt('URL:',curfn);
 				if (xyz) { curfn = xyz; }
 				else break;
 			}
@@ -345,7 +348,7 @@ function doMenuAction (cmd,evt) {
 				parms = '?dir='+curDir;
 				pop(fmx_appPath+'gitter.php'+parms,screen.availHeight,1200);
 			} else {
-				alert("Please select a '.git' folder")
+				alert("Please select a '.git' folder");
 			}
 		}
 		break;
@@ -359,7 +362,7 @@ function doMenuAction (cmd,evt) {
 					fref: curfn,
 					dir: curDir
 					};
-				$.post(fmx_AJ, parms, function(data,textStatus,jqXHR) {
+				$.post(fmx_AJ, parms, function(data) {
 					if (data) { alert(data); }
 				});
 			} else alert('Must be an XML file');
@@ -377,25 +380,25 @@ function doMenuAction (cmd,evt) {
 		break;
 	case 'fmxi':
 		parms = {act: 'fmxi'};
-		$.post(fmx_AJ, parms, function(data,textStatus,jqXHR) {
-				if (data) {
-					var DtD;
-					if (data.updt) {
-						var updt = data.updt.split('|');
-						DtD = $.extend(true, {}, aMsgDlg, {buttons:{'Update now':function(){if (confirm('It is a good idea to backup first. Do you want to continue with the update?')) {
-							parms = {act: 'updt', nver: updt[1]};
-							$.post(fmx_AJ, parms, function(data,textStatus,jqXHR) {
-								if (data) { alert(data); }
-								else refreshFilst();
-							});
-							myCloseDlg(this);
-						}}}});
-					} else {
-						DtD = aMsgDlg;
-					}
-					myOpenDlg(evt,DtD,{'msg':data.msg},'FMX - Hosted File Manager');
+		$.post(fmx_AJ, parms, null, 'json')
+			.done(data => {
+				var DtD;
+				if (data.updt) {
+					var updt = data.updt.split('|');
+					DtD = $.extend(true, {}, aMsgDlg, {buttons:{'Update now':function(){if (confirm('It is a good idea to backup first. Do you want to continue with the update?')) {
+						parms = {act: 'updt', nver: updt[1]};
+						$.post(fmx_AJ, parms, function(data) {
+							if (data) { alert(data); }
+							else refreshFilst();
+						});
+						myCloseDlg(this);
+					}}}});
+				} else {
+					DtD = aMsgDlg;
 				}
-			},'json');
+				myOpenDlg(evt,DtD,{'msg':data.msg},'FMX - Hosted File Manager');
+			})
+			.fail((jqXHR,textStatus,thrown) => { console.log(jqXHR,textStatus,thrown);alert(textStatus); });
 		break;
 	case 'cmcs':
 		var utilview = document.createElement('div');
@@ -408,7 +411,7 @@ function doMenuAction (cmd,evt) {
 		document.body.appendChild(utilview);
 
 		parms = {act: 'CLIC'};
-		$(utilview).load(fmx_AJ, parms, function(data,textStatus,jqXHR) {
+		$(utilview).load(fmx_AJ, parms, function() {
 				utilview.style.top = (evt.clientY-utilview.clientHeight-20) + 'px';
 				$("#util-view div").click(function(e) {e.preventDefault(); doFillCLI($(this).attr('data-cmd')); document.body.removeChild(utilview); });
 			});
@@ -427,9 +430,12 @@ function doViewFile (fpath) {
 	var fvurl = fmx_appPath+'filwin.php?fref='+fpath;
 	pop(fvurl,675,900);
 }
-function doEditFile (fpath) {
-	var feurl = fmx_appPath+'filedtwin.php?fref='+fpath;
-	editWindow = pop(feurl,screen.availHeight,screen.availWidth);
+function doEditFile (fpath, intab) {
+	if (intab) {
+		editWindow = window.open(fmx_appPath+'filedwin.php?fref='+fpath, "_blank");
+	} else {
+		editWindow = pop(fmx_appPath+'filedtwin.php?fref='+fpath,screen.availHeight,screen.availWidth);
+	}
 }
 function doEditImage (fpath) {
 	popPost(fmx_appPath+"imgedtwin.php", {"fref":fpath}, "imgedt", screen.availHeight, Math.min(1200,screen.availWidth));
@@ -450,7 +456,7 @@ function doFileAction (act,elem,evt) {
 				act: act,
 				fref: fileoi
 				};
-			$.post(fmx_AJ, parms, function(data,textStatus,jqXHR) {
+			$.post(fmx_AJ, parms, function(data) {
 					if (data) {
 						myOpenDlg(evt,aMsgDlg,{'msg':data},'File info for: '+fName);
 					}
@@ -460,7 +466,7 @@ function doFileAction (act,elem,evt) {
 			doViewFile(fileoi);
 			break;
 		case 'fedt':
-			doEditFile(fileoi);
+			doEditFile(fileoi, evt ? evt.altKey : false);
 			break;
 		case 'iedt':
 			doEditImage(fileoi);
@@ -574,12 +580,12 @@ function cm_dld (itm, fld) {
 		dir: curDir,
 		'files[]': $(itm).parents('tr').attr('data-fref') + (fld?'/':'')
 		};
-	$.post(fmx_AJ, parms, function(data,textStatus,jqXHR) {
+	$.post(fmx_AJ, parms, function(data) {
 		if (data) { downloadFile(data.fpth,data.rad=='Y',false); }
 		else { alert('download not available'); }
 	},'json');
 }
-function cm_dup (itm, fld) {
+function cm_dup (itm) {
 	var parms = {
 		act: 'dupl',
 		fref: curDir + $(itm).parents('tr').attr('data-fref')
@@ -681,36 +687,36 @@ $(function() {
 	// setup contextual menus
 	$('a.cppaMenu').contextMenu('clrdMenu', {
 		bindings: {
-			'clrdClr': function(t) { sessionStorage.removeItem("fmx_cppa"); bump_mcount('#cppaMenu', -1); },
-			'clrdDsp': function(t) { display_cmmStorage(sessionStorage.fmx_cppa); }
+			'clrdClr': function() { sessionStorage.removeItem("fmx_cppa"); bump_mcount('#cppaMenu', -1); },
+			'clrdDsp': function() { display_cmmStorage(sessionStorage.fmx_cppa); }
 		}
 	});
 	$('a.delfMenu').contextMenu('delfMenu', {
 		bindings: {
-			'delfTrue': function(t) { doMenuAction('delf', null); },
-			'delfMpty': function(t) { doMenuAction('mpty', null); }
+			'delfTrue': function() { doMenuAction('delf', null); },
+			'delfMpty': function() { doMenuAction('mpty', null); }
 		}
 	});
 	$('a.markMenu').contextMenu('clrdMenuSL', {
 		bindings: {
-			'clrdClr': function(t) { sessionStorage.removeItem("fmx_mrkd"); bump_mcount('#markMenu', -1); },
-			'clrdDsp': function(t) { display_cmmStorage(sessionStorage.fmx_mrkd); },
-			'symLnk': function(t) { cm_slnk(); }
+			'clrdClr': function() { sessionStorage.removeItem("fmx_mrkd"); bump_mcount('#markMenu', -1); },
+			'clrdDsp': function() { display_cmmStorage(sessionStorage.fmx_mrkd); },
+			'symLnk': function() { cm_slnk(); }
 		}
 	});
 	$('a.mvtoMenu').contextMenu('clrdMenu', {
 		bindings: {
-			'clrdClr': function(t) { sessionStorage.removeItem("fmx_mvto"); bump_mcount('#mvtoMenu', -1); },
-			'clrdDsp': function(t) { display_cmmStorage(sessionStorage.fmx_mvto); }
+			'clrdClr': function() { sessionStorage.removeItem("fmx_mvto"); bump_mcount('#mvtoMenu', -1); },
+			'clrdDsp': function() { display_cmmStorage(sessionStorage.fmx_mvto); }
 		}
 	});
 	$('a.upldMenu').contextMenu('upldMenu', {
-		onContextMenu: function(e) { /*sessionStorage.fmx_curD = curDir;*/ return true; },
+		onContextMenu: function() { /*sessionStorage.fmx_curD = curDir;*/ return true; },
 		bindings: {
-			'H5w': function(t) { upldAction.H5w(); },
-			'H5o': function(t) { upldAction.H5o(); },
-			'L4w': function(t) { upldAction.L4w(); },
-			'L4o': function(t) { upldAction.L4o(); }
+			'H5w': function() { upldAction.H5w(); },
+			'H5o': function() { upldAction.H5o(); },
+			'L4w': function() { upldAction.L4w(); },
+			'L4o': function() { upldAction.L4o(); }
 		}
 	});
 	$('td.fileCtxt').contextMenu('fileCtxt', {

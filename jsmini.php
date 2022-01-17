@@ -12,14 +12,24 @@ $btnttl = 'Submit';
 		<input type="hidden" name="act" value="jsmm" />
 		<input type="hidden" name="up_fn" value="<?=$fn?>" />
 		<input type="hidden" name="up_fpath" value="" />
-		<input type="hidden" name="CC[output_info]" value="compiled_code" />
 		<input type="hidden" name="CC[output_format]" value="json" />
-		<input type="hidden" name="CC[language_out]" value="ECMASCRIPT_2015" />
 		<label>Level: </label>
 		<select name="CC[compilation_level]">
 			<option value="WHITESPACE_ONLY">Whitespace Only</option>
 			<option value="SIMPLE_OPTIMIZATIONS" selected>Simple Optimizations</option>
 			<option value="ADVANCED_OPTIMIZATIONS">Advanced Optimizations</option>
+		</select>
+		<br><label>Output: </label>
+		<select name="CC[language_out]">
+			<option value="ECMASCRIPT_2015">ECMASCRIPT 2015</option>
+			<option value="ECMASCRIPT_2016">ECMASCRIPT 2016</option>
+			<option value="ECMASCRIPT_2017">ECMASCRIPT 2017</option>
+			<option value="ECMASCRIPT_2018">ECMASCRIPT 2018</option>
+			<option value="ECMASCRIPT_2019">ECMASCRIPT 2019</option>
+			<option value="ECMASCRIPT_2020">ECMASCRIPT 2020</option>
+			<option value="ECMASCRIPT_2021">ECMASCRIPT 2021</option>
+			<option value="STABLE">STABLE</option>
+			<option value="ECMASCRIPT_NEXT">NEXT</option>
 		</select>
 		<br><label>Save as: </label><input type="text" name="tofile" style="width:50%" value="<?=$fnm?>" />
 		<br /><hr /><input type="button" name="do_upload" value="<?=$btnttl?>" onclick="chknsend()" style="float:right;margin-bottom:12px" /><img id="curlspin" src="graphics/spinner.gif" style="float:right;display:none" />

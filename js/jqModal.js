@@ -1,3 +1,4 @@
+"use strict";
 /*
  * jqModal - Minimalist Modaling with jQuery
  *
@@ -9,7 +10,6 @@
  * $Version: 1.0.2 (2014.04.10 +r19)
  * Requires: jQuery 1.2.3+
  */
-
 (function($) {
 	
 	/**

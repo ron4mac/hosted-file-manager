@@ -1,3 +1,4 @@
+"use strict";
 (function($) {
 
 	var menu, trigger, content, hash, currentTarget;
