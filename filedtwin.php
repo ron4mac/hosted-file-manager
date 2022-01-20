@@ -168,9 +168,6 @@ p.message.done{opacity:0;padding:0;margin:0;height:0};
 			<div class="cntrl">
 				<input type="button" name="uncm" value="/*" class="sbutton" title="Un-comment selected (cmd-shft-/)" onclick="editor.toggleBlockComment()" />
 			</div>
-<!--			<div class="cntrl">
-				<input type="button" name="frmt" value="{}" class="sbutton" title="Format selected" onclick="autoFormatSelection()" />
-			</div> -->
 			<div class="cntrlr">
 				<button onclick="event.preventDefault();event.stopPropagation();window.close()" title="Close">Close</button>
 			</div>
@@ -234,7 +231,7 @@ editor.setOptions({
 });
 editor.session.on('changeMode', function(e, session){
 	// increase # errs shown by jslint
-	session.$worker.send("changeOptions", [{maxerr: 9999}]);
+	session.$worker.send("changeOptions", [{maxerr: 9999, unused: true}]);
 });
 editor.focus();
 const msgp = document.getElementsByClassName("message")[0];

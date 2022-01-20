@@ -92,7 +92,13 @@ function saveFile () {
 	pData.append('savef','saveonly');
 	fetch(eForm.action, {method: 'POST', body: pData})
 	.then(rslt => {if (rslt.ok) return rslt.text()})
-	.then(resp => {console.log(resp); if (!resp) alert ('File successfully saved')})
+	.then(resp => {
+		if (!resp) {
+			alert ('File successfully saved');
+			editor.session.getUndoManager().reset();
+			document.getElementById('dirty').style.display = 'none';
+		} else console.log(resp);
+	})
 	.catch(err => console.log(err));
 	return false;
 }
@@ -100,6 +106,7 @@ function saveFile () {
 <style>
 html, body {width:100%;height:100%;margin:0;padding:0;}
 form {position:relative:height:33px;}
+#dirty {display:none;height:16px;vertical-align:middle;margin-right:4px;}
 div.cntrl {float:left;margin-right:10px;}
 div.cntrlr {float:right;margin-right:10px;}
 .sbutton {border:1px solid #633;cursor:pointer;margin:0;}
@@ -155,6 +162,7 @@ p.message.done{opacity:0;padding:0;margin:0;height:0};
 				<input type="button" name="uncm" value="/*" class="sbutton" title="Un-comment selected (cmd-shft-/)" onclick="editor.toggleBlockComment()" />
 			</div>
 			<div class="cntrlr">
+				<img id="dirty" src="css/dirty.png">
 				<button type="submit" name="savef" value="saveonly" title="Save changes">Save</button>
 			</div>
 			<span><?php echo $fref; ?> (<?=$mode?>)</span>
@@ -186,6 +194,10 @@ editor.commands.addCommand({
 		editor.getSession().setUseWrapMode(true);
 	}
 });
+editor.on('change', (e) => {
+	let dss = editor.session.getUndoManager().hasUndo() ? 'inline' : 'none';
+	document.getElementById('dirty').style.display = dss;
+});
 <?php
 $atheme = '';
 if (isset($acetheme)) {
@@ -210,8 +222,8 @@ editor.setOptions({
 	enableSnippets: true
 });
 editor.session.on('changeMode', function(e, session){
-	// increase # errs shown by jslint
-	session.$worker.send("changeOptions", [{maxerr: 9999}]);
+	// increase # errs shown by jslint and show unused items
+	session.$worker.send("changeOptions", [{maxerr: 9999, unused: true}]);
 });
 editor.focus();
 const msgp = document.getElementsByClassName("message")[0];
