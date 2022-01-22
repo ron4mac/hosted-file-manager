@@ -2,6 +2,8 @@
 require_once 'functions.php';
 include 'cfg.php';
 
+$popd = isset($_GET['t']) ? false : true;
+
 if (isset($_POST['savef'])) {
 	$fref = $_POST['fref'];
 	if (!$fref) exit(0);
@@ -62,6 +64,7 @@ header('Cache-Control: no-cache');
 <script src="<?=$aceBase?>ext-modelist.js" type="text/javascript" charset="utf-8"></script>
 <?php endif; ?>
 <script type="text/javascript">
+var subb;
 ace.require("ace/ext/language_tools");
 function pop(url, h1, w1) {
 	var h2 = (screen.height-h1)/2;
@@ -70,7 +73,7 @@ function pop(url, h1, w1) {
 	return open(url, "", wcon);
 }
 window.addEventListener("beforeunload", function (e) {
-	if (!editor.session.getUndoManager().hasUndo()) return;
+	if (!editor.session.getUndoManager().hasUndo() || subb == 'saveclose') return;
 	var confirmationMessage = "You have not saved changes to this document.";
 	(e || window.event).returnValue = confirmationMessage;	//Gecko + IE
 	return confirmationMessage								//Webkit, Safari, Chrome etc.
@@ -94,9 +97,13 @@ function saveFile () {
 	.then(rslt => {if (rslt.ok) return rslt.text()})
 	.then(resp => {
 		if (!resp) {
-			alert ('File successfully saved');
-			editor.session.getUndoManager().reset();
-			document.getElementById('dirty').style.display = 'none';
+			if (subb == 'saveclose') {
+				window.close();
+			} else {
+				alert ('File successfully saved');
+				editor.session.getUndoManager().reset();
+				document.getElementById('dirty').style.display = 'none';
+			}
 		} else console.log(resp);
 	})
 	.catch(err => console.log(err));
@@ -161,9 +168,14 @@ p.message.done{opacity:0;padding:0;margin:0;height:0};
 			<div class="cntrl">
 				<input type="button" name="uncm" value="/*" class="sbutton" title="Un-comment selected (cmd-shft-/)" onclick="editor.toggleBlockComment()" />
 			</div>
+<?php if ($popd): ?>
+			<div class="cntrlr">
+				<button type="submit" name="savef" value="saveclose" title="Save changes and close" onclick="subb = this.value">Save & Close</button>
+			</div>
+<?php endif; ?>
 			<div class="cntrlr">
 				<img id="dirty" src="css/dirty.png">
-				<button type="submit" name="savef" value="saveonly" title="Save changes">Save</button>
+				<button type="submit" name="savef" value="saveonly" title="Save changes" onclick="subb = this.value">Save</button>
 			</div>
 			<span><?php echo $fref; ?> (<?=$mode?>)</span>
 		</div>

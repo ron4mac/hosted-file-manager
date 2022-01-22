@@ -430,8 +430,12 @@ function doViewFile (fpath) {
 	var fvurl = fmx_appPath+'filwin.php?fref='+fpath;
 	pop(fvurl,675,900);
 }
-function doEditFile (fpath) {
-		editWindow = window.open(fmx_appPath+'filedwin.php?fref='+fpath, "_blank");
+function doEditFile (fpath, intab) {
+	if (intab) {
+		editWindow = window.open(fmx_appPath+'filedwin.php?t=1&fref='+fpath, "_blank");
+	} else {
+		editWindow = pop(fmx_appPath+'filedwin.php?fref='+fpath,screen.availHeight,screen.availWidth);
+	}
 }
 function doEditImage (fpath) {
 	popPost(fmx_appPath+"imgedtwin.php", {"fref":fpath}, "imgedt", screen.availHeight, Math.min(1200,screen.availWidth));
@@ -462,7 +466,7 @@ function doFileAction (act,elem,evt) {
 			doViewFile(fileoi);
 			break;
 		case 'fedt':
-			doEditFile(fileoi);
+			doEditFile(fileoi, evt ? evt.altKey : false);
 			break;
 		case 'iedt':
 			doEditImage(fileoi);
