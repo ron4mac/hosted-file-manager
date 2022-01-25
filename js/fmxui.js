@@ -1,3 +1,4 @@
+/* globals $ */
 "use strict";
 // creates UI dialogs using jqModal
 

@@ -39,7 +39,7 @@ $done = $fw ? 'parent.opener.refreshFilst(); if (!errcnt) window.close();' : 'if
 			doneFunc: function (okcnt, errcnt) { <?php echo $done; ?> }
 		};
 	</script>
-	<script type="text/javascript" src="uplodr/upload.min.js"></script>
+	<script type="text/javascript" src="uplodr/upload<?=$jsver?>.js"></script>
 <?php if ($fw): ?>
 </head>
 <body>

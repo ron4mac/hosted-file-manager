@@ -1,4 +1,4 @@
-/* uplodr v0.8 */
+/* uplodr v0.9 */
 
 /* a couple of utility functions to avoid using jquery and assist in minification */
 // getElementById
@@ -68,25 +68,25 @@ function $ae (elem, evnt, func) {
 		;
 
 	// utility element creator
-	function CreateElement (type, cont, attr) {
-		var elem = document.createElement(type, attr);
+	let CreateElement = (type, cont, attr) => {
+		let elem = document.createElement(type);
 		if (cont) elem.innerHTML = cont;
-		for (var key in attr) {
+		for (let key in attr) {
 			elem.setAttribute(key, attr[key]);
 		}
 		return elem;
-	}
+	};
 
 	// file drag hover
-	function FileDragHover (e) {
+	let FileDragHover = (e) => {
 		e.stopPropagation();
 		e.preventDefault();
 		e.target.className = (e.type == 'dragover' ? 'hover' : 'dropzone');
-	}
+	};
 
 	// file selection
-	function FileSelectHandler (e) {
-		var files, i, f;
+	let FileSelectHandler = (e) => {
+		let files, i, f;
 
 		if (e instanceof FileList) {
 			files = e;
@@ -108,9 +108,9 @@ function $ae (elem, evnt, func) {
 			NextInQueue(false,'fsel');
 		}
 		if (upQueue.length > maxXfer) e_st.style.display = s_vu;
-	}
+	};
 
-	function _endUp () {
+	let _endUp = () => {
 		if (!qStopt) {
 			allDone = 1;
 			if (typeof(opts.doneFunc) == 'function') {
@@ -119,16 +119,16 @@ function $ae (elem, evnt, func) {
 			}
 			errCount = okCount = 0;
 		}
-	}
+	};
 
-	function NextInQueue (decr,tag) {
+	let NextInQueue = (decr,tag) => {
 		if (decr) {
 			if (tag == 'ufo') okCount++;
 			if (! --inPrg) { _endUp(); }
 		}
 		if (!qStopt && upQueue.length && (!maxXfer || inPrg < maxXfer)) {
-			var nxf = upQueue.shift();
-			var ufo = new UpldFileObj(nxf);			//console.log(ufo);
+			let nxf = upQueue.shift();
+			let ufo = new UpldFileObj(nxf);			//console.log(ufo);
 			inPrg++;
 			qCountSpan.innerHTML = upQueue.length;
 		}
@@ -136,27 +136,27 @@ function $ae (elem, evnt, func) {
 			e_st.style.display = s_hd;
 			e_gc.style.display = s_hd;
 		}
-	}
+	};
 
 	// progress bar object
 	function ProgressBar (fileObj, sclass) {
 		let $ = this;
 		
-		$.show = function (percent) {
+		$.show = (percent) => {
 			let p = 100 * percent;
 			$.pb.style.width = p + "%";
 			if (percent === 1) {
 				$.pb.className = 'indeterm';
 			}
 		};
-		$.msg = function (msg, err) {
+		$.msg = (msg, err) => {
 			$.pbi.innerHTML += '<br />' + msg;
 			if (err) {
 				$.pbi.className = 'pbfinf failure';
 				errCount++;
 			}
 		};
-		$.remove = function () {
+		$.rmov = () => {
 			$.pbw._ufo = null;
 			progressDiv.removeChild($.pbw);
 			$.fObj = null;
@@ -165,39 +165,39 @@ function $ae (elem, evnt, func) {
 		// create progress bar
 		let pbw = CreateElement('div', '', {class:'pbwrp'});
 		$.pb = pbw.appendChild(CreateElement('div', '', {class:sclass}));
-		let pbv = fileObj.fileName + '<i class="fa fa-window-close abortX" aria-hidden="true" onclick="this.parentNode.parentNode._ufo.abort(true);"></i>';
+		let pbv = fileObj.fn + '<i class="fa fa-window-close abortX" aria-hidden="true" onclick="this.parentNode.parentNode._ufo.abort(true);"></i>';
 		$.pbi = pbw.appendChild(CreateElement('div', pbv, {class:'pbfinf'}));
 		progressDiv.appendChild(pbw);
 		$.pbw = pbw;
 		$.pbw._ufo = fileObj;
 		$.fObj = fileObj;
-		return this;
+		return $;
 	}
 
-	function UpdateTotalProgress (adsz) {
+	let UpdateTotalProgress = (adsz) => {
 		if (!totProgressBar) return;
 		if (adsz < 0) return;
 		totalDone += adsz;
-		var wp = 100 * totalDone / total2do;
+		let wp = 100 * totalDone / total2do;
 		totProgressBar.style.width = wp + "%";
-	}
+	};
 
-	function addData (frmd, data) {
-		for (var key in data) {
+	let addData = (frmd, data) => {
+		for (let key in data) {
 			frmd.append(key, data[key]);
 		}
-	}
+	};
 
 	// object for a file upload with chunking support
 	function UpldFileObj (file) {
-		var $ = this, key, query;
+		let $ = this;
 		$.upFile = file;
-		$.fileName = file.fileName || file.name;
+		$.fn = file.fileName || file.name;
 		$.size = file.size;
 		$.upState = '';
 		$.doChnk = ($.upFile.size > maxcnksz);
 		$.chnkSize = Math.round(maxcnksz / 2) - 3072;
-		$.relPath = file.webkitRelativePath || $.fileName;
+		$.relPath = file.webkitRelativePath || $.fn;
 		$.uniqueId = $.size + '-' + $.relPath.replace(/[^0-9a-zA-Z_-]/img, '');
 		$.actSize = 0;
 		$.startByte = 0;
@@ -206,30 +206,30 @@ function $ae (elem, evnt, func) {
 		$.chnkNum = 0;
 		$.fData = null;
 		$.upForm = {};				// extra data can be added
-		$.xhr = new XMLHttpRequest();
+		$.X = new XMLHttpRequest();
 
-		var endup = function (all) {
-			if ($.xhr) {
-				$.xhr.upload.onprogress = null;
-				$.xhr.onabort = null;
-				$.xhr.onerror = null;
-				$.xhr.onload = null;
-				$.xhr = null;
+		const endup = (all) => {
+			if ($.X) {
+				$.X.upload.onprogress = null;
+				$.X.onabort = null;
+				$.X.onerror = null;
+				$.X.onload = null;
+				$.X = null;
 			}
 			$.fData = null;
 			if (all && $.pBar) {
-				$.pBar.remove();
+				$.pBar.rmov();
 				$.pBar = null;
 			}
 			NextInQueue(true,'ufo');
 		};
 
-		var fDat = function () {
+		const fDat = () => {
 			$.fData = new FormData();
 			addData($.fData, opts.payload);
 		};
 
-		var state = function () {
+		const state = () => {
 			fDat();
 			switch ($.upState) {
 				case '':
@@ -240,23 +240,22 @@ function $ae (elem, evnt, func) {
 				case 'upld':
 					endup(true);
 					return;
-					break;
 			}
-			$.xhr.open('POST', opts.upURL);
-			$.xhr.send($.fData);
+			$.X.open('POST', opts.upURL);
+			$.X.send($.fData);
 		};
 
-		var cstate = function () {
+		const cstate = () => {
 			fDat();
 			switch ($.upState) {
 				case '':
-					//console.log('pref',$.fileName);
-					addData($.fData, { chunkact: 'pref', file: $.fileName, size: $.size, ident: $.uniqueId});
+					//console.log('pref',$.fn);
+					addData($.fData, { chunkact: 'pref', file: $.fn, size: $.size, ident: $.uniqueId});
 					$.upState = 'chnk';
 					break;
 				case 'chnk':
-					//console.log('chnk',$.chnkNum+1,$.fileName);
-					addData($.fData, { chunkact: 'chnk', ident: $.uniqueId, fname: $.fileName, tchnk: $.numChnks });
+					//console.log('chnk',$.chnkNum+1,$.fn);
+					addData($.fData, { chunkact: 'chnk', ident: $.uniqueId, fname: $.fn, tchnk: $.numChnks });
 					if ($.chnkNum == $.numChnks) { endup(true); return; }	///////// do stuff here to finish up
 					$.startByte = $.chnkNum * $.chnkSize;
 					$.endByte = Math.min($.size, ($.chnkNum + 1) * $.chnkSize);
@@ -273,26 +272,26 @@ function $ae (elem, evnt, func) {
 					$.lastsz = 0;
 					break;
 				case 'abrt':
-					//console.log('abrt',$.fileName);
-					$.xhr.timeout = 10000;
-					addData($.fData, { chunkact: 'abrt', ident: $.uniqueId, fname: $.fileName });
+					//console.log('abrt',$.fn);
+					$.X.timeout = 10000;
+					addData($.fData, { chunkact: 'abrt', ident: $.uniqueId, fname: $.fn });
 					$.upState = 'nil';
 					break;
 				case 'nil':
-					//console.log('nil ',$.fileName);
+					//console.log('nil ',$.fn);
 					endup();
 					return;
-					break;
 			}
-			//console.log($.chnkNum, $.fileName);
-			$.xhr.open('POST', opts.upURL);
-			$.xhr.send($.fData);
+			//console.log($.chnkNum, $.fn);
+			$.X.open('POST', opts.upURL);
+			$.X.send($.fData);
 		};
 
-		var cb = {
-			prog: function (e) {
+		const cb = {
+			//upload progress
+			prog: (e) => {
 					if (!e.lengthComputable) return;
-					var loded = Math.round(e.loaded / e.total * $.actSize);
+					let loded = Math.round(e.loaded / e.total * $.actSize);
 					if ($.upState == 'chnk' && $.chnkNum) {		//console.log($.actSize,loded,e);
 						//var loded = $.loaded;
 						$.pBar.show(($.startByte + loded) / $.size);
@@ -305,52 +304,44 @@ function $ae (elem, evnt, func) {
 						$.lastsz = loded;
 					}
 				},
-			chng: function (e) {
-				//	console.log(this,e);
-					if (this.readyState < 4) { return; }
-					if (this.status !== 200) {
-						UpdateTotalProgress($.size - $.startByte - $.lastsz);
-						$.lastsz = $.size;
-						if (this.status === 0) {
-							$.pBar.msg('-- Aborted', true);
-							if ($.doChnk) {
-								$.upState = 'abrt';
-								cstate();
-							} else {
-								endup();
-							}
-						} else {
-							$.pBar.msg(this.responseText || this.statusText || this.status, true);
-							endup();
-						}
-					} else if (this.status === 200) {
-						if (this.responseText.length) {
-							$.pBar.msg(this.responseText, true);
-						} else {
-							if ($.doChnk) {
-								cstate();
-							} else {
-								state();
-							}
-						}
+			//upload successful
+			load: () => {
+				if ($.X.responseText.length) {
+					$.pBar.msg($.X.responseText, true);
+				} else {
+					if ($.doChnk) {
+						cstate();
+					} else {
+						state();
 					}
+				}
 				},
-			fail: function (e) {
-					$.pBar.msg(this.responseText, true);
-					//console.log(e,this);
+			abrt: () => {
+				$.pBar.msg('-- Aborted', true);
+				if ($.doChnk) {
+					$.upState = 'abrt';
+					cstate();
+				} else {
+					endup();
+				}
+				},
+			//upload failure
+			fail: () => {
+					$.pBar.msg($.X.responseText, true);
+					endup();
 				}
 			};
 
-		$.abort = function (ua) {
-			if ($.xhr) {
-				var xrs = $.xhr.readyState;
+		$.abort = () => {
+			if ($.X) {
+				let xrs = $.X.readyState;
 				if (xrs < 4 && xrs !== 0) {
-					$.xhr.abort();
+					$.X.abort();
 				} else {
 					cb.abrt();
 				}
 			} else {
-				$.pBar.remove();
+				$.pBar.rmov();
 				$.pBar = null;
 			}
 		};
@@ -358,9 +349,9 @@ function $ae (elem, evnt, func) {
 		// put up the progress bar
 		$.pBar = new ProgressBar($, $.doChnk ? 'chnkpb' : 'normpb');
 
-		var errM = '';
+		let errM = '';
 		if (typeof(aft) == 'object' && aft.length) {
-			var dotParts = file.name.split('.');
+			let dotParts = file.name.split('.');
 			if (dotParts.length == 1 || (aft.indexOf(dotParts.pop().toLowerCase()) < 0)) {
 				errM = '<i class="fa fa-info-circle infoG" onclick="alert(\'Allowed file types: \' + H5uOpts.allowed_file_types.join(\', \'));"></i> File type not allowed';
 			}
@@ -371,14 +362,15 @@ function $ae (elem, evnt, func) {
 		if (errM) {
 			$.pBar.msg(errM, true);
 			UpdateTotalProgress(file.size);
-			$.xhr = null;
+			$.X = null;
 			NextInQueue(true,'errM');
 			return;
 		}
 
-		$.xhr.onreadystatechange = cb.chng;
-		$.xhr.upload.onerror = cb.fail;
-		$.xhr.upload.onprogress = cb.prog;
+		$.X.upload.onload = cb.load;
+		$.X.upload.onerror = cb.fail;
+		$.X.upload.onabort = cb.abrt;
+		$.X.upload.onprogress = cb.prog;
 
 		if ($.doChnk) {
 			cstate();
@@ -386,10 +378,10 @@ function $ae (elem, evnt, func) {
 			state();
 		}
 
-		return (this);
+		return $;
 	}
 
-	function _setup () {
+	let _setup = () => {
 		let updiv = $id(opts.lodrdiv);
 		if (w.File && w.FileList) {
 			// create UI
@@ -435,7 +427,7 @@ function $ae (elem, evnt, func) {
 		} else {
 			updiv.appendChild(CreateElement('div', 'Can not use this upload method with the web browser that you are using.', {}));
 		}
-	}
+	};
 
 	w.H5uSetup = _setup;
 	w.H5uQctrl = _qCtrl;
