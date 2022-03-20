@@ -11,30 +11,30 @@ header('Cache-Control: no-cache');
 <title><?php echo $fref; ?></title>
 <script type="text/javascript">
 var resizeTime = null;
-function viewFile() {
+function viewFile () {
 	document.getElementById('fvue').src='<?php echo $fvurl; ?>';
 }
-function viewAs(mTyp) {
+function viewAs (mTyp) {
 	document.getElementById('fvue').src='<?php echo $fvurl; ?>'+'&mtyp='+mTyp;
 }
-function resizeFrame() {
+function resizeFrame (get=false) {
 	if (resizeTime) {
 		clearTimeout(resizeTime);
 		resizeTime = null;
 	}
-	var fv = document.getElementById('fvue');
+	let fv = document.getElementById('fvue');
 	if (fv) {
 		fv.height = window.innerHeight - fv.offsetTop - 12 + "px";
 	}
-	viewFile();
+	if (get) viewFile();
 }
-function expWin() {
+function expWin () {
 	window.moveTo(0, 0);
 	window.resizeTo(screen.availWidth, screen.availHeight);
 }
-function winResized() {
+function winResized () {
 	if (resizeTime) clearTimeout(resizeTime);
-	resizeTime=setTimeout(resizeFrame,200);
+	resizeTime=setTimeout(resizeFrame,100);
 }
 window.onresize = winResized;
 </script>
@@ -44,7 +44,7 @@ div.mtsel {float:right;}
 img.wacti {float:right;margin-top:2px;margin-right:10px;}
 </style>
 </head>
-<body style="overflow:hidden;height:100%" onload="resizeFrame()">
+<body style="overflow:hidden;height:100%" onload="resizeFrame(true)">
 <b><?php echo $fref; ?></b> (<?php echo $mtyp; ?>)
 <div class="mtsel">view as: <select onChange="viewAs(this.value);">
 <option value ="">default</option>
@@ -53,6 +53,6 @@ img.wacti {float:right;margin-top:2px;margin-right:10px;}
 <option value ="0x">hex</option>
 </select></div>
 <img class="wacti" src="graphics/expwin.png" title="Expand window" alt="" onclick="expWin()" />
-<iframe id="fvue" src=""></iframe>
+<div><div></div><iframe id="fvue" src=""></iframe></div>
 </body>
 </html>

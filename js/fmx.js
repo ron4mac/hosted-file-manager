@@ -1,5 +1,6 @@
 /* jshint unused: true */
-/* globals $,fmx_AJ,myOpenDlg,myCloseDlg,curDir,fmx_appPath,fupQadd2 */
+/* globals $,fmx_AJ,myOpenDlg,myCloseDlg,curDir,fmx_appPath,fupQadd2,upload_winpop,ctxPrf,  URLSearchParams */
+/* exported refreshFilstO, allSelect, selectionAction, fils2up */
 "use strict";
 function refreshFilst () {
 	window.location = window.location.href.split("#")[0];
@@ -14,12 +15,37 @@ function refreshFilstO (so) {
 	}
 }
 
+const toFormData = (obj) => {
+	const formData = new FormData();
+	Object.keys(obj).forEach(key => {
+		if (typeof obj[key] !== 'object') formData.append(key, obj[key]);
+		else formData.append(key, JSON.stringify(obj[key]));
+	});
+	return formData;
+};
+
+function postAction (act, parms={}, cb=()=>{}, json=false) {
+	if (typeof parms === 'object') {
+		if (!(parms instanceof FormData)) parms = toFormData(parms);
+	} else if (typeof parms === 'string') {
+		parms = new URLSearchParams(parms);
+	}
+	if (act) parms.set('act', act);
+
+	fetch(fmx_AJ, {method:'POST',body:parms})
+	.then(resp => { if (!resp.ok) throw new Error('Network response was not OK'); if (json) return resp.json(); else return resp.text() })
+	.then(data => cb(data))
+	.catch(err => alert(err));
+}
+
 function postAndRefresh (parms) {
-	$.post(fmx_AJ, parms, function(data) {
-			if (data) { alert(data); }
-			else { refreshFilst(); }
-		}
-	);
+	postAction(null, parms, (data) => { if (data) alert(data); else refreshFilst() });
+}
+
+function postFormAndRefresh (act) {
+	let parms = new FormData(document.forms.filst);
+	parms.set('act', act);
+	postAndRefresh(parms);
 }
 
 var aMsgDlg = {
@@ -126,7 +152,6 @@ function makeFileList (fstr, htm) {
 			if (fpt*1===0) { fdr = fpa[1].substr(cdl); }
 			else { rslt += fdr + '%2F' + fpa[1] + sep; }
 		}
-	//console.log(cdl);console.log(fdr);console.log(curDir);
 	}
 	return rslt.replace(/%2F/g,'/');
 }
@@ -185,7 +210,7 @@ function doMenuAction (cmd,evt) {
 		break;
 	case 'trsh':
 		if (hasSome() && ((scnt==1) || confirm('You have multiple files selected. Are you sure you want to trash ALL the selected files?'))) {
-			postAndRefresh('act=trsh&'+$("form[name='filst']").serialize());
+			postFormAndRefresh('trsh');
 		}
 		break;
 	case 'mpty':
@@ -193,18 +218,19 @@ function doMenuAction (cmd,evt) {
 		break;
 	case 'delf':
 		if (hasSome() && ((scnt==1) || confirm('You have multiple files selected. Are you sure you want to delete ALL the selected files?'))) {
-			postAndRefresh('act=delf&'+$("form[name='filst']").serialize());
+			postFormAndRefresh('delf');
 		}
 		break;
 	case 'dnld':
 		if (hasSome()) {
-			parms = 'act=dnld&'+$("form[name='filst']").serialize();
 			$('div.dnldprg').css('display','inline');
-			$.post(fmx_AJ, parms, function(data) {
+			parms = new FormData(document.forms.filst);
+			parms.set('act','dnld');
+			postAction(null, parms, (data) => {
 				$('div.dnldprg').css('display','none');
 				if (data) { downloadFile(data.fpth,data.rad=='Y',false); }
 				else { alert('download not available'); }
-			},'json');
+			}, true);
 		}
 		break;
 	case 'dupl':
@@ -357,14 +383,8 @@ function doMenuAction (cmd,evt) {
 			curfn = curDir+$(slctd[0]).parents('tr').attr('data-fref');
 			var m = curfn.match(/([^\/\\]+)\.(\w+)$/);
 			if (m && m[2] == 'xml') {
-				parms = {
-					act: 'jxtr',
-					fref: curfn,
-					dir: curDir
-					};
-				$.post(fmx_AJ, parms, function(data) {
-					if (data) { alert(data); }
-				});
+				parms = {act: 'jxtr', fref: curfn, dir: curDir};
+				postAction(null, parms, (data) => {if (data) alert(data);});
 			} else alert('Must be an XML file');
 		}
 		break;
@@ -380,25 +400,21 @@ function doMenuAction (cmd,evt) {
 		break;
 	case 'fmxi':
 		parms = {act: 'fmxi'};
-		$.post(fmx_AJ, parms, null, 'json')
-			.done(data => {
+		const resp = (data) => {
 				var DtD;
 				if (data.updt) {
 					var updt = data.updt.split('|');
 					DtD = $.extend(true, {}, aMsgDlg, {buttons:{'Update now':function(){if (confirm('It is a good idea to backup first. Do you want to continue with the update?')) {
 						parms = {act: 'updt', nver: updt[1]};
-						$.post(fmx_AJ, parms, function(data) {
-							if (data) { alert(data); }
-							else refreshFilst();
-						});
+						postAndRefresh(parms);
 						myCloseDlg(this);
 					}}}});
 				} else {
 					DtD = aMsgDlg;
 				}
 				myOpenDlg(evt,DtD,{'msg':data.msg},'FMX - Hosted File Manager');
-			})
-			.fail((jqXHR,textStatus,thrown) => { console.log(jqXHR,textStatus,thrown);alert(textStatus); });
+			};
+		postAction('fmxi', {}, resp, true);
 		break;
 	case 'cmcs':
 		var utilview = document.createElement('div');
@@ -452,15 +468,8 @@ function doFileAction (act,elem,evt) {
 	var parms;
 	switch (act) {
 		case 'finf':
-			parms = {
-				act: act,
-				fref: fileoi
-				};
-			$.post(fmx_AJ, parms, function(data) {
-					if (data) {
-						myOpenDlg(evt,aMsgDlg,{'msg':data},'File info for: '+fName);
-					}
-				});
+			parms = {act: act, fref: fileoi};
+			postAction(null, parms, (data) => myOpenDlg(evt,aMsgDlg,{'msg':data},'File info for: '+fName));
 			break;
 		case 'fvue':
 			doViewFile(fileoi);
@@ -580,10 +589,12 @@ function cm_dld (itm, fld) {
 		dir: curDir,
 		'files[]': $(itm).parents('tr').attr('data-fref') + (fld?'/':'')
 		};
-	$.post(fmx_AJ, parms, function(data) {
-		if (data) { downloadFile(data.fpth,data.rad=='Y',false); }
-		else { alert('download not available'); }
-	},'json');
+	postAction(null, parms,
+		(data) => {
+			if (data) { downloadFile(data.fpth,data.rad=='Y',false); }
+			else { alert('download not available'); }
+			},
+		true);
 }
 function cm_dup (itm) {
 	var parms = {

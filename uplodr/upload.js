@@ -199,12 +199,9 @@ function $ae (elem, evnt, func) {
 		$.chnkSize = Math.round(maxcnksz / 2) - 3072;
 		$.relPath = file.webkitRelativePath || $.fn;
 		$.uniqueId = $.size + '-' + $.relPath.replace(/[^0-9a-zA-Z_-]/img, '');
-		$.actSize = 0;
-		$.startByte = 0;
-		$.lastsz = 0;
+		$.actSize = $.startByte = $.lastsz = $.chnkNum = 0;
 		$.numChnks = Math.max(Math.floor($.size / $.chnkSize), 1);
-		$.chnkNum = 0;
-		$.fData = null;
+		$.fData = $.pBar = null;
 		$.upForm = {};				// extra data can be added
 		$.X = new XMLHttpRequest();
 

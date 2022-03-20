@@ -100,7 +100,6 @@ function saveFile () {
 			if (subb == 'saveclose') {
 				window.close();
 			} else {
-				alert ('File successfully saved');
 				editor.session.getUndoManager().reset();
 				document.getElementById('dirty').style.display = 'none';
 			}

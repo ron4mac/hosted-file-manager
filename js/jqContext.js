@@ -1,7 +1,8 @@
+/* globals jQuery */
 "use strict";
 (function($) {
 
-	var menu, trigger, content, hash, currentTarget;
+	var menu, content, hash, currentTarget;
 	var defaults = {
 		menuStyle: {
 //			listStyle: 'none',

@@ -118,6 +118,7 @@ if (isset($_POST['cmdlin'])) {
 <script src="<?=$jqlink?>"></script>
 <script src="js/js.php" type="text/javascript"></script>
 <script type="text/javascript">
+if (!window.fetch) alert("This web browser is not new enough to properly run this version of the File Manager");
 var fmx_docroot = '<?php echo dirname($_SERVER['DOCUMENT_ROOT']); ?>';
 var fmx_appPath = '';
 var fmx_AJ='fmxjx.php';

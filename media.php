@@ -69,8 +69,8 @@ foreach ($files as $file) {
 		break;
 	case 'audio/':
 		// fancybox doesn't directly handle audio so force an iframe
-	//	$imgsl[$file] = ['javascript:;" data-type="iframe" data-src="'.$iurl, 'css/audio.svg'];
-		$imgsl[$file] = [$iurl, 'css/audio.svg'];
+		$imgsl[$file] = ['javascript:;" data-type="iframe" data-src="'.$iurl, 'css/audio.svg'];
+	//	$imgsl[$file] = [$iurl, 'css/audio.svg'];
 		break;
 	}
 }
@@ -162,10 +162,13 @@ nav {font-size:larger;}
 	max-width  : 80%;
 	max-height : 80%;
 	margin: 0;
+	background-color: transparent;
 }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script> -->
 <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+<script src="js/echo.min.js"></script>
 <script>
 function backc (colr) {
 	var elms = document.getElementsByClassName("aimg");
@@ -186,5 +189,12 @@ function backc (colr) {
 <body>
 <?php echo $html; ?>
 <?php //echo'<xmp>';var_dump($GLOBALS);echo'</xmp>'; ?>
+<script>
+	echo.init({
+		offset: 200,
+		throttle: 250,
+		debounce: false
+	});
+</script>
 </body>
 </html>

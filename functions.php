@@ -11,10 +11,10 @@ if ($fmxInJoomla) {
 	$rmtuser = getenv('REMOTE_USER');
 	$cooknam = 'fil_vew' . ($rmtuser ? "_$rmtuser" : '');
 }
-$cookie = $_COOKIE[$cooknam];
+$cookie = isset($_COOKIE[$cooknam]) ? $_COOKIE[$cooknam] : null;
 if (!$cookie) { exit('Unauthorized'); }
 $baseDir = convert_uudecode($cookie).'/';
-$fmxVersion = '3.4.6 - January 2022';
+$fmxVersion = '3.4.7 - March 2022';
 
 function FileMimeType ($fpath)
 {

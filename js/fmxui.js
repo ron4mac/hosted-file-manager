@@ -1,4 +1,5 @@
 /* globals $ */
+/* exported myOpenDlg,myCloseDlg */
 "use strict";
 // creates UI dialogs using jqModal
 

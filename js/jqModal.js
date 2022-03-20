@@ -1,3 +1,4 @@
+/* globals jQuery */
 "use strict";
 /*
  * jqModal - Minimalist Modaling with jQuery

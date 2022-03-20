@@ -8,6 +8,11 @@ $fcon = '';
 $mtyp = $mtyp_arg = isset($_GET['mtyp']) ? escapeshellcmd($_GET['mtyp']) : '';
 if (!$mtyp) $mtyp = FileMimeType($ffref);
 list($x,$y) = preg_split('/\//',$mtyp.'/');
+if (in_array($x, ['audio','image','video'])) {
+	header("Content-Type: $mtyp");
+	readfile($ffref);
+	exit();
+}
 switch ($y) {
 	case 'zip':
 		$mtyp = 'text/plain';
@@ -100,7 +105,8 @@ img { background-image: url(css/transback8.png); }
 			include 'mdview.php';
 			$mtyp = 'text/html';
 			$fcon = \Michelf\Markdown::defaultTransform(file_get_contents($ffref));
-		} elseif ($mtyp == 'text/plain' && pathinfo($ffref, PATHINFO_EXTENSION) == 'json') {
+		}
+		elseif ($mtyp == 'text/plain' && pathinfo($ffref, PATHINFO_EXTENSION) == 'json') {
 			//$fcon = print_r(json_decode(file_get_contents($ffref), true), true);
 			$fcon = json_encode(json_decode(file_get_contents($ffref), true), JSON_PRETTY_PRINT);
 		}
