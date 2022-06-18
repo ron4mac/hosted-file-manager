@@ -129,13 +129,12 @@ function ckBox ($v, $n=null)
 
 function statusAction ()
 {
-	$stats = explode("\x00", `git status -z`);
+	$stats = explode("\x00", `git status -z` ?: '');
 	$html = '';
 	foreach ($stats as $stat) {
 		if (!$stat) continue;
 		$m = substr($stat, 0, 2);
 		$f = substr($stat, 3);
-	//	list($m, $f, $ff) = explode(' ', $stat.'', 3);
 		switch ($m) {
 			case ' D':
 			case ' M':

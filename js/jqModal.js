@@ -1,5 +1,5 @@
 /* globals jQuery */
-"use strict";
+'use strict';
 /*
  * jqModal - Minimalist Modaling with jQuery
  *
@@ -54,7 +54,7 @@
 	$.fn.jqmAddTrigger=function(trigger){
 		return this.each(function(){
 			if(!addTrigger($(this), 'jqmShow', trigger))
-				err("jqmAddTrigger must be called on initialized modals");
+				err('jqmAddTrigger must be called on initialized modals');
 		});
 	};
 	
@@ -69,7 +69,7 @@
 	$.fn.jqmAddClose=function(trigger){
 		return this.each(function(){
 			if(!addTrigger($(this), 'jqmHide', trigger))
-				err("jqmAddClose must be called on initialized modals");
+				err('jqmAddClose must be called on initialized modals');
 		});
 	};
 	
@@ -291,7 +291,7 @@
 		// F: The Keep Focus Function (for modal: true dialos)
 		// Binds or Unbinds (t) the Focus Examination Function (X) to keypresses and clicks
 		
-		$(document)[t]("keypress keydown mousedown",X);
+		$(document)[t]('keypress keydown mousedown',X);
 		
 		
 	}, X = function(e){

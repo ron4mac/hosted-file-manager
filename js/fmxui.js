@@ -1,6 +1,6 @@
 /* globals $ */
 /* exported myOpenDlg,myCloseDlg */
-"use strict";
+'use strict';
 // creates UI dialogs using jqModal
 
 // apply esc and return keys to the modal
@@ -74,7 +74,7 @@ function myOpenDlg (e, dId, fVals, titl) {
 function myProcessDlg (elem, action) {
 	var clos = true;
 	if (action) {
-		var frm = $(elem).parent().parent().prev().children(":first");
+		var frm = $(elem).parent().parent().prev().children(':first');
 		var ddat = $(frm).serialize();
 		clos = action($(frm).get(0), ddat);
 	}

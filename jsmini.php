@@ -32,6 +32,7 @@ $btnttl = 'Submit';
 			<option value="ECMASCRIPT_NEXT">NEXT</option>
 		</select>
 		<br><label>Save as: </label><input type="text" name="tofile" style="width:50%" value="<?=$fnm?>" />
+		<br><input type="checkbox" id="rmjsdoc" name="rmjsdoc" value="1" checked /> <label for="rmjsdoc">Remove JsDoc/License</label>
 		<br /><hr /><input type="button" name="do_upload" value="<?=$btnttl?>" onclick="chknsend()" style="float:right;margin-bottom:12px" /><img id="curlspin" src="graphics/spinner.gif" style="float:right;display:none" />
 	</form>
 </div>

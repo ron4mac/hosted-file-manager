@@ -212,8 +212,13 @@ fclose($fh_res);
 			}
 		}
 		if (isset($rdat->compiledCode) && $rdat->compiledCode) {
+			$rmjsdoc = isset($_POST['rmjsdoc']);
+			if ($rmjsdoc) $rdat->compiledCode = preg_replace('#/\*.+\*/[\s]*#s', '', $rdat->compiledCode);
 			file_put_contents($baseDir.$_POST['path'].$_POST['tofile'], $rdat->compiledCode);
-		} else echo 'Minification was not possible';
+		} else {
+			$erm = $rdat->serverErrors[0]->error;
+			echo "Minification was not possible.\n" . $erm;
+		}
 		break;
 	case 'mvto':
 		$todir = escapeshellarg($baseDir.$_POST['todr']);

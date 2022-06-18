@@ -100,9 +100,9 @@ if (isset($_POST['cmdlin'])) {
 	chdir($rDir);
 	$rsptxt = `$cmd 2>&1`;
 	// get rid of backspaced characters (found in man pages)
-	$rsptxt = preg_replace('/.\x08/','',$rsptxt);
+	$rsptxt && $rsptxt = trim(preg_replace('/.\x08/','',$rsptxt));
 	// mostly because of a possible </textarea>, escape tags
-	$rsptxt = preg_replace(['/<xmp/','/<\/xmp/'], ['<x m p','</x m p'], $rsptxt);		//removed since using <xmp> to wrap output
+	$rsptxt && $rsptxt = trim(preg_replace(['/<xmp/','/<\/xmp/'], ['<x m p','</x m p'], $rsptxt));		//removed since using <xmp> to wrap output
 	}
 ?>
 <?php if (!$fmxInJoomla): ?>
@@ -313,7 +313,7 @@ if ($dFiles) {
 		$efle = urlencode($afle);
 		if ($fs[2] & 040000) {
 			echo "<tr data-fref='$fle'>";
-			$dt = strftime("%b %d, %Y  %l:%M%P", $fs[9]);
+			$dt = date('M d, Y g:ia', $fs[9]);
 			if (is_writable($fPth)) {
 				echo '<td><input type="checkbox" class="fsel" name="files[]" value="'.$fle.'/" /></td>';
 			} else {
@@ -341,7 +341,7 @@ if ($dFiles) {
 			if ($sz > 1073741824) {$sz = sprintf('%.1f', ($sz / 1073741824)). 'g';}
 			elseif ($sz > 1048575) {$sz = sprintf('%.1f', ($sz / 1048576)) . 'm';}
 			elseif ($sz > 1023) {$sz = sprintf('%.1f', ($sz / 1024)) . 'k';}
-			$dt = strftime("%b %d, %Y  %l:%M%P", $fs[9]);
+			$dt = date('M d, Y g:ia', $fs[9]);
 			if (is_writable($fPth)) {
 				echo '<td><input type="checkbox" class="fsel" name="files[]" value="'.$fle.'" /></td>';
 			} else {

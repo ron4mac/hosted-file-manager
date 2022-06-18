@@ -1,17 +1,17 @@
 /* jshint unused: true */
 /* globals $,fmx_AJ,myOpenDlg,myCloseDlg,curDir,fmx_appPath,fupQadd2,upload_winpop,ctxPrf,  URLSearchParams */
 /* exported refreshFilstO, allSelect, selectionAction, fils2up */
-"use strict";
+'use strict';
 function refreshFilst () {
-	window.location = window.location.href.split("#")[0];
+	window.location = window.location.href.split('#')[0];
 }
 
 function refreshFilstO (so) {
-	var wlp = window.location.href.split("#")[0].split("?");
+	var wlp = window.location.href.split('#')[0].split('?');
 	if (wlp[1]) {
-		window.location = wlp[0] + "?" + wlp[1].split("&")[0] + "&O=" + so;
+		window.location = wlp[0] + '?' + wlp[1].split('&')[0] + '&O=' + so;
 	} else {
-		window.location = wlp[0] + "?O=" + so;
+		window.location = wlp[0] + '?O=' + so;
 	}
 }
 
@@ -65,7 +65,7 @@ var aSchDlg = {
 	buttons: {
 		'Search`prm': function() {
 			var frm = document.myUIform;
-			if (!frm.sterm.value.trim()) { alert("Please enter a valid search term"); return; }
+			if (!frm.sterm.value.trim()) { alert('Please enter a valid search term'); return; }
 			var trm = frm.sterm.value.trim(),
 				cmd = frm.cmd.value,
 				trmFrm = document.forms.cliterm;
@@ -88,7 +88,7 @@ var fRenDlg = {
 	buttons: {
 		'Rename`prm': function() {
 			var frm = document.myUIform;
-			if (!frm.nunam.value.trim()) { alert("Please enter a valid name"); return; }
+			if (!frm.nunam.value.trim()) { alert('Please enter a valid name'); return; }
 			var parms = {
 				act: 'fren',
 				fref: curDir + frm.oldnm.value,
@@ -105,7 +105,7 @@ var fNamDlg = {
 	buttons: {
 		'Create`prm': function() {
 			var frm = document.myUIform;
-			if (!frm.fref.value.trim()) { alert("Please enter a valid name"); return; }
+			if (!frm.fref.value.trim()) { alert('Please enter a valid name'); return; }
 			var parms = {
 				act: frm.act.value,
 				fref: curDir + frm.fref.value.trim()
@@ -130,11 +130,11 @@ var upldAction = {
 
 function downloadFile (A, cdl, asf) {
 	var dlURL = fmx_appPath+'fildnld.php?fle=' + encodeURI(A) + (cdl ? '&tcdl=1&rad=Y' : '') + (asf ? ('&asf='+asf) : ''); //alert(dlURL);
-	var dlframe = document.createElement("iframe");
+	var dlframe = document.createElement('iframe');
 	// set source to desired file
 	dlframe.src = dlURL;
 	// This makes the IFRAME invisible to the user.
-	dlframe.style.display = "none";
+	dlframe.style.display = 'none';
 	// Add the IFRAME to the page.  This will trigger the download
 	document.body.appendChild(dlframe);
 }
@@ -142,13 +142,13 @@ function downloadFile (A, cdl, asf) {
 function makeFileList (fstr, htm) {
 	var sep = htm ? '<br />' : ' ';
 	var rslt = '';
-	var itm, itms = fstr.split("\u0000");
+	var itm, itms = fstr.split('\u0000');
 	var fpts, fdr, fpt, fpa, cdl = encodeURIComponent(curDir).length;
 	for (itm in itms) {
-		fpts = itms[itm].split("&");
+		fpts = itms[itm].split('&');
 		fdr = '';
 		for (fpt in fpts) {
-			fpa = fpts[fpt].split("=");
+			fpa = fpts[fpt].split('=');
 			if (fpt*1===0) { fdr = fpa[1].substr(cdl); }
 			else { rslt += fdr + '%2F' + fpa[1] + sep; }
 		}
@@ -173,19 +173,19 @@ function doesSupportAjaxUploadWithProgress () {
 function pop (url, h1, w1) {
 	var h2 = (screen.height-h1)/2;
 	var w2 = (screen.width-w1)/2;
-	var wcon="toolbar=no,status=no,location=no,menubar=no,resizable=0,scrollbars=1,width="+w1+",height="+h1+",left="+w2+",top="+h2;
-	return window.open(url, "", wcon);
+	var wcon='toolbar=no,status=no,location=no,menubar=no,resizable=0,scrollbars=1,width='+w1+',height='+h1+',left='+w2+',top='+h2;
+	return window.open(url, '', wcon);
 }
 
 function popPost (url, data, name, h1, w1) {
-	var flds = "", key;
+	var flds = '', key;
 	for (key in data) { flds += '<input type="hidden" name="'+key+'" value="'+data[key]+'" />'; }
 	var ppf = $('<form action="'+url+'" method="post" target="'+name+'">'+flds+'</form>');
 	$(document.body).append(ppf);
 	var h2 = (screen.height-h1)/2;
 	var w2 = (screen.width-w1)/2;
-	var wcon="toolbar=no,status=no,location=no,menubar=no,resizable=0,scrollbars=1,width="+w1+",height="+h1+",left="+w2+",top="+h2;
-	window.open("", name, wcon).focus();
+	var wcon='toolbar=no,status=no,location=no,menubar=no,resizable=0,scrollbars=1,width='+w1+',height='+h1+',left='+w2+',top='+h2;
+	window.open('', name, wcon).focus();
 	ppf[0].submit();
 }
 
@@ -194,7 +194,7 @@ function popUp (url) {
 }
 
 function doMenuAction (cmd,evt) {
-	var slctd = $(".fsel:checked"),
+	var slctd = $('.fsel:checked'),
 		scnt = slctd.length,
 		parms, curfn, trmFrm, destfn,
 		oneItem = function () { if (!scnt) { alert('An item needs to be selected'); } else if (scnt>1) { alert('Please select only one item.'); } else { return true; } return false; },
@@ -202,7 +202,7 @@ function doMenuAction (cmd,evt) {
 	switch (cmd) {
 	case 'cppa':
 		if (scnt) {
-			sessionStorage.fmx_cppa = $("form[name='filst']").serialize();
+			sessionStorage.fmx_cppa = $('form[name="filst"]').serialize();
 			show_mcount('#cppaMenu', sessionStorage.fmx_cppa);
 		} else if (sessionStorage.fmx_cppa) {
 			postAndRefresh('act=cppa&todr='+encodeURIComponent(curDir)+'&'+sessionStorage.fmx_cppa);
@@ -243,9 +243,9 @@ function doMenuAction (cmd,evt) {
 		}
 		break;
 	case 'mark':
-		parms = (sessionStorage.fmx_mrkd === undefined) ? '' : (sessionStorage.fmx_mrkd+"\u0000");
+		parms = (sessionStorage.fmx_mrkd === undefined) ? '' : (sessionStorage.fmx_mrkd+'\u0000');
 		if (scnt) {
-			sessionStorage.fmx_mrkd = parms + $("form[name='filst']").serialize();
+			sessionStorage.fmx_mrkd = parms + $('form[name="filst"]').serialize();
 			bump_mcount('#markMenu', scnt);
 		}
 		break;
@@ -257,7 +257,7 @@ function doMenuAction (cmd,evt) {
 		break;
 	case 'mvto':
 		if (scnt) {
-			sessionStorage.fmx_mvto = $("form[name='filst']").serialize();
+			sessionStorage.fmx_mvto = $('form[name="filst"]').serialize();
 			show_mcount('#mvtoMenu', sessionStorage.fmx_mvto);
 		} else {
 			if (!sessionStorage.fmx_mvto) {
@@ -265,7 +265,7 @@ function doMenuAction (cmd,evt) {
 				break;
 			}
 			parms = sessionStorage.fmx_mvto;
-			sessionStorage.removeItem("fmx_mvto");
+			sessionStorage.removeItem('fmx_mvto');
 			postAndRefresh('act=mvto&todr='+encodeURIComponent(curDir)+'&'+parms);
 		}
 		break;
@@ -329,8 +329,8 @@ function doMenuAction (cmd,evt) {
 			curfn = /*curDir+*/$(slctd[0]).parents('tr').attr('data-fref');
 			trmFrm = document.forms.cliterm;
 			if (cmd=='zip') {
-				var zcmd = "zip ";
-				if ($(slctd[0]).parent().next().hasClass('foldCtxt')) { zcmd += "-r "; }
+				var zcmd = 'zip ';
+				if ($(slctd[0]).parent().next().hasClass('foldCtxt')) { zcmd += '-r '; }
 				destfn = curfn.replace(/\s/g,'_');
 				trmFrm.cmdlin.value = zcmd+destfn+'.zip "'+curfn+'"';
 				if (evt.shiftKey) {
@@ -364,17 +364,17 @@ function doMenuAction (cmd,evt) {
 				if (xyz) { curfn = xyz; }
 				else break;
 			}
-			var wPath = ctxPrf+curDir.slice(curDir.search("/"));
+			var wPath = ctxPrf+curDir.slice(curDir.search('/'));
 			pop(wPath+curfn,screen.availHeight,1200);
 		}
 		break;
 	case 'gitr':
 		if (oneItem()) {
-			if (".git" == $(slctd[0]).parents('tr').attr('data-fref')) {
+			if ('.git' == $(slctd[0]).parents('tr').attr('data-fref')) {
 				parms = '?dir='+curDir;
 				pop(fmx_appPath+'gitter.php'+parms,screen.availHeight,1200);
 			} else {
-				alert("Please select a '.git' folder");
+				alert('Please select a \'.git\' folder');
 			}
 		}
 		break;
@@ -429,7 +429,7 @@ function doMenuAction (cmd,evt) {
 		parms = {act: 'CLIC'};
 		$(utilview).load(fmx_AJ, parms, function() {
 				utilview.style.top = (evt.clientY-utilview.clientHeight-20) + 'px';
-				$("#util-view div").click(function(e) {e.preventDefault(); doFillCLI($(this).attr('data-cmd')); document.body.removeChild(utilview); });
+				$('#util-view div').click(function(e) {e.preventDefault(); doFillCLI($(this).attr('data-cmd')); document.body.removeChild(utilview); });
 			});
 		break;
 	case 'mnu':
@@ -448,13 +448,13 @@ function doViewFile (fpath) {
 }
 function doEditFile (fpath, intab) {
 	if (intab) {
-		editWindow = window.open(fmx_appPath+'filedwin.php?t=1&fref='+fpath, "_blank");
+		editWindow = window.open(fmx_appPath+'filedwin.php?t=1&fref='+fpath, '_blank');
 	} else {
 		editWindow = pop(fmx_appPath+'filedwin.php?fref='+fpath,screen.availHeight,screen.availWidth);
 	}
 }
 function doEditImage (fpath) {
-	popPost(fmx_appPath+"imgedtwin.php", {"fref":fpath}, "imgedt", screen.availHeight, Math.min(1200,screen.availWidth));
+	popPost(fmx_appPath+'imgedtwin.php', {'fref':fpath}, 'imgedt', screen.availHeight, Math.min(1200,screen.availWidth));
 }
 function doManageZip (fpath) {
 	var feurl = fmx_appPath+'arcview.php?fref='+fpath;
@@ -499,8 +499,8 @@ function allSelect (evt, elem) {
 }
 
 function fils2up () {
-	if (document.cliterm.cmdlin.value === "") {
-		alert("Please enter a command.");
+	if (document.cliterm.cmdlin.value === '') {
+		alert('Please enter a command.');
 		return false;
 	} else {
 		var cmd = document.cliterm.cmdlin.value;
@@ -513,7 +513,7 @@ function fils2up () {
 }
 
 function selectionAction (fedt) {
-	var sel = "";
+	var sel = '';
 	if (window.getSelection !== 'undefined') {
 		sel = window.getSelection();
 	} else if (document.selection !== 'undefined') {
@@ -527,14 +527,14 @@ function selectionAction (fedt) {
 }
 
 function display_cmmStorage (stor) {
-	if (!stor) { alert("[ empty ]"); return; }
+	if (!stor) { alert('[ empty ]'); return; }
 	var disp = '';
-	var pecs = stor.split("\u0000");
+	var pecs = stor.split('\u0000');
 	for (var x in pecs) {
 		var prts = decodeURIComponent(pecs[x]).split('&');
 		for (var i=0; i<prts.length; i++) {
 			if (i>0) disp += '    ';
-			disp += prts[i] + "\n";
+			disp += prts[i] + '\n';
 		}
 	}
 	alert(disp);
@@ -544,7 +544,7 @@ function show_mcount (mid, stor) {
 	var mm = $(mid).html();
 	var pp = mm.split('(');
 	if (!stor) { $(mid).html(pp[0]); return; }
-	var pecs = stor.split("\u0000");
+	var pecs = stor.split('\u0000');
 	var ct = 0;
 	for (var x in pecs) {
 		var prts = decodeURIComponent(pecs[x]).split('&');
@@ -610,28 +610,28 @@ function cm_ren (itm) {
 function cm_zip (itm, fld) {
 	var curfn = $(itm).parents('tr').attr('data-fref');
 	var trmFrm = document.forms.cliterm;
-	var zcmd = "zip ";
-	if (fld) { zcmd += "-r "; }
+	var zcmd = 'zip ';
+	if (fld) { zcmd += '-r '; }
 	var destfn = curfn.replace(/\s/g,'_');
 	trmFrm.cmdlin.value = zcmd+destfn+'.zip "'+curfn+'"';
 	trmFrm.submit();
 }
 function cm_slnk () {
 	if (!sessionStorage.fmx_mrkd) {
-		alert("Mark something to link first");
+		alert('Mark something to link first');
 		return;
 	}
-	var itms = sessionStorage.fmx_mrkd.split("\u0000");
+	var itms = sessionStorage.fmx_mrkd.split('\u0000');
 	if (itms.length != 1) {
-		alert("Can SymLink to only one location at a time");
+		alert('Can SymLink to only one location at a time');
 		return;
 	}
-	var fpts = itms[0].split("&");
-	var prts = fpts[0].split("=");
+	var fpts = itms[0].split('&');
+	var prts = fpts[0].split('=');
 	var dir = prts[1].replace(/%2F/g,'/');
-	prts = fpts[1].split("=");
+	prts = fpts[1].split('=');
 	var fil = prts[1].replace(/%2F/g,'/');
-	var lnkn = prompt("Link to marked:", "");
+	var lnkn = prompt('Link to marked:', '');
 	if (lnkn===null) return;
 	var parms = {
 		act: 'slnk',
@@ -646,13 +646,13 @@ function cm_slnk () {
 $(function() {
 	// some functionality checks
 	try { sessionStorage.fmx_ok = 1; }
-	catch(err) { alert("Your browser 'sessionStorage' is not functioning. (private browsing?) Not all functions of FMX will work successfully."); }
+	catch(err) { alert('Your browser \'sessionStorage\' is not functioning. (private browsing?) Not all functions of FMX will work successfully.'); }
 
 	sessionStorage.fmx_curD = curDir;
 
-	$("#fmnu [data-mnu]").click(function(e) {e.preventDefault(); doMenuAction($(this).attr('data-mnu'),e); });
-	$("#footerPopContent [data-mnu]").click(function(e) {e.preventDefault(); doMenuAction($(this).attr('data-mnu'),e); });
-	$("#ftbl [data-act]").click(function(e) {e.preventDefault(); doFileAction($(this).attr('data-act'),this,e); });
+	$('#fmnu [data-mnu]').click(function(e) {e.preventDefault(); doMenuAction($(this).attr('data-mnu'),e); });
+	$('#footerPopContent [data-mnu]').click(function(e) {e.preventDefault(); doMenuAction($(this).attr('data-mnu'),e); });
+	$('#ftbl [data-act]').click(function(e) {e.preventDefault(); doFileAction($(this).attr('data-act'),this,e); });
 	$('nav li ul').hide().removeClass('fallback');
 	$('nav li').hover(function () {
 		$('ul', this).stop(true,true).fadeToggle(100);
@@ -678,15 +678,15 @@ $(function() {
 		// manage check-all state
 		if (this.checked) {
 			let isAllChecked = 0;
-			$(".fsel").each(function() {
+			$('.fsel').each(function() {
 				if (!this.checked)
 					isAllChecked = 1;
 			});
 			if (isAllChecked === 0) {
-				$("#checkAll").prop("checked", true);
+				$('#checkAll').prop('checked', true);
 			}
 		} else {
-			$("#checkAll").prop("checked", false);
+			$('#checkAll').prop('checked', false);
 		}
 	});
 
@@ -698,7 +698,7 @@ $(function() {
 	// setup contextual menus
 	$('a.cppaMenu').contextMenu('clrdMenu', {
 		bindings: {
-			'clrdClr': function() { sessionStorage.removeItem("fmx_cppa"); bump_mcount('#cppaMenu', -1); },
+			'clrdClr': function() { sessionStorage.removeItem('fmx_cppa'); bump_mcount('#cppaMenu', -1); },
 			'clrdDsp': function() { display_cmmStorage(sessionStorage.fmx_cppa); }
 		}
 	});
@@ -710,14 +710,14 @@ $(function() {
 	});
 	$('a.markMenu').contextMenu('clrdMenuSL', {
 		bindings: {
-			'clrdClr': function() { sessionStorage.removeItem("fmx_mrkd"); bump_mcount('#markMenu', -1); },
+			'clrdClr': function() { sessionStorage.removeItem('fmx_mrkd'); bump_mcount('#markMenu', -1); },
 			'clrdDsp': function() { display_cmmStorage(sessionStorage.fmx_mrkd); },
 			'symLnk': function() { cm_slnk(); }
 		}
 	});
 	$('a.mvtoMenu').contextMenu('clrdMenu', {
 		bindings: {
-			'clrdClr': function() { sessionStorage.removeItem("fmx_mvto"); bump_mcount('#mvtoMenu', -1); },
+			'clrdClr': function() { sessionStorage.removeItem('fmx_mvto'); bump_mcount('#mvtoMenu', -1); },
 			'clrdDsp': function() { display_cmmStorage(sessionStorage.fmx_mvto); }
 		}
 	});
