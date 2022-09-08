@@ -159,9 +159,10 @@ $srtBy = $_GET['O'] ?? 'n';
 	<nav>
 	<ul>
 		<li>
-			<a href="#" data-mnu="mnu">archive</a>
-			<ul class="fallback">
-				<li><a href="#" data-mnu="zip" data-req="2">zip</a></li>
+			<a href="#" class="altm archive" data-mnu="mnu">archive</a>
+			<ul class="fallback altm">
+				<li class="mnur"><a href="#" data-mnu="zip" data-req="2">zip</a></li>
+				<li class="mnua"><a href="#" data-mnu="zipx" data-req="2">zip-x</a></li>
 				<li><a href="#" data-mnu="uzip" data-req="2">unzip</a></li>
 				<li><a href="#" data-mnu="tarz" data-req="2">tar/gz</a></li>
 				<li><a href="#" data-mnu="utrz" data-req="2">untar/gz</a></li>
@@ -488,6 +489,16 @@ if ($dFiles) {
 		}
 	});
 
+	$('a.altm').on('mouseenter', (e) => {
+		let telm = $(e.target);
+		if (e.altKey) {
+			telm.next().children('.mnur').hide();
+			telm.next().children('.mnua').show();
+		} else {
+			telm.next().children('.mnua').hide();
+			telm.next().children('.mnur').show();
+		}
+	});
 </script>
 <?php if (!$fmxInJoomla): ?>
 </body>
