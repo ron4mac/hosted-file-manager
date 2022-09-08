@@ -19,6 +19,7 @@ function $ae (elem, evnt, func) {
 			payload: {},	// other data sent along with the file data
 			maxFilesize: 134217728,
 			dropMessage: 'Drop files here to upload<br>(or click to select)',
+			accept: '*',
 			concurrent: 3,
 			maxchunksize: 16777216,		// 16M
 			allowed_file_types: [],	// all
@@ -384,7 +385,7 @@ function $ae (elem, evnt, func) {
 			// create UI
 			updiv.appendChild(CreateElement(
 				'div',
-				'<input type="file" name="userpictures" id="file_field" multiple="multiple" accept="image/*,video/*" style="display:none">'
+				'<input type="file" name="userpictures" id="file_field" multiple="multiple" accept="'+opts.accept+'">'
 				+ '<div class="drpmsg">'+opts.dropMessage+'</div>',
 				{id:'dropArea', onclick:"$id('file_field').click();"}
 				)

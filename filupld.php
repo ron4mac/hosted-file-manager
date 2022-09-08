@@ -3,6 +3,7 @@ require_once 'functions.php';
 include 'cfg.php';
 $fw = empty($_GET['o']);	// is a request for full popup window content
 $fst = $fw ? '' : ' target="submit-iframe"';
+$faccept = empty($fmx_upload_accept) ? '' : (' accept="'.$fmx_upload_accept.'"');
 ?>
 <?php if ($fw): ?>
 <?php header('Cache-Control: no-cache'); ?>
@@ -24,7 +25,7 @@ $fst = $fw ? '' : ' target="submit-iframe"';
 <input type="hidden" name="w" value="1">
 <?php endif; ?>
 <div id="files">
-	<input type="file" name="user_file[]" id="upload_field" multiple="multiple" />
+	<input type="file" name="user_file[]" id="upload_field" multiple="multiple"<?=$faccept?>>
 	<br /><br /><label><input type="checkbox" name="ovrok" value="on" style="margin-right:5px;vertical-align:text-top" />Overwrite same-named server files</label>
 </div>
 <hr />
@@ -40,7 +41,7 @@ $fst = $fw ? '' : ' target="submit-iframe"';
 <script type="text/javascript">
 	function appendFileSel(curelm) {
 		$(curelm).unbind();
-		$(curelm).after('<input type="file" name="user_file[]" multiple="multiple" />');
+		$(curelm).after('<input type="file" name="user_file[]" multiple="multiple"<?=$faccept?>>');
 		$(curelm).next().change( function() { appendFileSel(this); });
 	}
 	$(function() {

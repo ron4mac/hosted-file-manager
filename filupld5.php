@@ -18,25 +18,26 @@ $done = $fw ? 'parent.opener.refreshFilst(); if (!errcnt) window.close();' : 'if
 <head>
 	<title>HTML5 Multi-file Upload</title>
 	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
-	<link rel="stylesheet" href="<?php echo $fontawsm; ?>">
+	<link rel="stylesheet" href="<?=$fontawsm?>">
 <?php endif; ?>
 	<link rel="stylesheet" type="text/css" href="css/fmx.css" />
 	<link rel="stylesheet" type="text/css" href="uplodr/upload.css" />
 	<script type="text/javascript">
 		var fmx_appPath = '';
 		var filesPath = sessionStorage.fmx_curD;
-		var uploadMaxFilesize = <?php echo $uploadMaxFilesizeBytes; ?>;
+		var uploadMaxFilesize = <?=$uploadMaxFilesizeBytes?>;
 		var h5_fup = {
 			lang: {abortd:'-- aborted', noupld:'Could not upload', toobig:'File is larger than max size allowed.', notype:'Cannot upload a file of this type.'},
-			// optional array of allowed mime types
-			//ftypes: ['image/jpeg'],
 			payload: {'fpath':sessionStorage.fmx_curD, 'oefile':'1'},
 			done: function (errcnt) { parent.opener.refreshFilst(); if (!errcnt) window.close(); }
 		};
 		var h5uOptions = {
-			maxchunksize: <?php echo $maxChunkSize; ?>,
+<?php if (!empty($fmx_upload_accept)): ?>
+			accept: '<?=$fmx_upload_accept?>',
+<?php endif; ?>
+			maxchunksize: <?=$maxChunkSize?>,
 			payload: {'fpath':sessionStorage.fmx_curD, 'oefile':'1'},
-			doneFunc: function (okcnt, errcnt) { <?php echo $done; ?> }
+			doneFunc: function (okcnt, errcnt) { <?=$done?> }
 		};
 	</script>
 	<script type="text/javascript" src="uplodr/upload<?=$jsver?>.js"></script>
@@ -46,8 +47,8 @@ $done = $fw ? 'parent.opener.refreshFilst(); if (!errcnt) window.close();' : 'if
 <?php endif; ?>
 <!-- <?php echo $uploadMaxFilesize,' :: ',$postMaxSize,' :: ',$memoryLimit.'<br>'; ?> -->
 <!-- <?php echo $uploadMaxFilesizeBytes,' :: ',$postMaxSizeBytes,' :: ',$memoryLimitBytes,' = ',$maxChunkSize; ?> -->
-	<!-- <p style="color:red">Maximum file size: <?php echo $uploadMaxFilesize; ?></p> -->
-	<input type="hidden" name="MAX_FILE_SIZE" id="MAX_FILE_SIZE" value="<?php echo $uploadMaxFilesizeBytes; ?>" />
+	<!-- <p style="color:red">Maximum file size: <?=$uploadMaxFilesize?></p> -->
+	<input type="hidden" name="MAX_FILE_SIZE" id="MAX_FILE_SIZE" value="<?=$uploadMaxFilesizeBytes?>" />
 	<div id="uplodr"></div>
 	<script type="text/javascript">H5uSetup();</script>
 <?php if ($fw): ?>
