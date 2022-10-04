@@ -42,6 +42,7 @@ function $ae (elem, evnt, func) {
 		allDone = 0,
 		okCount = 0,
 		errCount = 0,
+		msgCount = 0,
 		e_st, e_gc,
 		s_hd = 'none',
 		s_vu = 'inline-block',
@@ -115,10 +116,10 @@ function $ae (elem, evnt, func) {
 		if (!qStopt) {
 			allDone = 1;
 			if (typeof(opts.doneFunc) == 'function') {
-				let okC = okCount, errC = errCount;
-				setTimeout(function(){ opts.doneFunc(okC, errC); }, 500);
+				let okC = okCount, errC = errCount, msgC = msgCount;
+				setTimeout(function(){ opts.doneFunc(okC, errC, msgC); }, 500);
 			}
-			errCount = okCount = 0;
+			errCount = okCount = msgCount = 0;
 		}
 	};
 
@@ -129,7 +130,7 @@ function $ae (elem, evnt, func) {
 		}
 		if (!qStopt && upQueue.length && (!maxXfer || inPrg < maxXfer)) {
 			let nxf = upQueue.shift();
-			let ufo = new UpldFileObj(nxf);			//console.log(ufo);
+			let ufo = new UpldFileObj(nxf, $id('faex').value || 'f');			//console.log(ufo);
 			inPrg++;
 			qCountSpan.innerHTML = upQueue.length;
 		}
@@ -155,6 +156,9 @@ function $ae (elem, evnt, func) {
 			if (err) {
 				$.pbi.className = 'pbfinf failure';
 				errCount++;
+			} else {
+				$.pbi.className = 'pbfinf message';
+				msgCount++;
 			}
 		};
 		$.rmov = () => {
@@ -190,7 +194,7 @@ function $ae (elem, evnt, func) {
 	};
 
 	// object for a file upload with chunking support
-	function UpldFileObj (file) {
+	function UpldFileObj (file, faex) {
 		let $ = this;
 		$.upFile = file;
 		$.fn = file.fileName || file.name;
@@ -224,6 +228,7 @@ function $ae (elem, evnt, func) {
 
 		const fDat = () => {
 			$.fData = new FormData();
+			$.fData.append('faex', faex);
 			addData($.fData, opts.payload);
 		};
 
@@ -303,9 +308,12 @@ function $ae (elem, evnt, func) {
 					}
 				},
 			//upload successful
-			load: () => {
-				if ($.X.responseText.length) {
-					$.pBar.msg($.X.responseText, true);
+			load: (e) => {
+				console.log(e);
+//				if ($.X.readyState < 4) return;
+				if ($.X.status>200 || $.X.responseText.length) {
+					$.pBar.msg($.X.responseText, $.X.status>200);
+					endup();
 				} else {
 					if ($.doChnk) {
 						cstate();
@@ -314,7 +322,8 @@ function $ae (elem, evnt, func) {
 					}
 				}
 				},
-			abrt: () => {
+			abrt: (e) => {
+				console.log(e);
 				$.pBar.msg('-- Aborted', true);
 				if ($.doChnk) {
 					$.upState = 'abrt';
@@ -324,9 +333,10 @@ function $ae (elem, evnt, func) {
 				}
 				},
 			//upload failure
-			fail: () => {
-					$.pBar.msg($.X.responseText, true);
-					endup();
+			fail: (e) => {
+				console.log(e);
+				$.pBar.msg($.X.responseText, true);
+				endup();
 				}
 			};
 
@@ -365,8 +375,10 @@ function $ae (elem, evnt, func) {
 			return;
 		}
 
-		$.X.upload.onload = cb.load;
+//		$.X.upload.onload = cb.load;
+		$.X.onload = cb.load;
 		$.X.upload.onerror = cb.fail;
+		$.X.onerror = cb.fail;
 		$.X.upload.onabort = cb.abrt;
 		$.X.upload.onprogress = cb.prog;
 

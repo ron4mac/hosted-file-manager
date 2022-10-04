@@ -9,7 +9,7 @@ $memoryLimit = ini_get('memory_limit');
 $memoryLimitBytes = return_bytes($memoryLimit);
 $maxChunkSize = min($uploadMaxFilesizeBytes,$postMaxSizeBytes,$memoryLimitBytes,67108864) - 1048576;
 $fw = empty($_GET['o']);	// is a request for full popup window content
-$done = $fw ? 'parent.opener.refreshFilst(); if (!errcnt) window.close();' : 'if (!errcnt) refreshFilst();';
+$done = $fw ? 'parent.opener.refreshFilst(); if (!(errcnt+msgcnt)) window.close();' : 'if (!(errcnt+msgcnt)) refreshFilst();';
 ?>
 <?php if ($fw): ?>
 <?php header('Cache-Control: no-cache'); ?>
@@ -37,7 +37,7 @@ $done = $fw ? 'parent.opener.refreshFilst(); if (!errcnt) window.close();' : 'if
 <?php endif; ?>
 			maxchunksize: <?=$maxChunkSize?>,
 			payload: {'fpath':sessionStorage.fmx_curD, 'oefile':'1'},
-			doneFunc: function (okcnt, errcnt) { <?=$done?> }
+			doneFunc: function (okcnt, errcnt, msgcnt) { <?=$done?> }
 		};
 	</script>
 	<script type="text/javascript" src="uplodr/upload<?=$jsver?>.js"></script>
@@ -49,6 +49,12 @@ $done = $fw ? 'parent.opener.refreshFilst(); if (!errcnt) window.close();' : 'if
 <!-- <?php echo $uploadMaxFilesizeBytes,' :: ',$postMaxSizeBytes,' :: ',$memoryLimitBytes,' = ',$maxChunkSize; ?> -->
 	<!-- <p style="color:red">Maximum file size: <?=$uploadMaxFilesize?></p> -->
 	<input type="hidden" name="MAX_FILE_SIZE" id="MAX_FILE_SIZE" value="<?=$uploadMaxFilesizeBytes?>" />
+	<label for="faex">When file already exists: </label>
+	<select id="faex" name="faex" value="f">
+		<option value="f" selected>Fail</option>
+		<option value="r">Rename</option>
+		<option value="o">Overwrite</option>
+	</select>
 	<div id="uplodr"></div>
 	<script type="text/javascript">H5uSetup();</script>
 <?php if ($fw): ?>

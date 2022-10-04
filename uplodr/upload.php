@@ -7,6 +7,7 @@ class Up_Load
 	protected $pvals;
 	protected $file;
 	protected $target_file;
+	protected $as_file = '';
 	protected $filup_cb = null;
 	// for chunking
 	protected $ckid;
@@ -20,6 +21,7 @@ class Up_Load
 
 		// pull in the POSTed values
 		$this->pvals = (object)$_POST;
+		$this->upldLog(print_r($this->pvals,true));
 
 		// process the incoming data
 		try {
@@ -27,6 +29,10 @@ class Up_Load
 				$this->receiveFile();
 			} else {
 				$this->processChunk();
+			}
+			if ($this->as_file) {
+			//	header('HTTP/1.1 100 Continue');
+				echo 'Stored as: ' . $this->as_file;
 			}
 		}
 		catch (Exception $e) {
@@ -66,7 +72,10 @@ class Up_Load
 	// normal receipt of a single uploaded file
 	private function receiveFile ()
 	{
-		$this->vetUpload();
+		$this->vetUpload($this->pvals->faex ? ($this->pvals->faex=='f') : true);
+		if ($this->pvals->faex=='r') {
+			$this->target_file = $this->uniqueFn($this->target_file);
+		}
 		if (!move_uploaded_file($this->file['tmp_name'], $this->target_file)) throw new Exception('Could not place file');
 		if ($this->filup_cb) call_user_func($this->filup_cb, basename($this->target_file));
 	}
@@ -80,7 +89,8 @@ class Up_Load
 		switch ($this->pvals->chunkact) {
 			case 'pref':
 				$target_file = $this->target_dir . basename($this->pvals->file);
-				if (file_exists($target_file)) throw new Exception('File already exists');
+				$faexf = $this->pvals->faex ? ($this->pvals->faex=='f') : true;
+				if ($faexf && file_exists($target_file)) throw new Exception('File already exists');
 				// create the temporary directory, if necessary
 				if ($this->ckid && !is_dir($this->ckpath)) {
 					mkdir($this->ckpath, 0777, true);
@@ -125,6 +135,9 @@ class Up_Load
 
 			// create the final destination file
 			$dest = $this->target_dir . $this->pvals->fname;
+			if ($this->pvals->faex=='r') {
+				$dest = $this->uniqueFn($dest);
+			}
 			if (($fp = @fopen($dest, 'w')) !== false) {
 				for ($i=1; $i<=$totalchunks; $i++) {
 					fwrite($fp, file_get_contents($this->ckpath.'/part'.$i));
@@ -139,6 +152,21 @@ class Up_Load
 			$this->cleanup();
 			if ($this->filup_cb) call_user_func($this->filup_cb, basename($dest));
 		}
+	}
+
+	// create a unique file name
+	private function uniqueFn ($fpath)
+	{
+		if (!file_exists($fpath)) return $fpath;
+		$path_parts = pathinfo($fpath);
+		$pfmx = $path_parts['dirname'].'/'.$path_parts['filename'];		//file path minus extension
+		$pfxp = isset($path_parts['extension'])?('.'.$path_parts['extension']):'';		//file path estension part
+		$x = 0;
+		do {
+			$unique = $pfmx.'_'.++$x.$pfxp;
+		} while (file_exists($unique));
+		$this->as_file = basename($unique);
+		return $unique;
 	}
 
 	// remove temporary storage that was used for chunks

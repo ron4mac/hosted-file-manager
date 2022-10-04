@@ -8,7 +8,8 @@ $jsver = $dev_mode ? '' : '.min';
 $jqlink = '//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery'.$jsver.'.js';
 
 // the version of ace editor to be used
-$aceBase = '//cdnjs.cloudflare.com/ajax/libs/ace/1.4.13/';
+//$aceBase = '//cdnjs.cloudflare.com/ajax/libs/ace/1.4.13/';
+$aceBase = '//cdnjs.cloudflare.com/ajax/libs/ace/1.11.2/';
 // Specify the theme to use with Ace editor
 // If theme name starts with /, it is a local theme file in js/ace/
 //$acetheme = '/rjcode';

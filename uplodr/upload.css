@@ -1,5 +1,5 @@
 /* uplodr v0.8 */
-
+#uplodr { margin-top: 0.5rem }
 #dropArea {
 	box-sizing: border-box;
 	position:relative;
@@ -9,6 +9,7 @@
 	padding: 0;
 	text-align: center;
 	border-radius: 5px;
+	overflow-x: hidden;
 }
 #dropArea.hover { background-color: #DFD; border: 1px solid #999; box-shadow: inset 2px 2px 3px #999 }
 #file_field { position: absolute; top: -1000px }
@@ -47,6 +48,7 @@
 .indeterm { background: #efefef url("indtrm.gif") repeat-x top; }
 .pbfinf { padding: 3px 4px; }
 .failure { background: #F99 none 0 0 no-repeat; }
+.message { background: #AEF none 0 0 no-repeat; }
 
 
 i.abortX, i.pausQ, i.playQ, i.cancelQ, i.infoG { font-size: initial; cursor: pointer; }

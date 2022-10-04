@@ -119,13 +119,13 @@ var fNamDlg = {
 // file upload methods
 var upldAction = {
 	// HTML5 w/progress in a popup window
-	H5w: function(){ popUp(fmx_appPath+'filupld5.php'); },
+	H5w: () => popUp(fmx_appPath+'filupld5.php'),
 	// HTML5 w/progress in a div overlay
-	H5o: function(cbf){ $('#upload').jqm({ajax:fmx_appPath+'filupld5.php?o=1', ajaxText:'Loading...', onLoad: cbf, onHide: refreshFilst, target:'.upldr', overlay:5}).jqmShow(); },
+	H5o: (cbf) => $('#upload').jqm({ajax:fmx_appPath+'filupld5.php?o=1', ajaxText:'Loading...', onLoad: cbf, onHide: refreshFilst, target:'.upldr', overlay:5}).jqmShow(),
 	// legacy HTML in a popup window
-	L4w: function(){ popUp(fmx_appPath+'filupld.php'); },
+	L4w: () => popUp(fmx_appPath+'filupld.php'),
 	// legacy HTML in a div overlay
-	L4o: function(){ $('#upload').jqm({ajax:fmx_appPath+'filupld.php?o=1', ajaxText:'Loading...', onHide: refreshFilst, target:'.upldr',overlay:5}).jqmShow(); },
+	L4o: () => $('#upload').jqm({ajax:fmx_appPath+'filupld.php?o=1', ajaxText:'Loading...', onHide: refreshFilst, target:'.upldr',overlay:5}).jqmShow()
 	};
 
 function downloadFile (A, cdl, asf) {
@@ -197,8 +197,8 @@ function doMenuAction (cmd,evt) {
 	var slctd = $('.fsel:checked'),
 		scnt = slctd.length,
 		parms, curfn, trmFrm, destfn,
-		oneItem = function () { if (!scnt) { alert('An item needs to be selected'); } else if (scnt>1) { alert('Please select only one item.'); } else { return true; } return false; },
-		hasSome = function () { if (scnt) { return true; } alert('Some items need to be selected'); return false; };
+		oneItem = () => { if (!scnt) { alert('An item needs to be selected'); } else if (scnt>1) { alert('Please select only one item.'); } else { return true; } return false; },
+		hasSome = () => { if (scnt) { return true; } alert('Some items need to be selected'); return false; };
 	switch (cmd) {
 	case 'cppa':
 		if (scnt) {
@@ -404,7 +404,7 @@ function doMenuAction (cmd,evt) {
 				var DtD;
 				if (data.updt) {
 					var updt = data.updt.split('|');
-					DtD = $.extend(true, {}, aMsgDlg, {buttons:{'Update now':function(){if (confirm('It is a good idea to backup first. Do you want to continue with the update?')) {
+					DtD = $.extend(true, {}, aMsgDlg, {buttons:{'Update now': ()=>{if (confirm('It is a good idea to backup first. Do you want to continue with the update?')) {
 						parms = {act: 'updt', nver: updt[1]};
 						postAndRefresh(parms);
 						myCloseDlg(this);
@@ -427,9 +427,9 @@ function doMenuAction (cmd,evt) {
 		document.body.appendChild(utilview);
 
 		parms = {act: 'CLIC'};
-		$(utilview).load(fmx_AJ, parms, function() {
+		$(utilview).load(fmx_AJ, parms, () => {
 				utilview.style.top = (evt.clientY-utilview.clientHeight-20) + 'px';
-				$('#util-view div').click(function(e) {e.preventDefault(); doFillCLI($(this).attr('data-cmd')); document.body.removeChild(utilview); });
+				$('#util-view div').click((e) => {e.preventDefault(); doFillCLI($(this).attr('data-cmd')); document.body.removeChild(utilview); });
 			});
 		break;
 	case 'mnu':
@@ -643,7 +643,7 @@ function cm_slnk () {
 }
 
 // initialize session settings and the UI
-$(function() {
+$(() => {
 	// some functionality checks
 	try { sessionStorage.fmx_ok = 1; }
 	catch(err) { alert('Your browser \'sessionStorage\' is not functioning. (private browsing?) Not all functions of FMX will work successfully.'); }
@@ -698,62 +698,62 @@ $(function() {
 	// setup contextual menus
 	$('a.cppaMenu').contextMenu('clrdMenu', {
 		bindings: {
-			'clrdClr': function() { sessionStorage.removeItem('fmx_cppa'); bump_mcount('#cppaMenu', -1); },
-			'clrdDsp': function() { display_cmmStorage(sessionStorage.fmx_cppa); }
+			'clrdClr': () => { sessionStorage.removeItem('fmx_cppa'); bump_mcount('#cppaMenu', -1); },
+			'clrdDsp': () => display_cmmStorage(sessionStorage.fmx_cppa)
 		}
 	});
 	$('a.delfMenu').contextMenu('delfMenu', {
 		bindings: {
-			'delfTrue': function() { doMenuAction('delf', null); },
-			'delfMpty': function() { doMenuAction('mpty', null); }
+			'delfTrue': () => doMenuAction('delf', null),
+			'delfMpty': () => doMenuAction('mpty', null)
 		}
 	});
 	$('a.markMenu').contextMenu('clrdMenuSL', {
 		bindings: {
-			'clrdClr': function() { sessionStorage.removeItem('fmx_mrkd'); bump_mcount('#markMenu', -1); },
-			'clrdDsp': function() { display_cmmStorage(sessionStorage.fmx_mrkd); },
-			'symLnk': function() { cm_slnk(); }
+			'clrdClr': () => { sessionStorage.removeItem('fmx_mrkd'); bump_mcount('#markMenu', -1); },
+			'clrdDsp': () => display_cmmStorage(sessionStorage.fmx_mrkd),
+			'symLnk': () => cm_slnk()
 		}
 	});
 	$('a.mvtoMenu').contextMenu('clrdMenu', {
 		bindings: {
-			'clrdClr': function() { sessionStorage.removeItem('fmx_mvto'); bump_mcount('#mvtoMenu', -1); },
-			'clrdDsp': function() { display_cmmStorage(sessionStorage.fmx_mvto); }
+			'clrdClr': () => { sessionStorage.removeItem('fmx_mvto'); bump_mcount('#mvtoMenu', -1); },
+			'clrdDsp': () => display_cmmStorage(sessionStorage.fmx_mvto)
 		}
 	});
 	$('a.upldMenu').contextMenu('upldMenu', {
-		onContextMenu: function() { /*sessionStorage.fmx_curD = curDir;*/ return true; },
+		onContextMenu: () => { /*sessionStorage.fmx_curD = curDir;*/ return true; },
 		bindings: {
-			'H5w': function() { upldAction.H5w(); },
-			'H5o': function() { upldAction.H5o(); },
-			'L4w': function() { upldAction.L4w(); },
-			'L4o': function() { upldAction.L4o(); }
+			'H5w': () => upldAction.H5w(),
+			'H5o': () => upldAction.H5o(),
+			'L4w': () => upldAction.L4w(),
+			'L4o': () => upldAction.L4o()
 		}
 	});
 	$('td.fileCtxt').contextMenu('fileCtxt', {
 		bindings: {
-			'cfi_edt': function(t) { doFileAction('fedt', t, null); },
-			'cfi_del': function(t) { cm_del(t,false); },
-			'cfi_dld': function(t) { cm_dld(t,false); },
-			'cfi_dup': function(t) { cm_dup(t,false); },
-			'cfi_ren': function(t) { cm_ren(t); },
-			'cfi_zip': function(t) { cm_zip(t,false); }
+			'cfi_edt': (t) => doFileAction('fedt', t, null),
+			'cfi_del': (t) => cm_del(t,false),
+			'cfi_dld': (t) => cm_dld(t,false),
+			'cfi_dup': (t) => cm_dup(t,false),
+			'cfi_ren': (t) => cm_ren(t),
+			'cfi_zip': (t) => cm_zip(t,false)
 		}
 	});
 	$('td.foldCtxt').contextMenu('foldCtxt', {
 		bindings: {
-			'cfo_del': function(t) { cm_del(t,true); },
-			'cfo_dld': function(t) { cm_dld(t,true); },
-			'cfo_dup': function(t) { cm_dup(t,true); },
-			'cfo_ren': function(t) { cm_ren(t); },
-			'cfo_zip': function(t) { cm_zip(t,true); }
+			'cfo_del': (t) => cm_del(t,true),
+			'cfo_dld': (t) => cm_dld(t,true),
+			'cfo_dup': (t) => cm_dup(t,true),
+			'cfo_ren': (t) => cm_ren(t),
+			'cfo_zip': (t) => cm_zip(t,true)
 		}
 	});
 
 	// let's try file drag-n-drop
 	const $form = $('#filsform');
-	$form.on('drag dragstart dragend dragover dragenter dragleave drop', function(e) { e.preventDefault(); e.stopPropagation(); })
-	.on('dragover dragenter', function() { $form.addClass('upld-body'); })
-	.on('dragleave dragend drop', function() { $form.removeClass('upld-body'); })
-	.on('drop', function(e) { let fils = e.originalEvent.dataTransfer.files; upldAction.H5o(function(){ fupQadd2(fils); }); });
+	$form.on('drag dragstart dragend dragover dragenter dragleave drop', (e) => { e.preventDefault(); e.stopPropagation(); })
+	.on('dragover dragenter', () => $form.addClass('upld-body') )
+	.on('dragleave dragend drop', () => $form.removeClass('upld-body') )
+	.on('drop', (e) => { let fils = e.originalEvent.dataTransfer.files; upldAction.H5o(()=>fupQadd2(fils)); });
 });
