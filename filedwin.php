@@ -94,7 +94,7 @@ function saveFile () {
 	let pData = new FormData(eForm);
 	pData.append('savef','saveonly');
 	fetch(eForm.action, {method: 'POST', body: pData})
-	.then(rslt => {if (rslt.ok) return rslt.text()})
+	.then(rslt => {if (!rslt.ok) throw new Error(`Filed to save file. ERROR: ${rslt.status}`); return rslt.text()})
 	.then(resp => {
 		if (!resp) {
 			if (subb == 'saveclose') {
@@ -103,9 +103,9 @@ function saveFile () {
 				editor.session.getUndoManager().reset();
 				document.getElementById('dirty').style.display = 'none';
 			}
-		} else console.log(resp);
+		} else alert(resp);
 	})
-	.catch(err => console.log(err));
+	.catch(err => alert(err));
 	return false;
 }
 </script>

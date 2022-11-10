@@ -96,7 +96,7 @@ if (isset($_GET['dbf'])) {
 } elseif (isset($_GET['dir'])) {
 	$directory = $baseDir.$_GET['dir'];
 	$expire = time()+60*60*24; //set expiration to 1 day from now
-	setcookie($cooknam.'_pla', $directory, $expire, null, null, null, true);
+	setcookie($cooknam.'_pla', $directory, $expire, '', '', false, true);
 } else {
 	$databases = null;
 	$directory = $_COOKIE[$cooknam.'_pla'];
