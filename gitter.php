@@ -71,7 +71,13 @@ if (isset($_POST['act'])) {
 			@unlink($file);
 			break;
 		case 'dif':
-			$rslt = str_replace('xmp>','.xmp>',`git diff -w {$file}`);
+			$rslt = str_replace('xmp>','.xmp>',`git diff -w {$file}` ?? '[ NO DIFFERENCES ]');
+			break;
+		case 'und':
+			$rslt = `git reset HEAD~1`;
+			break;
+		case 'uns':
+			$rslt = `git restore --staged {$file}`;
 			break;
 		case 'spat':
 			setcookie(GH_PAT, $file, $cookT);
@@ -139,17 +145,20 @@ function statusAction ()
 			case ' D':
 			case ' M':
 				$html .= ckBox($f, 'ftc[]').'<a href="javascript:postAct({act:\'rev\', f: \''.urlencode($f).'\'})">revert</a> '.$f;
-				$html .= ' <a href="javascript:postAct({act:\'dif\', f: \''.urlencode($f).'\'})">diff</a><br />';
+				$html .= ' <a href="javascript:postAct({act:\'dif\', f: \''.urlencode($f).'\'})">diff</a><br>';
+				break;
+			case 'M ':
+				$html .= $f.' <a href="javascript:postAct({act:\'uns\', f: \''.urlencode($f).'\'})">unstage</a><br>';
 				break;
 			case '??':
-				$html .= ckBox($f, 'ftc[]').'<a href="javascript:postAct({act:\'del\', f: \''.urlencode($f).'\'})">delete</a> '.$f.'<br />';
+				$html .= ckBox($f, 'ftc[]').'<a href="javascript:postAct({act:\'del\', f: \''.urlencode($f).'\'})">delete</a> '.$f.'<br>';
 				break;
 			default:
-				$html .= bin2hex($m) . " $f<br />";
+				$html .= bin2hex($m) . " $f<br>";
 				break;
 		}
 	}
-	return $html;
+	return $html ?: '<a href="javascript:postAct({act:\'und\', f: \' \'})">Undo Last Commit</a><br>';
 }
 header('Cache-Control: no-cache');
 ?>
@@ -158,11 +167,10 @@ header('Cache-Control: no-cache');
 <head>
 	<title>Gitter [ GitHub Sync ]></title>
 	<meta charset="UTF-8">
-	<meta http-equiv="Content-Language" content="en" />
+	<meta http-equiv="Content-Language" content="en">
 	<meta name="google" content="notranslate">
 	<script type="text/javascript">
-	function postAct (params)
-	{
+	function postAct (params) {
 		var form = document.createElement("form");
 		form.setAttribute("method", "post");
 		for (var key in params) {
@@ -177,8 +185,7 @@ header('Cache-Control: no-cache');
 		document.body.appendChild(form);
 		form.submit();
 	}
-	function doDnld ()
-	{
+	function doDnld () {
 		var dlframe = document.createElement("iframe");
 		// set source to desired file
 		dlframe.src = "gitter.php?<?=$_SERVER['QUERY_STRING']?>&dnld=1";
@@ -189,11 +196,18 @@ header('Cache-Control: no-cache');
 		//console.log(data); //alert("Data Loaded: " + data);
 		return false;
 	}
-	function getsetpat ()
-	{
+	function getsetpat () {
 		var pat = prompt("Github Personal Access Token", "");
 		if (pat) postAct({act:'spat', f:pat});
 		return false;
+	}
+	function chkCommit (evt) {
+		let ftcs = document.querySelectorAll('input[name="ftc[]"]:checked');
+		if (ftcs.length && !document.forms.gitsync.COS.checked) {
+			alert("Need to indicate a partial commit");
+			evt.preventDefault();
+			evt.stopPropagation();
+		}
 	}
 	</script>
 	<style>
@@ -211,44 +225,44 @@ header('Cache-Control: no-cache');
 	<a href="https://www.atlassian.com/git/tutorials" target="_blank" style="float:right">Tutor</a>
 	<?php if (!$uname): ?>
 	<form name="gituser" class="userform" method="post">
-		User Name: <input type="text" id="uname" name="uname" value="ron4mac" />
-		<br />Email Addr: <input type="text" id="uemail" name="uemail" value="ron@rjconline.net" />
-		<br /><input type="submit" name="setuser" value="Set User Config" />
+		User Name: <input type="text" id="uname" name="uname" value="ron4mac">
+		<br>Email Addr: <input type="text" id="uemail" name="uemail" value="ron@rjconline.net">
+		<br><input type="submit" name="setuser" value="Set User Config">
 	</form>
 	<?php endif; ?>
-	<?php if ($msg) { echo $msg.'<br />'; } ?>
+	<?php if ($msg) { echo $msg.'<br>'; } ?>
 	<form name="gitsync" class="syncform" method="post">
 	Branch: <select name="brchsel"><?php echo $opts; ?></select>
 	<button onclick="return doDnld()" title="Download the archive zip from Github">Download</button>
 	<?php if ($rslt): ?>
-	<br /><br />Result
+	<br><br>Result
 	<div class="rslt">
 		<xmp><?php echo $rslt; ?></xmp>
 	</div>
 	<?php else: ?>
-	<br />
+	<br>
 	<?php endif; ?>
-	<br />Status
+	<br>Status
 	<div class="stat">
 		<xmp><?php echo `git fetch origin; git status`; ?></xmp>
 		<?php $sact = statusAction(); echo $sact; ?>
 	</div>
 	<?php if($sact): ?>
-	<input type="submit" name="commit" value="Commit" /> &nbsp;&nbsp;<?=ckBox('1', 'COS')?> Only selected &nbsp;&nbsp;Msg: <input type="text" id="cmmsg" name="cmmsg" class="cmmsg" /><br />
+	<input type="submit" name="commit" value="Commit" onclick="chkCommit(event)"> &nbsp;&nbsp;<?=ckBox('1', 'COS')?> Only selected &nbsp;&nbsp;Msg: <input type="text" id="cmmsg" name="cmmsg" class="cmmsg"><br>
 	<?php endif; ?>
-	<br />Remote
+	<br>Remote
 	<div class="remo">
-		<input type="submit" name="pull" value="Pull" />
+		<input type="submit" name="pull" value="Pull">
 		<div class="push">
-			User: <input type="text" id="user" name="user" />
+			User: <input type="text" id="user" name="user">
 			<?php if (!$gh_auth): ?>
-			<br /><a href="#" onclick="return getsetpat();" style="background-color:coral;padding:4px">Set your Personal Access Token</a>
+			<br><a href="#" onclick="return getsetpat();" style="background-color:coral;padding:4px">Set your Personal Access Token</a>
 			<?php endif; ?>
-			<br /><input type="submit" name="push" value="Push" /> &nbsp;&nbsp;&nbsp;<input type="checkbox" name="force" />-Force!
+			<br><input type="submit" name="push" value="Push"> &nbsp;&nbsp;&nbsp;<input type="checkbox" name="force">-Force!
 		</div>
 	</div>
 	</form>
-	<br />Config
+	<br>Config
 	<div class="cnfg">
 		<xmp><?php echo `git config -l`; ?></xmp>
 	</div>

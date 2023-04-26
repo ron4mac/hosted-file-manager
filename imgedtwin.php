@@ -41,7 +41,7 @@ header('Cache-Control: no-cache');
 	<title>Image Edit :: <?php echo $fref?></title>
 	<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
 	<link rel="stylesheet" href="<?php echo $fontawsm; ?>" />
-	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.6/cropper.min.css" />
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
 	<link rel="stylesheet" href="css/jqModal.css" />
 	<link rel="stylesheet" href="css/fmxui.css" />
 	<style>
@@ -64,7 +64,7 @@ header('Cache-Control: no-cache');
 		#snding { display:none; }
 	</style>
 	<script src="<?=$jqlink?>"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.6/cropper.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 	<script src="js/jqModal<?php echo $jsver; ?>.js" type="text/javascript"></script>
 	<script src="js/fmxui<?php echo $jsver; ?>.js" type="text/javascript"></script>
 	<script>
