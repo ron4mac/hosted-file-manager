@@ -2,10 +2,7 @@
 
 class MySimpleMailParse
 {
-	protected	$fh,
-			//	$headers = [],
-				$boundaries = [],
-				$sections = [];
+	protected $fh, $boundaries = [], $sections = [];
 
 	public function __construct ($fref)
 	{
@@ -24,7 +21,7 @@ class MySimpleMailParse
 		return $h;
 	}
 
-	public function getBody ($part=0, &$ishtml)
+	public function getBody (&$ishtml, $part=0)
 	{
 		$secn = 0;
 		foreach ($this->sections as $i => $s)
@@ -54,10 +51,44 @@ class MySimpleMailParse
 		}
 	}
 
+	public function getAttachment (&$type, &$name, $part=0, $noc=true)
+	{
+		$attn = 0;
+		foreach ($this->sections as $i => $s)
+		{
+			if (empty($s['headers']['content-type'])) continue;
+			$ct = $s['headers']['content-type'];
+			if (strpos($s['headers']['content-disposition'] ?? '','attachment') !== false) {
+				if ($attn == $part) {
+					$cte = empty($s['headers']['content-transfer-encoding']) ? '' : strtolower($s['headers']['content-transfer-encoding']);
+					$pt = empty($s['headers']['content-type']) ? false : strpos($s['headers']['content-type'],'text/plain') !== false;
+					preg_match('#(.+);\s+name="([^"]+)"#', $s['headers']['content-type'], $matches);
+					$type = $matches[1];
+					$name = $matches[2];
+					if ($noc) return true;
+
+					$cis = $pt ? '<br>' : '';
+					switch ($cte) {
+						case 'quoted-printable':
+							if ($pt) return nl2br(quoted_printable_decode(implode('',$s['content'])));
+							return quoted_printable_decode(implode($cis,$s['content']));
+						case 'base64':
+							if ($pt) return nl2br(base64_decode(implode('',$s['content'])));
+							return base64_decode(implode($cis,$s['content']));
+						default:
+							return implode($cis,$s['content']);
+					}
+					break;
+				}
+				$attn++;
+			}
+		}
+		return false;
+	}
+
 	private function parse ($bound=false)
 	{
-		$section = ['headers'=>[],'boundary'=>'','content'=>'','zzz'=>''];
-	//	$headers = [];
+		$section = ['headers'=>[],'boundary'=>'','content'=>''];
 		$headone = false;
 		$headstr = '';
 		$qp = false;
@@ -117,6 +148,26 @@ function my_mail_parse ($fref)
 {
 	$msmp = new MySimpleMailParse($fref);		//file_put_contents('MSMP.log',print_r($msmp,true));
 
+	$attachments = [];
+	$attn = 0;
+	$type = $name = $content = '';
+	while ($content = $msmp->getAttachment($type, $name, $attn)) {
+		//if ($content !== true) file_put_contents($name, $content);
+		$attachments[$attn] = ['type'=>$type,'name'=>$name];
+		$attn++;
+	}
+
+	// if a fetch/ajax call just send the attachment and exit
+	$pinp = file_get_contents('php://input');
+	if ($pinp) {
+		$type = $name = $content = '';
+		$jreq = json_decode($pinp, true);
+		$content = $msmp->getAttachment($type, $name, $jreq['attn'], false);
+		header('Content-Encoding: gzip');
+		echo gzencode($content);
+		flush();exit();
+	}
+
 	// form the email header: date,from,to,etc
 	$head = '<style>.msmh_{font-weight:bold}</style>';
 	$head .= '<div><span class="msmh_">Date:</span> '.$msmp->getHeaderValue('date').'</div>';
@@ -127,11 +178,18 @@ function my_mail_parse ($fref)
 		$head .= '<div><span class="msmh_">CC:</span> '.htmlspecialchars($cc).'</div>';
 	}
 	$head .= '<div><span class="msmh_">Subject:</span> '.htmlspecialchars($msmp->getHeaderValue('subject')).'</div>';
+	if ($attachments) {
+		$attlnks = '';
+		foreach ($attachments as $k=>$v) {
+			$attlnks .= '<a href="javascript:dnld_att('.$k.', \''.$v['name'].'\')" data-atype="'.$v['type'].'" data-aname="'.$v['name'].'">'.$v['name'].'</a> ';
+		}
+		$head .= '<div><span class="msmh_">Attachments:</span> '.$attlnks.'</div>';
+	}
 	$head .= '<hr>';
 
 	// get the email body
 	$ishtml = false;
-	$body = $msmp->getBody(1, $ishtml);
+	$body = $msmp->getBody($ishtml, 1);
 /*
 	// twart getting remote images, etc
 	$body = preg_replace('#<\s*img(.*?) src\s*=\s*(["\'])(.+?)\2#i','<img$1 src="graphics/holder.gif"',$body);
@@ -155,10 +213,30 @@ function my_mail_parse ($fref)
 		include 'utils.php';
 		include 'washtml.php';
 		$oerl = error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);	// insulate the r-cube notices and warnings
-		$washer = new rcube_washtml(['blocked_src'=>'graphics/holdery.gif']);
+		$washer = new rcube_washtml(['blocked_src'=>'graphics/holdery.gif','charset'=>'utf8']);
 		$body = $washer->wash($body);
 		error_reporting($oerl);
 	}
 
-	return $head.$body;
+	// add a script to manage attachment download
+	$emlscript = <<< EOT
+	function dnld_att (atn, atnm) {
+		fetch('', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ attn: atn })})
+		.then(resp => resp.blob())
+		.then(data => {
+			var url = window.URL || window.webkitURL;
+			lnk = url.createObjectURL(data);
+			var a = document.createElement("a");
+			a.setAttribute("download", atnm);
+			a.setAttribute("href", lnk);
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+		})
+		.catch(e => alert(e));
+	}
+EOT;
+
+	return $head.$body.'<script>'.$emlscript.'</script>';
 }
+
