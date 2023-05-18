@@ -423,6 +423,7 @@ if ($dFiles) {
 		<ul>
 			<li id="delfTrue">Truly Delete</li>
 			<li id="delfMpty">Empty Trash</li>
+			<li id="delfView">View Trash</li>
 		</ul>
 	</div>
 	<div class="contextMenu" id="upldMenu">

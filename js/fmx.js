@@ -221,6 +221,9 @@ function doMenuAction (cmd,evt) {
 			postFormAndRefresh('delf');
 		}
 		break;
+	case 'tvew':
+		window.location = '?dir=tmp/Trash';
+		break;
 	case 'dnld':
 		if (hasSome()) {
 			$('div.dnldprg').css('display','inline');
@@ -705,7 +708,8 @@ $(() => {
 	$('a.delfMenu').contextMenu('delfMenu', {
 		bindings: {
 			'delfTrue': () => doMenuAction('delf', null),
-			'delfMpty': () => doMenuAction('mpty', null)
+			'delfMpty': () => doMenuAction('mpty', null),
+			'delfView': () => doMenuAction('tvew', null)
 		}
 	});
 	$('a.markMenu').contextMenu('clrdMenuSL', {
