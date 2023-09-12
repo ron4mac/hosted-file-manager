@@ -41,7 +41,7 @@ header('Cache-Control: no-cache');
 	<title>Image Edit :: <?php echo $fref?></title>
 	<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
 	<link rel="stylesheet" href="<?php echo $fontawsm; ?>" />
-	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.0/cropper.min.css" />
 	<link rel="stylesheet" href="css/jqModal.css" />
 	<link rel="stylesheet" href="css/fmxui.css" />
 	<style>
@@ -58,13 +58,13 @@ header('Cache-Control: no-cache');
 		.panel { background-color:#BBB; }
 		.panel ul { list-style-type:none;line-height:1.3em;padding: 0 1em;}
 		.panel ul li { margin-bottom:6px;height:100% }
-		.panel input ( width:100px; )
+		.panel input {width:100%;box-sizing:border-box;}
 		.editor { flex:100%;box-sizing:border-box;width:100%; }
 		.eeditor { width:100%;box-sizing:border-box; }
 		#snding { display:none; }
 	</style>
 	<script src="<?=$jqlink?>"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.0/cropper.min.js"></script>
 	<script src="js/jqModal<?php echo $jsver; ?>.js" type="text/javascript"></script>
 	<script src="js/fmxui<?php echo $jsver; ?>.js" type="text/javascript"></script>
 	<script>
@@ -86,6 +86,16 @@ header('Cache-Control: no-cache');
 			cropper.scale(sx, sy);
 			curSx = sx;
 			curSy = sy;
+			updImgVals();
+		}
+		function setScaleX (elem) {
+			let sp = elem.value;
+			cropper.scaleX(sp);
+			updImgVals();
+		}
+		function setScaleY (elem) {
+			let sp = elem.value;
+			cropper.scaleY(sp);
 			updImgVals();
 		}
 		function flip (v) {
@@ -173,8 +183,8 @@ header('Cache-Control: no-cache');
 			let cnvd = cropper.getCanvasData();
 			cnvW.value = Math.round(cnvd.naturalWidth);
 			cnvH.value = Math.round(cnvd.naturalHeight);
-		//	cnvW.value = Math.round(cnvd.width);
-		//	cnvH.value = Math.round(cnvd.height);
+			cnvW.value = Math.round(cnvd.width);
+			cnvH.value = Math.round(cnvd.height);
 		}
 		var mTypDlg = {
 			cselect: '#mTypDlog',
@@ -194,7 +204,7 @@ header('Cache-Control: no-cache');
 <body>
 <div id="container">
 <div class="toolbar">
-	<label>Constraint:</label>&nbsp;<select id="aspect" onchange="setAspect(this)">
+	<label>Constraint:</label>&nbsp;<select id="s-aspect" onchange="setAspect(this)">
 		<option value="0">none</option>
 		<option value="4:3">4:3</option>
 		<option value="3:4">3:4</option>
@@ -209,7 +219,7 @@ header('Cache-Control: no-cache');
 	<button onclick="cropper.rotate(45);updImgVals()">Rotate Right</button>
 	<button onclick="flip(true)">Flip V</button>
 	<button onclick="flip(false)">Flip H</button>
-	<select id="aspect" onchange="setScale(this)">
+	<select id="s-scale" onchange="setScale(this)">
 		<option value="1">Scale 100%</option>
 		<option value=".75">Scale 75%</option>
 		<option value=".5">Scale 50%</option>
@@ -227,8 +237,8 @@ header('Cache-Control: no-cache');
 			<li>Canvas height<br><input type="number" step="1" id="cnvH" onchange="setCnvVal(this,'height')" /></li>
 			<li>Image width<br><input type="number" step="1" id="imgW" onchange="" /></li>
 			<li>Image height<br><input type="number" step="1" id="imgH" onchange="" /></li>
-			<li>Scale X<br><input type="number" step="1" id="sclX" onchange="" /></li>
-			<li>Scale Y<br><input type="number" step="1" id="sclY" onchange="" /></li>
+			<li>Scale X<br><input type="number" max="1" min="0" step="0.01" id="sclX" onchange="setScaleX(this)" /></li>
+			<li>Scale Y<br><input type="number" max="1" min="0" step="0.01" id="sclY" onchange="setScaleY(this)" /></li>
 			<li>Crop x pos<br><input type="number" step="1" id="crpx" onchange="setDatVal(this,'x')" /></li>
 			<li>Crop y pos<br><input type="number" step="1" id="crpy" onchange="setDatVal(this,'y')" /></li>
 			<li>Crop width<br><input type="number" step="1" id="crpw" onchange="setDatVal(this,'width')" /></li>

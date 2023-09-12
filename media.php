@@ -93,7 +93,7 @@ if ($imgsl) {
 			$html .= '<a data-fancybox="gallery" href="'.$aimg[0].'"><img src="'.$aimg[1].'" /></a></div>';
 		} else {
 			$html .= '<div class="mbox"><p>'.$file.'</p>';
-			$html .= '<a data-fancybox="gallery" href="'.$aimg.'"><img class="aimg" src="'.$aimg.'" /></a></div>';
+			$html .= '<a data-fancybox="gallery" data-caption="'.htmlspecialchars($file).'" href="'.$aimg.'"><img class="aimg" src="'.$aimg.'" /></a></div>';
 		}
 	}
 	$html .= '</div>';
@@ -163,6 +163,10 @@ nav {font-size:larger;}
 	max-height : 80%;
 	margin: 0;
 	background-color: transparent;
+}
+.fancybox-caption {
+	position: relative;
+	font-size: large;
 }
 </style>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

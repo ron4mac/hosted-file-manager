@@ -249,12 +249,15 @@ fclose($fh_res);
 		$newver = checkForUpdate();
 		$msg = 'FMX Version: ' . $fmxVersion;
 		$msg .= '<br />PHP Version: ' . phpversion();
-		$msg .= '<br />MySql(i) Client Version: ' . str_replace('$','',mysqli_get_client_info());
+		$msg .= function_exists('mysqli_get_client_info') ? ('<br />MySql(i) Client Version: ' . str_replace('$','',mysqli_get_client_info())) : '<br /><span class="notify">No PHP myqsli support</span>';
 		if (class_exists('SQLite3')) {
 			$sql3v = SQLite3::version();
 			$msg .= '<br />SQLite3 Version: ' . $sql3v['versionString'];
 		} else {
-			$msg .= '<br />SQLite3 not available';
+			$msg .= '<br /><span class="notify">SQLite3 not available</span>';
+		}
+		if (!class_exists('ZipArchive')) {
+			$msg .= '<br /><span class="notify">No PHP ZipArchive support</span>';
 		}
 		$msg .= '<br /><br />';
 		if ($newver) {
