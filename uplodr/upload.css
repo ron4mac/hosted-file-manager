@@ -11,7 +11,7 @@
 	border-radius: 5px;
 	overflow-x: hidden;
 }
-#dropArea.hover { background-color: #DFD; border: 1px solid #999; box-shadow: inset 2px 2px 3px #999 }
+#dropArea.hover { background-color: #DFD; border: 1px solid #999; box-shadow: inset 2px 2px 6px #BBB }
 #file_field { position: absolute; top: -1000px }
 #totprogress {
 	width: 100%;

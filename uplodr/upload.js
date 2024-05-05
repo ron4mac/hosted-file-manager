@@ -7,7 +7,13 @@ function $id (id) {
 }
 // addEventListener
 function $ae (elem, evnt, func) {
-	elem.addEventListener(evnt, func, false);
+	if (typeof evnt === 'object') {
+		for (let evt in evnt) {
+			elem.addEventListener(evt, evnt[evt], false);
+		}
+	} else {
+		elem.addEventListener(evnt, func, false);
+	}
 }
  
 /* encapsulate the entire upload engine in a function */
@@ -81,9 +87,7 @@ function $ae (elem, evnt, func) {
 
 	// file drag hover
 	let FileDragHover = (e) => {
-		e.stopPropagation();
-		e.preventDefault();
-		e.target.className = (e.type == 'dragover' ? 'hover' : 'dropzone');
+		e.target.className = (e.type == 'dragenter' ? 'hover' : '');
 	};
 
 	// file selection
@@ -93,8 +97,8 @@ function $ae (elem, evnt, func) {
 		if (e instanceof FileList) {
 			files = e;
 		} else {
-			// cancel event and hover styling
-			FileDragHover(e);
+			// prevent default action if 'drop' event
+			if (e.type == 'drop') e.preventDefault();
 
 			// fetch FileList object
 			files = e.target.files || e.dataTransfer.files;
@@ -419,9 +423,12 @@ function $ae (elem, evnt, func) {
 
 				// file drop
 				let filedrag = $id('dropArea');
-				$ae(filedrag, 'dragover', FileDragHover);
-				$ae(filedrag, 'dragleave', FileDragHover);
-				$ae(filedrag, 'drop', FileSelectHandler);
+				$ae(filedrag,{
+					dragenter: FileDragHover,
+					dragleave: FileDragHover,
+					dragover: (e) => e.preventDefault(),
+					drop: FileSelectHandler
+					});
 				filedrag.style.display = 'block';
 
 				// progress display area
