@@ -171,6 +171,7 @@ function doesSupportAjaxUploadWithProgress () {
 }
 
 function pop (url, h1, w1) {
+	if (w1>screen.availWidth) w1 = screen.availWidth;
 	var h2 = (screen.height-h1)/2;
 	var w2 = (screen.width-w1)/2;
 	var wcon='toolbar=no,status=no,location=no,menubar=no,resizable=0,scrollbars=1,width='+w1+',height='+h1+',left='+w2+',top='+h2;
@@ -178,6 +179,7 @@ function pop (url, h1, w1) {
 }
 
 function popPost (url, data, name, h1, w1) {
+	if (w1>screen.availWidth) w1 = screen.availWidth;
 	var flds = '', key;
 	for (key in data) { flds += '<input type="hidden" name="'+key+'" value="'+data[key]+'" />'; }
 	var ppf = $('<form action="'+url+'" method="post" target="'+name+'">'+flds+'</form>');
@@ -368,7 +370,7 @@ function doMenuAction (cmd,evt) {
 				else break;
 			}
 			var wPath = ctxPrf+curDir.slice(curDir.search('/'));
-			pop(wPath+curfn,screen.availHeight,1200);
+			pop(wPath+curfn,screen.availHeight,.6*screen.availWidth);
 		}
 		break;
 	case 'gitr':
@@ -755,9 +757,42 @@ $(() => {
 	});
 
 	// let's try file drag-n-drop
-	const $form = $('#filsform');
+/*	const $form = $('#filsform');
 	$form.on('drag dragstart dragend dragover dragenter dragleave drop', (e) => { e.preventDefault(); e.stopPropagation(); })
 	.on('dragover dragenter', () => $form.addClass('upld-body') )
 	.on('dragleave dragend drop', () => $form.removeClass('upld-body') )
 	.on('drop', (e) => { let fils = e.originalEvent.dataTransfer.files; upldAction.H5o(()=>fupQadd2(fils)); });
+	*/
+	const filesDrop = new FileDropper(document.getElementById('filsform'), (fils) => upldAction.H5o(()=>fupQadd2(fils)) );
 });
+
+// some reusable classes
+class FileDropper {
+	constructor(elm, cb) {
+		elm.addEventListener('dragover', this, false);
+		elm.addEventListener('drop', this, false);
+		elm.addEventListener('dragenter', this, false);
+		elm.addEventListener('dragleave', this, false);
+		this.cb = cb;
+	}
+	handleEvent(e) {
+		e.preventDefault();
+		switch (e.type) {
+//			case 'dragover':
+//				e.preventDefault();
+//				break;
+			case 'drop':
+		//		e.preventDefault();
+				let fils = e.dataTransfer.files;
+				this.cb(fils);
+				break;
+			case 'dragenter':
+				e.target.classList.add('upld-body');
+				break;
+			case 'dragleave':
+				e.target.classList.remove('upld-body');
+				break;
+		}
+	}
+}
+
