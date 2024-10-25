@@ -6,6 +6,7 @@
    
 nav ul {padding:0;display:inline;list-style-type:none;}
 nav ul li {float:left;margin-bottom:0.9em;}
+nav ul li:hover {color:magenta;}
 nav ul li a {display:block;}
 nav ul li ul {position:absolute;width:auto;background:#CCF;border:1px solid #999;padding:4px 0 4px 0;}
 nav ul li ul li {margin:0;padding:0;width:auto;float:none;line-height:1.4em;}

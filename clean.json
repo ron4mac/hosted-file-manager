@@ -32,5 +32,11 @@
 "md/",
 "mparse/mime_parser.php",
 "mparse/rfc822_addresses.php",
-"zipmngr.php"
+"zipmngr.php",
+"css/context.css",
+"css/jqModal.css",
+"js/jqContext.js",
+"js/jqContext.min.js",
+"js/jqModal.js",
+"js/jqModal.min.js"
 ]

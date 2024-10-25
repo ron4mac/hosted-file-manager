@@ -1,10 +1,10 @@
 <?php
 include '../cfg.php';
 $jsfiles = [
-	'jqModal'.$jsver.'.js',
+//	'jqModal'.$jsver.'.js',
 	'fmx'.$jsver.'.js',
 	'fmxui'.$jsver.'.js',
-	'jqContext'.$jsver.'.js'
+//	'jqContext'.$jsver.'.js'
 	];
 
 $lastmod = 0;

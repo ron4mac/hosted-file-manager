@@ -115,7 +115,12 @@ if (isset($_POST['cmdlin'])) {
 <meta name="google" content="notranslate">
 <link rel="stylesheet" href="<?php echo $fontawsm; ?>" />
 <link rel="stylesheet" type="text/css" href="css/css.php" />
-<script src="<?=$jqlink?>"></script>
+<link rel="stylesheet" href="//rjcrans.net/rjlibs/dlog/dialog.css" />
+<link rel="stylesheet" href="//rjcrans.net/rjlibs/cntx/context.css" />
+<!-- <script src="<?=$jqlink?>"></script> -->
+<script src="//rjcrans.net/rjlibs/cmmn/common.js" type="text/javascript"></script>
+<script src="//rjcrans.net/rjlibs/cntx/context.js" type="text/javascript"></script>
+<script src="//rjcrans.net/rjlibs/dlog/dialog.js" type="text/javascript"></script>
 <script src="js/js.php" type="text/javascript"></script>
 <script type="text/javascript">
 if (!window.fetch) alert("This web browser is not new enough to properly run this version of the File Manager");
@@ -125,6 +130,10 @@ var fmx_AJ='fmxjx.php';
 var curDir='<?php echo $pDir; ?>/';
 var ctxPrf='<?php echo isset($_SERVER['CONTEXT_PREFIX']) ? $_SERVER['CONTEXT_PREFIX'] : ''; ?>';
 var upload_winpop = <?php echo isset($fmx_upload_winpop)?'true':'false' ?>;
+function allSelect (elm) {
+	let ckd = elm.checked;
+	document.querySelectorAll('.fsel').forEach(cb => {cb.checked = ckd;});
+}
 </script>
 </head>
 <body class="fmgt">
@@ -158,62 +167,61 @@ $srtBy = $_GET['O'] ?? 'n';
 <div id="fmnu">
 	<nav>
 	<ul>
-		<li>
+		<li class="drpm">
 			<a href="#" class="altm archive" data-mnu="mnu">archive</a>
 			<ul class="fallback altm">
-				<li class="mnur"><a href="#" data-mnu="zip" data-req="2">zip</a></li>
-				<li class="mnua"><a href="#" data-mnu="zipx" data-req="2">zip-x</a></li>
-				<li><a href="#" data-mnu="uzip" data-req="2">unzip</a></li>
-				<li><a href="#" data-mnu="tarz" data-req="2">tar/gz</a></li>
-				<li><a href="#" data-mnu="utrz" data-req="2">untar/gz</a></li>
+				<li class="mnur"><a href="#" data-mnu="zip">zip</a></li>
+				<li class="mnua"><a href="#" data-mnu="zipx">zip-x</a></li>
+				<li><a href="#" data-mnu="uzip">unzip</a></li>
+				<li><a href="#" data-mnu="tarz">tar/gz</a></li>
+				<li><a href="#" data-mnu="utrz">untar/gz</a></li>
 				<li class="mnusep"></li>
-				<li><a href="#" data-mnu="mgzp" data-req="2">View</a></li>
+				<li><a href="#" data-mnu="mgzp">View</a></li>
 			</ul>
 		</li>
-		<li><a href="#" id="cppaMenu" data-mnu="cppa" data-req="2" class="cppaMenu">copy/paste</a></li>
-		<!-- <li><a href="#" data-mnu="delf" data-req="2">delete</a></li> -->
-		<li><a href="#" data-mnu="trsh" data-req="2" class="delfMenu">delete<?=$trshc?></a></li>
-		<li><a href="#" data-mnu="dnld" data-req="2">download</a><div class="dnldprg"> rr</div></li>
-		<li><a href="#" data-mnu="dupl" data-req="2">duplicate</a></li>
-		<li><a href="#" id="markMenu" data-mnu="mark" data-req="2" class="markMenu">mark</a></li>
-		<li><a href="#" data-mnu="mdya" data-req="0">media</a></li>
-		<li><a href="#" id="mvtoMenu" data-mnu="mvto" data-req="2" class="mvtoMenu">move/to</a></li>
-		<li>
-			<a href="#" data-mnu="mnu">new</a>
+		<li><a href="#" id="cppaMenu" data-mnu="cppa" data-ctx="cppCtx">copy/paste</a></li>
+		<li><a href="#" data-mnu="trsh" data-ctx="delCtx">delete<?=$trshc?></a></li>
+		<li><a href="#" data-mnu="dnld">download</a><div class="dnldprg"> rr</div></li>
+		<li><a href="#" data-mnu="dupl">duplicate</a></li>
+		<li><a href="#" id="markMenu" data-mnu="mark" data-ctx="mrkCtx">mark</a></li>
+		<li><a href="#" data-mnu="mdya">media</a></li>
+		<li><a href="#" id="mvtoMenu" data-mnu="mvto" data-ctx="mvtCtx">move/to</a></li>
+		<li class="drpm">
+			<a href="#" class="altm archive" data-mnu="mnu">new</a>
 			<ul class="fallback">
-				<li><a href="#" data-mnu="nfle" data-req="0">file</a></li>
-				<li><a href="#" data-mnu="nfld" data-req="0">folder</a></li>
+				<li><a href="#" data-mnu="nfle">file</a></li>
+				<li><a href="#" data-mnu="nfld">folder</a></li>
 			</ul>
 		</li>
-		<li><a href="#" data-mnu="refr" data-req="0">refresh</a></li>
-		<li><a href="#" data-mnu="rnam" data-req="1">rename</a></li>
-		<li>
+		<li><a href="#" data-mnu="refr">refresh</a></li>
+		<li><a href="#" data-mnu="rnam">rename</a></li>
+		<li class="drpm">
 			<a href="#" data-mnu="mnu">search</a>
 			<ul class="fallback">
-				<li><a href="#" data-mnu="srhf" data-req="0">file</a></li>
-				<li><a href="#" data-mnu="srhc" data-req="0">content</a></li>
+				<li><a href="#" data-mnu="srhf">file</a></li>
+				<li><a href="#" data-mnu="srhc">content</a></li>
 			</ul>
 		</li>
-		<li>
+		<li class="drpm">
 			<a href="#" data-mnu="mnu">transfer</a>
 			<ul class="fallback">
-				<li><a href="#" data-mnu="furl" data-req="0">from URL</a></li>
-				<li><a href="#" data-mnu="turl" data-req="0">to URL</a></li>
+				<li><a href="#" data-mnu="furl">from URL</a></li>
+				<li><a href="#" data-mnu="turl">to URL</a></li>
 			</ul>
 		</li>
-		<li><a href="#" data-mnu="upld" data-req="0" class="upldMenu">upload</a></li>
-		<li><a href="#" data-mnu="webv" data-req="0">webview</a></li>
+		<li><a href="#" data-mnu="upld" data-ctx="uplCtx">upload</a></li>
+		<li><a href="#" data-mnu="webv">webview</a></li>
 		<li>&nbsp;&nbsp;&nbsp;||&nbsp;</li>
-		<li>
+		<li class="drpm">
 			<a href="#" data-mnu="mnu">develop</a>
 			<ul class="fallback">
-				<li><a href="#" data-mnu="gitr" data-req="0">gitter</a></li>
-				<li><a href="#" data-mnu="jxtr" data-req="1">jextract</a></li>
-				<li><a href="#" data-mnu="mmiz" data-req="0">minify(.js)</a></li>
-				<li><a href="#" data-mnu="sql3" data-req="0">sqlite3</a></li>
+				<li><a href="#" data-mnu="gitr">gitter</a></li>
+				<li><a href="#" data-mnu="jxtr">jextract</a></li>
+				<li><a href="#" data-mnu="mmiz">minify(.js)</a></li>
+				<li><a href="#" data-mnu="sql3">sqlite3</a></li>
 			</ul>
 		</li>
-		<li><a href="#" data-mnu="fmxi" data-req="0">?</a></li>
+		<li><a href="#" data-mnu="fmxi">?</a></li>
 	</ul>
 	</nav>
 </div>
@@ -223,7 +231,7 @@ $srtBy = $_GET['O'] ?? 'n';
 	<table id="ftbl">
 		<thead>
 		<tr>
-		<td><input type="checkbox" id="checkAll" onchange="allSelect(event,this)" /></td>
+		<td><input type="checkbox" id="checkAll" onchange="allSelect(this)" /></td>
 		<td><?=$parntBut?></td>
 <?php
 	$mlab = '<a href="#" onclick="refreshFilstO(\'m\')">Last Modified</a>';
@@ -320,8 +328,8 @@ if ($dFiles) {
 			} else {
 				echo '<td>&nbsp;</td>';
 			}
-			echo '<td class="diricon foldCtxt"><i class="fa fa-folder" aria-hidden="true"></i></td>';
-			echo '<td class="foldCtxt">';
+			echo '<td class="diricon" data-ctx="fldCtx"><i class="fa fa-folder" aria-hidden="true"></i></td>';
+			echo '<td data-ctx="fldCtx">';
 			if ($lok) { echo '<a href="index.php?dir='.$efle.'">'.$fle.'</a>'; }
 			else { echo $fle; }
 			echo ($isLnk ? " &rarr; $rlnk" : '').'</td>';
@@ -349,13 +357,13 @@ if ($dFiles) {
 				echo '<td>&nbsp;</td>';
 			}
 			if ($filedt) {
-				echo '<td class="filedticon fileCtxt" onclick="doFileAction(\'fedt\',this,event)"><i class="fa fa-file" aria-hidden="true"></td>';
+				echo '<td class="filedticon" data-ctx="filCtx" onclick="doFileAction(\'fedt\',this,event)"><i class="fa fa-file" aria-hidden="true"></td>';
 			} elseif ($imgedt) {
-				echo '<td class="imgedticon fileCtxt" onclick="doFileAction(\'iedt\',this,event)"><i class="fa fa-file-image-o" aria-hidden="true"></i></td>';
+				echo '<td class="imgedticon" data-ctx="filCtx" onclick="doFileAction(\'iedt\',this,event)"><i class="fa fa-file-image-o" aria-hidden="true"></i></td>';
 			} else {
-				echo '<td class="filicon fileCtxt"><i class="fa fa-file" aria-hidden="true"></i></td>';
+				echo '<td class="filicon" data-ctx="filCtx"><i class="fa fa-file" aria-hidden="true"></i></td>';
 			}
-			echo '<td class="fileCtxt">';
+			echo '<td data-ctx="filCtx">';
 			if ($lok) { echo '<a href="#" data-act="fvue">'.$ufle.'</a>'; }
 			else { echo $ufle; }
 			echo ($isLnk ? " &rarr; $rlnk" : '').'</td>';
@@ -378,7 +386,7 @@ if ($dFiles) {
 		<input type="hidden" name="mcmdlin" value="" />
 		Command: <input type="text" id="cmdlin" name="cmdlin" size="80" maxlength="512" />
 		<input type="button" name="doCmd" value="Do it" onclick="fils2up()" />
-		<a href="#" data-mnu="cmcs" data-req="0">?</a>
+		<a href="#" data-mnu="cmcs">?</a>
 		</form>
 	</div>
 </div>
@@ -395,66 +403,32 @@ if ($dFiles) {
 <?php endif; ?>
 </div>
 <?php endif; ?>
-<div id="upload" class="jqmWindow"><div class="upldr"></div><span class="button jqmClose"><img src="<?=$appB?>css/closex.png" alt="close" /></span></div>
-<div id="element_to_pop_up" class="jqmWindow">
-	<div class="bpDlgHdr"><span class="bpDlgTtl">TITLE</span><span class="button jqmClose"><img src="<?=$appB?>css/closex.png" alt="close" /></span></div>
-	<div class="bpDlgCtn"><form class="bp-dctnt" name="myUIform" onsubmit="return false"></form></div>
-	<div class="bpDlgFtr"><div class="bp-bttns"></div></div>
-</div>
+<div id="upload"><div class="upldr"></div></div>
 <div style="display:none">
-	<div id="aMsgDlog" title="Message:"><span class="aMsg">{msg}</span></div>
-	<div id="aSchDlog" title="Search:"><input type="hidden" name="cmd" value="{cmd}" /><input type="text" class="dlgitxt" name="sterm" value="{trm}" maxlength="80" /></div>
-	<div id="fRenDlog" title="Rename:"><input type="hidden" name="oldnm" value="{old}" /><input type="text" class="dlgitxt" name="nunam" value="{new}" maxlength="80" /></div>
-	<div id="fNamDlog" title="{ttl}"><input type="hidden" name="act" value="{act}" /><input type="text" class="dlgitxt" name="fref" maxlength="80" /></div>
-	<div class="contextMenu" id="clrdMenu">
-		<ul>
-			<li id="clrdClr">Clear</li>
-			<li id="clrdDsp">Display</li>
-		</ul>
+	<div id="aMsgDlog">
+		<span class="ffld aMsg">{msg}</span>
 	</div>
-	<div class="contextMenu" id="clrdMenuSL">
-		<ul>
-			<li id="clrdClr">Clear</li>
-			<li id="clrdDsp">Display</li>
-			<li id="symLnk">SymLink</li>
-		</ul>
+	<div id="aSchDlog">
+		<input type="text" class="ffld dlgitxt" name="sterm" maxlength="80" required />
+		<input type="hidden" name="cmd" />
 	</div>
-	<div class="contextMenu" id="delfMenu">
-		<ul>
-			<li id="delfTrue">Truly Delete</li>
-			<li id="delfMpty">Empty Trash</li>
-			<li id="delfView">View Trash</li>
-		</ul>
+	<div id="fRenDlog">
+		<input type="text" name="nunam" class="ffld dlg-fname" maxlength="80" required />
+		<input type="hidden" name="oldnm" />
 	</div>
-	<div class="contextMenu" id="upldMenu">
-		<ul>
-			<li id="H5w">H5win</li>
-			<li id="H5o">H5ovr</li>
-			<li id="L4w">L4win</li>
-			<li id="L4o">L4ovr</li>
-		</ul>
-	</div>
-	<div class="contextMenu" id="fileCtxt">
-		<ul>
-			<li id="cfi_edt">Edit</li>
-			<li id="cfi_del">Delete</li>
-			<li id="cfi_dld">Download</li>
-			<li id="cfi_dup">Duplicate</li>
-			<li id="cfi_ren">Rename</li>
-			<li id="cfi_zip">Zip</li>
-		</ul>
-	</div>
-	<div class="contextMenu" id="foldCtxt">
-		<ul>
-			<li id="cfo_del">Delete</li>
-			<li id="cfo_dld">Download</li>
-			<li id="cfo_dup">Duplicate</li>
-			<li id="cfo_ren">Rename</li>
-			<li id="cfo_zip">Zip</li>
-		</ul>
+	<div id="fNamDlog" title="{ttl}">
+		<input type="text" name="fref" class="ffld dlg-fname" maxlength="80" required />
+		<input type="hidden" name="act" value="{act}" />
 	</div>
 </div>
 <script>
+	// set footer popup trigger
+	_rj.ae('footerPopButton', 'click', () => {
+		let fpc = _rj.id('footerPopContent').classList;
+		if (fpc.contains('open')) fpc.remove('open');
+		else fpc.add('open');
+	});
+/*
 	var $table = $('#ftbl'),
 		$bodyCells = $table.find('tbody tr:first').children(),
 		colWidth;
@@ -478,18 +452,6 @@ if ($dFiles) {
 	});
 	$(window).trigger('resize');
 
-	// set footer popup trigger
-	var fpopen = false;
-	$('#footerPopButton').click(function () {
-		if (fpopen === false) {
-				$('#footerPopContent').addClass('open');
-			fpopen = true;
-		} else {
-				$('#footerPopContent').removeClass('open');
-			fpopen = false;
-		}
-	});
-
 	$('a.altm').on('mouseenter', (e) => {
 		let telm = $(e.target);
 		if (e.altKey) {
@@ -500,6 +462,7 @@ if ($dFiles) {
 			telm.next().children('.mnur').show();
 		}
 	});
+*/
 </script>
 <?php if (!$fmxInJoomla): ?>
 </body>

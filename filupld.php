@@ -24,9 +24,9 @@ $faccept = empty($fmx_upload_accept) ? '' : (' accept="'.$fmx_upload_accept.'"')
 <?php if ($fw): ?>
 <input type="hidden" name="w" value="1">
 <?php endif; ?>
-<div id="files">
-	<input type="file" name="user_file[]" id="upload_field" multiple="multiple"<?=$faccept?>>
-	<br /><br /><label><input type="checkbox" name="ovrok" value="on" style="margin-right:5px;vertical-align:text-top" />Overwrite same-named server files</label>
+<div id="files" style="display:grid">
+	<input type="file" name="user_file[]" id="upload_field" multiple="multiple"<?=$faccept?> required />
+	<br /><label><input type="checkbox" name="ovrok" value="on" style="margin-right:5px;vertical-align:text-top" />Overwrite same-named server files</label>
 </div>
 <hr />
 <input type="button"  name="do_upload" value="Upload file(s)" onclick="chknsend()" style="float:right;margin-bottom:12px" />
@@ -49,9 +49,12 @@ $faccept = empty($fmx_upload_accept) ? '' : (' accept="'.$fmx_upload_accept.'"')
 		$('#upload_field').change( function() { if (!this.hasOwnProperty('multiple')) {appendFileSel(this);} });
 	});
 	function chknsend () {
-		document.upform.submit();
-		$('#uplfrm').hide();
-		$('#uplmsg').show();
+		let f = document.upform;
+		if (f.reportValidity()) {
+			f.submit();
+			$('#uplfrm').hide();
+			$('#uplmsg').show();
+		}
 	}
 </script>
 <?php if ($fw): ?>

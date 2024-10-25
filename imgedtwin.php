@@ -10,7 +10,7 @@ if (!empty($_FILES['croppedImage'])) {
 		if ($upf['error'] == UPLOAD_ERR_OK) {
 			$tmp_name = $upf['tmp_name'];
 			if (is_uploaded_file($tmp_name)) {
-				if (!move_uploaded_file($tmp_name, $baseDir.$_POST['fpath'])) {
+				if (!move_uploaded_file($tmp_name, $baseDir.$_POST['fpath'].$_POST['fname'])) {
 					throw new Exception('Error: failed to place file');
 				}
 			} else {
@@ -42,7 +42,7 @@ header('Cache-Control: no-cache');
 	<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
 	<link rel="stylesheet" href="<?php echo $fontawsm; ?>" />
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.0/cropper.min.css" />
-	<link rel="stylesheet" href="css/jqModal.css" />
+	<link rel="stylesheet" href="//rjcrans.net/rjlibs/dlog/dialog.css" />
 	<link rel="stylesheet" href="css/fmxui.css" />
 	<style>
 		html, body { height:100%;margin:0; }
@@ -65,7 +65,7 @@ header('Cache-Control: no-cache');
 	</style>
 	<script src="<?=$jqlink?>"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.0/cropper.min.js"></script>
-	<script src="js/jqModal<?php echo $jsver; ?>.js" type="text/javascript"></script>
+	<script src="//rjcrans.net/rjlibs/dlog/dialog.js" type="text/javascript"></script>
 	<script src="js/fmxui<?php echo $jsver; ?>.js" type="text/javascript"></script>
 	<script>
 		var imgfb = "<?php echo $frefp; ?>";
@@ -153,24 +153,51 @@ header('Cache-Control: no-cache');
 			  });
 			}, mt || mtype);
 		}
-		function doSaveAs (mt) {
-			let asn = prompt("Save as:", imgfnwe + "." + mt.split("/")[1]);
-			if (asn) {
-				save2srvr(asn, mt);
+		const saveToServer = (rslt, fd=null) => {
+			upSpinner(true);
+			if (!fd) {
+				fd = new FormData();
+				fd.append('fname', rslt);
+				fd.append('imime', mtype);
 			}
-		}
+			let mt = fd.get('imime');
+			cropper.getCroppedCanvas().toBlob((blob) => {
+
+				fd.append('fpath', imgfb);
+				fd.append('croppedImage', blob);
+
+				fetch('imgedtwin.php', {method:'POST', body:fd})
+				.then(resp => { if (!resp.ok) throw new Error(`HTTP ${resp.status}`); return resp.text() })
+				.then(data => {
+					upSpinner(false);
+					if (data) alert(data);
+				})
+				.catch(err => alert('Failure: '+err));
+
+			}, mt ?? mtype);
+		};
 		function saveAs (e) {
-			myOpenDlg(e,mTypDlg,{[mtype.split("/")[1]]:'checked',action:'doSaveAs'});
+			rjOpenDlg(e,saveAsDlg,{
+				fattrs:{['input[value="'+mtype+'"]|checked']:'', 'input[name="fname"]|value':imgfn},
+				cb: saveToServer,
+				class:'XXXXXX'
+			});
 		}
-		function doDownload (mt) {
+		const doDownload = (rslt, fd=null) => {
+			let mt = fd.get('imime');
 			let a = document.createElement('a');
 			let result = cropper.getCroppedCanvas();
 			a.href = result.toDataURL(mt);
-			a.download = imgfnwe + "." + mt.split("/")[1];
+			//a.download = imgfnwe + "." + mt.split("/")[1];
+			a.download = fd.get('fname');
 			a.click();
-		}
+		};
 		function download (e) {
-			myOpenDlg(e,mTypDlg,{[mtype.split("/")[1]]:'checked',action:'doDownload'});
+			rjOpenDlg(e,dnldAsDlg,{
+				fattrs:{['input[value="'+mtype+'"]|checked']:'', 'input[name="fname"]|value':imgfn},
+				cb: doDownload,
+				class:'XXXXXX'
+			});
 		}
 		function updImgVals () {
 			let imgd = cropper.getImageData();
@@ -186,19 +213,26 @@ header('Cache-Control: no-cache');
 			cnvW.value = Math.round(cnvd.width);
 			cnvH.value = Math.round(cnvd.height);
 		}
-		var mTypDlg = {
-			cselect: '#mTypDlog',
+		var saveAsDlg = {
+			id: 1,
+			title: 'Save image ...',
+			cselect: '#saveAsDlog',
 			modal: true,
 			buttons: {
-				'Continue`prm': function() {
-					let frm = document.myUIform;
-					let act = frm.action.value;
-					let prm = frm.imime.value;
-					myCloseDlg(this);
-					setTimeout(function(){ window[act](prm); }, 100);
-					}
-				}
-			};
+				cancel: {type: 'reset'},
+				save: {}
+			}
+		};
+		var dnldAsDlg = {
+			id: 2,
+			title: 'Download image ...',
+			cselect: '#saveAsDlog',
+			modal: true,
+			buttons: {
+				cancel: {type: 'reset'},
+				download: {}
+			}
+		};
 	</script>
 </head>
 <body>
@@ -273,19 +307,15 @@ var cropY = document.getElementById("crpy");
 var cropW = document.getElementById("crpw");
 var cropH = document.getElementById("crph");
 </script>
-<div id="element_to_pop_up" class="jqmWindow">
-	<div class="bpDlgHdr"><span class="bpDlgTtl">TITLE</span><span class="button jqmClose"><img src="<?=$appB?>css/closex.png" alt="close" /></span></div>
-	<div class="bpDlgCtn"><form class="bp-dctnt" name="myUIform" onsubmit="return false"></form></div>
-	<div class="bpDlgFtr"><div class="bp-bttns"></div></div>
-</div>
 <div style="display:none">
-	<div id="mTypDlog" title="Select the desired image format:">
-		<input type="radio" name="imime" value="image/png" {png} />&nbsp;<label>PNG</label><br>
-		<input type="radio" name="imime" value="image/jpeg" {jpeg} />&nbsp;<label>JPEG</label><br>
-	<!--	<input type="radio" name="imime" value="image/gif" {gif} />&nbsp;<label>GIF</label><br>
-		<input type="radio" name="imime" value="image/bmp" {bmp} />&nbsp;<label>BMP</label><br>
-		<input type="radio" name="imime" value="image/tiff" {tiff} />&nbsp;<label>TIFF</label><br> -->
-		<input type="hidden" name="action" value="{action}" />
+	<div id="saveAsDlog">
+		<div class="ffld">
+			<label>As file: <input type="text" name="fname" /></label>
+		</div>
+		<div class="ffld">
+			<label><input type="radio" name="imime" value="image/png" />&nbsp;PNG</label>
+			<label><input type="radio" name="imime" value="image/jpeg" />&nbsp;JPEG</label>
+		</div>
 	</div>
 </div>
 </div>

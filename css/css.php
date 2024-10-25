@@ -1,11 +1,9 @@
 <?php
 include '../cfg.php';
 $csfiles = [
-	'jqModal.css',
 	'fmx.css',
 	'fmxui.css',
-	'nav.css',
-	'context.css'
+	'nav.css'
 	];
 
 $lastmod = 0;

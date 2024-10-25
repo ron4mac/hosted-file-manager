@@ -142,10 +142,11 @@ function statusAction ()
 		$m = substr($stat, 0, 2);
 		$f = substr($stat, 3);
 		switch ($m) {
-			case ' D':
 			case ' M':
-				$html .= ckBox($f, 'ftc[]').'<a href="javascript:postAct({act:\'rev\', f: \''.urlencode($f).'\'})">revert</a> '.$f;
-				$html .= ' <a href="javascript:postAct({act:\'dif\', f: \''.urlencode($f).'\'})">diff</a><br>';
+				$actdif = ['revert',' <a href="javascript:postAct({act:\'dif\', f: \''.urlencode($f).'\'})">diff</a>'];
+			case ' D':
+				if ($m==' D') $actdif = ['restore',''];
+				$html .= ckBox($f, 'ftc[]').'<a class="fact" href="javascript:postAct({act:\'rev\', f: \''.urlencode($f).'\'})">'.$actdif[0].'</a> '.$f.$actdif[1].'<br>';
 				break;
 			case 'M ':
 				$html .= $f.' <a href="javascript:postAct({act:\'uns\', f: \''.urlencode($f).'\'})">unstage</a><br>';
@@ -213,6 +214,7 @@ header('Cache-Control: no-cache');
 	<style>
 		/*.syncform {line-height:1.5em;}*/
 		.userform {line-height:1.5em; border:1px dotted #AAA; background-color:#FEE; padding:6px;}
+		.fact {display: inline-block; width: 3rem; text-align: right;}
 		.cmmsg {width:40em;}
 		.rslt {border:1px solid #CCC; background-color:#FEF; padding:0 6px;}
 		.stat {border:1px solid #CCC; background-color:#FFE; padding:0 6px 10px 6px;}

@@ -100,9 +100,9 @@ input[type="checkbox"] {
 }
 
 #util-view {
-	position: fixed;
-	top: 180px;
-	left: 200px;
+	position: absolute;
+/*	top: 180px;
+	left: 200px;*/
 	background-color: white;
 	border: 1px solid #bbb;
 	padding: 4px;
@@ -121,6 +121,18 @@ input[type="checkbox"] {
 	background-color: #BCE;
 	border: 1px solid #999;
 	border-radius: 4px;
+}
+
+/* new html5 dialog usage classes*/
+dialog.rj_dlog {
+	background-color: #EFFFFF;
+	min-width: 300px;
+}
+dialog.rj_dlog.updlg {
+	min-width: 400px;
+}
+dialog .dlg-fname {
+	width: 18rem;
 }
 
 /* popup footer */

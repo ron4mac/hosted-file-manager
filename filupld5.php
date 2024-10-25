@@ -19,8 +19,8 @@ $done = $fw ? 'parent.opener.refreshFilst(); if (!(errcnt+msgcnt)) window.close(
 	<title>HTML5 Multi-file Upload</title>
 	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
 	<link rel="stylesheet" href="<?=$fontawsm?>">
-<?php endif; ?>
 	<link rel="stylesheet" type="text/css" href="css/fmx.css" />
+<?php endif; ?>
 	<link rel="stylesheet" type="text/css" href="uplodr/upload.css" />
 	<script type="text/javascript">
 		var fmx_appPath = '';
@@ -56,8 +56,8 @@ $done = $fw ? 'parent.opener.refreshFilst(); if (!(errcnt+msgcnt)) window.close(
 		<option value="o">Overwrite</option>
 	</select>
 	<div id="uplodr"></div>
-	<script type="text/javascript">H5uSetup();</script>
 <?php if ($fw): ?>
+	<script type="text/javascript">H5uSetup();</script>
 </body>
 </html>
 <?php endif; ?>

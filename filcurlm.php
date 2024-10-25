@@ -10,9 +10,11 @@ $curl_url = '';
 	<p><?=$curl_msg?></p>
 	<form id="upform" name="upform" method="post">
 		<input type="hidden" id="up_fpath" name="up_fpath" value="" />
-		<label>URL: </label><input type="text" name="url" id="curlurl" style="width:100%;box-sizing:border-box" value="<?=$curl_url?>" />
-		<label>user: </label><input type="text" name="user" style="width:30%" value="" />
-		<label>pass: </label><input type="text" name="pass" style="width:30%" value="" />
+		<div class="ffld"><label>URL: <input type="text" name="url" id="curlurl" style="width:100%;box-sizing:border-box" value="<?=$curl_url?>" required /></label></div>
+		<div class="ffld">
+			<label>user: <input type="text" name="user" style="width:30%" value="" /></label>
+			<label>pass: <input type="text" name="pass" style="width:30%" value="" /></label>
+		</div>
 		<br /><hr /><input type="button" name="do_upload" value="<?=$btnttl?>" onclick="chknsend()" style="float:right;margin-bottom:12px" /><img id="curlspin" src="graphics/spinner.gif" style="float:right;display:none" />
 	</form>
 </div>
