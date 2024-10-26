@@ -14,6 +14,7 @@ $faccept = empty($fmx_upload_accept) ? '' : (' accept="'.$fmx_upload_accept.'"')
 <title>File Upload</title>
 <link rel="stylesheet" type="text/css" href="css/fmx.css" />
 <script src="<?=$jqlink?>"></script>
+<script src="//rjcrans.net/rjlibs/cmmn/common.js"></script>
 </head>
 <body>
 <?php endif; ?>
@@ -29,7 +30,7 @@ $faccept = empty($fmx_upload_accept) ? '' : (' accept="'.$fmx_upload_accept.'"')
 	<br /><label><input type="checkbox" name="ovrok" value="on" style="margin-right:5px;vertical-align:text-top" />Overwrite same-named server files</label>
 </div>
 <hr />
-<input type="button"  name="do_upload" value="Upload file(s)" onclick="chknsend()" style="float:right;margin-bottom:12px" />
+<input type="button" name="do_upload" value="Upload file(s)" onclick="chknsend(this)" style="float:right;margin-bottom:12px" />
 </form>
 </div>
 <div id="uplmsg" style="display:none;color:#228">
@@ -39,23 +40,33 @@ $faccept = empty($fmx_upload_accept) ? '' : (' accept="'.$fmx_upload_accept.'"')
 <?php endif; ?>
 </div>
 <script type="text/javascript">
-	function appendFileSel(curelm) {
-		$(curelm).unbind();
-		$(curelm).after('<input type="file" name="user_file[]" multiple="multiple"<?=$faccept?>>');
-		$(curelm).next().change( function() { appendFileSel(this); });
+	const cgact = (e) => {
+		let fs = e.target;
+		if (!fs.hasOwnProperty('multiple')) appendFileSel(fs);
+	};
+
+	function appendFileSel (curelm) {
+		curelm.removeEventListener('change', cgact);
+		let fs = document.createElement('input');
+		fs.type = 'file';
+		fs.name = 'user_file[]';
+		fs.multiple = true;
+		_rj.ae(fs, 'change', cgact);
+		curelm.after(fs);
 	}
-	$(function() {
-		$('#up_fpath').val(sessionStorage.fmx_curD);
-		$('#upload_field').change( function() { if (!this.hasOwnProperty('multiple')) {appendFileSel(this);} });
-	});
-	function chknsend () {
+
+	function chknsend (elm) {
 		let f = document.upform;
 		if (f.reportValidity()) {
+			elm.disabled = true;
 			f.submit();
-			$('#uplfrm').hide();
-			$('#uplmsg').show();
+			_rj.hide('uplfrm');
+			_rj.show('uplmsg');
 		}
 	}
+
+	_rj.id('up_fpath').value = sessionStorage.fmx_curD;
+	_rj.ae('upload_field', 'change', cgact);
 </script>
 <?php if ($fw): ?>
 </body>

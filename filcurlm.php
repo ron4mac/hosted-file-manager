@@ -19,28 +19,26 @@ $curl_url = '';
 	</form>
 </div>
 <script type="text/javascript">
-	$(function() {
 <?php if ($isTo): ?>
-		var slctd = $(".fsel:checked");
-		$('#curlurl').val($(slctd[0]).parents('tr').attr('data-fref'));
+	var slctd = _rj.qs('.fsel:checked');
+	_rj.id('curlurl').value = slctd.closest('[data-fref]').dataset.fref;
 <?php endif; ?>
-		$('#up_fpath').val(sessionStorage.fmx_curD);
-	});
+	_rj.id('up_fpath').value = sessionStorage.fmx_curD;
 	function chknsend () {
-		var frm = document.upform;
-		var wurl = frm.url.value.trim();
+		let frm = document.upform;
+		let wurl = frm.url.value.trim();
 		if (!wurl) { alert("Please enter a valid url"); return; }
-		var parms = {
+		let parms = {
 			act: '<?=$fmxact?>',
 			path: curDir,
 			url: wurl
 			};
-		var userpass = frm.user.value.trim();
+		let userpass = frm.user.value.trim();
 		if (userpass) parms.user = userpass;
 		userpass = frm.pass.value.trim();
 		if (userpass) parms.pass = userpass;
-		postAndRefresh(parms);
+		postAndRefresh(parms, ()=>{_rj.id('curlspin').style.display = 'none'});
 		frm.do_upload.disabled = true;
-		$('#curlspin').show();
+		_rj.id('curlspin').style.display = 'inline-block';
 	}
 </script>

@@ -65,7 +65,7 @@ function display_entry ($av)
 	function dnld_entry (e) {
 		e.preventDefault();
 		if (dlFrame) document.body.removeChild(dlFrame);
-		var dlURL = "arcview.php?fref='.$fref.'&act=dnld&idx='.$idx.'&pth='.$pth.'";
+		let dlURL = "arcview.php?fref='.$fref.'&act=dnld&idx='.$idx.'&pth='.$pth.'";
 		dlFrame = document.createElement("iframe");
 		dlFrame.src = dlURL;
 		dlFrame.style.display = "none";
@@ -118,11 +118,11 @@ function display_archive ($av)
 	function dnld_entry (e) {
 		e.preventDefault();
 		if (dlFrame) document.body.removeChild(dlFrame);
-		var slctd = $(".slctd")[0];
-		var idx = slctd ? slctd.getAttribute("data-idx") : null;
+		let slctd = _rj.qs(".slctd");
+		let idx = slctd ? slctd.dataset.idx : null;
 		if (idx === null) { alert("Please select a file first."); return; }
-		var pth = encodeURI($(".slctd div:nth-child(3)").html());
-		var dlURL = "arcview.php?fref='.$fref.'&act=dnld&idx=" + idx + "&pth=" + pth;
+		let pth = encodeURI(_rj.qs(".slctd div:nth-child(3)").innerHTML);
+		let dlURL = "arcview.php?fref='.$fref.'&act=dnld&idx=" + idx + "&pth=" + pth;
 		dlFrame = document.createElement("iframe");
 		dlFrame.src = dlURL;
 		dlFrame.style.display = "none";
@@ -130,21 +130,22 @@ function display_archive ($av)
 	}
 	function view_entry (e) {
 		e.preventDefault();
-		var slctd = $(".slctd")[0];
-		var idx = slctd ? slctd.getAttribute("data-idx") : null;
+		let slctd = _rj.qs(".slctd");
+		let idx = slctd ? slctd.dataset.idx : null;
 		if (idx === null) { alert("Please select a file first."); return; }
-		$("#act").val("vue");
-		$("#idx").val(idx);
-		$("#pth").val($(".slctd div:nth-child(3)").html());
-		document.getElementById("actfrm").submit();
+		_rj.id("act").value = "vue";
+		_rj.id("idx").value = idx;
+		_rj.id("pth").value = _rj.qs(".slctd div:nth-child(3)").innerHTML;
+		_rj.id("actfrm").submit();
 	}
 	function iSelect (elm) {
-		$(".rTableRow").each(function(){ $(this).removeClass("slctd") });
-		$(elm).addClass("slctd");
+		_rj.qs(".rTableRow", true).forEach(e => e.classList.remove("slctd"));
+		elm.closest(".rTableRow").classList.add("slctd");
 	}
-	$(function() {
-		$(".rTableRow").click(function(){ iSelect(this) });
-	});';
+	_rj.ae(document, "DOMContentLoaded", () => 
+		_rj.qs(".rTableRow", true).forEach(elm => _rj.ae(elm, "click", (e) => iSelect(e.target)))
+	);
+';
 	$dsp->addScript($addScr);
 
 	$body = '
@@ -165,7 +166,7 @@ function display_archive ($av)
 	ob_end_clean();
 	$body .= '</div>';
 	
-	$scrt = '<script src="'.$jqlink.'"></script>';
+	$scrt = '<script src="//rjcrans.net/rjlibs/cmmn/common.js" type="text/javascript"></script>';
 	$dsp->display($body, $scrt);
 }
 

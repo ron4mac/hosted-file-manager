@@ -44,8 +44,8 @@ function postAction (act, parms={}, cb=()=>{}, json=false) {
 	.catch(err => alert(err));
 }
 
-function postAndRefresh (parms) {
-	postAction(null, parms, (data) => { if (data) alert(data); else refreshFilst() });
+function postAndRefresh (parms, cb=()=>{}) {
+	postAction(null, parms, (data) => { cb(); if (data) alert(data); else refreshFilst() });
 }
 
 function postFormAndRefresh (act) {
@@ -514,7 +514,7 @@ function doEditFile (fpath, intab) {
 	let pfx = '';
 	let ext = fpath.split('.').pop();
 	if (['htm', 'html'].indexOf(ext) >= 0) {
-		if (confirm('Use WYSIWYG html editor?')) pfx = 'h';
+		if (confirm('Use WYSIWYG html editor? Has the side effect of reformatting an original file with some possible loss of data. Would be best to first edit a copy of an original.')) pfx = 'h';
 	}
 	if (intab) {
 		editWindow = window.open(fmx_appPath+pfx+'filedwin.php?t=1&fref='+fpath, '_blank');
