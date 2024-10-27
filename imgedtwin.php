@@ -63,9 +63,9 @@ header('Cache-Control: no-cache');
 		.eeditor { width:100%;box-sizing:border-box; }
 		#snding { display:none; }
 	</style>
-	<script src="<?=$jqlink?>"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.0/cropper.min.js"></script>
 	<script src="//rjcrans.net/rjlibs/dlog/dialog.js" type="text/javascript"></script>
+	<script src="//rjcrans.net/rjlibs/cmmn/common.js" type="text/javascript"></script>
 	<script src="js/fmxui<?php echo $jsver; ?>.js" type="text/javascript"></script>
 	<script>
 		var imgfb = "<?php echo $frefp; ?>";
@@ -124,34 +124,6 @@ header('Cache-Control: no-cache');
 		function upSpinner (show) {
 			let csss = document.getElementById("snding");
 			csss.style.display = show ? "inline-block" : "none";
-		}
-		function save2srvr (thfn, mt) {
-			upSpinner(true);
-			cropper.getCroppedCanvas().toBlob((blob) => {
-			const formData = new FormData();
-			
-			formData.append('fpath', imgfb+thfn);
-			
-			// Pass the image file name as the third parameter if necessary.
-			formData.append('croppedImage', blob/*, 'example.png' */);
-
-			// send to server
-			$.ajax('imgedtwin.php', {
-				method: 'POST',
-				data: formData,
-				processData: false,
-				contentType: false,
-				success(data, textStatus, jqXHR) {
-					console.log('Upload success');
-					upSpinner(false);
-				},
-				error(jqXHR, textStatus, errorThrown) {
-					console.log('Upload error',jqXHR, textStatus, errorThrown);
-					upSpinner(false);
-					alert(errorThrown);
-				},
-			  });
-			}, mt || mtype);
 		}
 		const saveToServer = (rslt, fd=null) => {
 			upSpinner(true);
@@ -261,7 +233,7 @@ header('Cache-Control: no-cache');
 	</select>
 	<button onclick="download(event)">Download</button>
 	<button onclick="saveAs()">Save as ...</button>
-	<button onclick="save2srvr(imgfn)">Save</button>
+	<button onclick="saveToServer(imgfn)">Save</button>
 	<i id="snding" class="fa fa-spinner fa-pulse"></i>
 </div>
 <div class="content">

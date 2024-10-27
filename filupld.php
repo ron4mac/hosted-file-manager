@@ -13,7 +13,6 @@ $faccept = empty($fmx_upload_accept) ? '' : (' accept="'.$fmx_upload_accept.'"')
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <title>File Upload</title>
 <link rel="stylesheet" type="text/css" href="css/fmx.css" />
-<script src="<?=$jqlink?>"></script>
 <script src="//rjcrans.net/rjlibs/cmmn/common.js"></script>
 </head>
 <body>

@@ -5,7 +5,7 @@ if (PHP_VERSION_ID < 70000) die('PHP version 7+ required');
 // Developer mode
 $dev_mode = false;
 $jsver = $dev_mode ? '' : '.min';
-$jqlink = '//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery'.$jsver.'.js';
+//$jqlink = '//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery'.$jsver.'.js';
 
 // the version of ace editor to be used
 //$aceBase = '//cdnjs.cloudflare.com/ajax/libs/ace/1.4.13/';

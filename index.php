@@ -117,7 +117,6 @@ if (isset($_POST['cmdlin'])) {
 <link rel="stylesheet" type="text/css" href="css/css.php" />
 <link rel="stylesheet" href="//rjcrans.net/rjlibs/dlog/dialog.css" />
 <link rel="stylesheet" href="//rjcrans.net/rjlibs/cntx/context.css" />
-<!-- <script src="<?=$jqlink?>"></script> -->
 <script src="//rjcrans.net/rjlibs/cmmn/common.js" type="text/javascript"></script>
 <script src="//rjcrans.net/rjlibs/cntx/context.js" type="text/javascript"></script>
 <script src="//rjcrans.net/rjlibs/dlog/dialog.js" type="text/javascript"></script>

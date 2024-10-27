@@ -109,7 +109,7 @@ if (!empty($_POST['act'])) {
 
 function display_archive ($av)
 {
-	global $fref, $fpath, $jqlink;
+	global $fref, $fpath;
 
 	$dsp = new MyArchiveView(basename($fpath));
 
