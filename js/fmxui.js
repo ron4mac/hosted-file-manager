@@ -1,11 +1,11 @@
-/* globals $,RJ_DlogMgr */
-/* exported rjOpenDlg,rjCloseDlg,rjHtmlElement */
+/* globals RJ_DlogMgr, _rj */
+/* exported rjOpenDlg, rjCloseDlg, rjHtmlElement */
 'use strict';
 
 var fmx_ui = {
 	ddm: null,
 	mdl: null
-}
+};
 
 // apply esc and return keys to the modal
 //$(function() {
@@ -44,7 +44,8 @@ function rjHtmlElement (tag, attribs, inner, style) {
 	return elm;
 }
 
-_rj.ae(document,'click',e=>{
+// any document click hides an open dialog
+_rj.ae(document,'click', () => {
 	if (fmx_ui.ddm) {
 		fmx_ui.ddm.style.display = 'none';
 		fmx_ui.ddm = null;

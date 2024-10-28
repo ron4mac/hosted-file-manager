@@ -106,7 +106,8 @@ $html .= '<br style="clear:both" />';
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" /> -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@4.0/dist/fancybox.css" />
 <style>
 nav {font-size:larger;}
 .bckb {
@@ -169,11 +170,19 @@ nav {font-size:larger;}
 	font-size: large;
 }
 </style>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
 <!-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script> -->
-<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@4.0/dist/fancybox.umd.js"></script>
 <script src="js/echo.min.js"></script>
 <script>
+Fancybox.defaults.infinite = 0;
+Fancybox.defaults.showClass = false;
+Fancybox.defaults.hideClass = false;
+Fancybox.defaults.autoFocus = false;
+Fancybox.Plugins.Thumbs.defaults.autoStart = false;
+Fancybox.Plugins.Toolbar.defaults.display = ["zoom","slideshow","fullscreen","download","close"];
+
 function backc (colr) {
 	var elms = document.getElementsByClassName("aimg");
 	if (colr) {

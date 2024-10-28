@@ -1,5 +1,5 @@
 /* jshint unused: true, esnext:false, esversion: 11 */
-/* globals fmx_AJ, _rj, RJ_DlogMgr, rjOpenDlg, rjHtmlElement, curDir, fmx_ui, fmx_appPath, H5uSetup, upload_winpop, ctxPrf, URLSearchParams */
+/* globals fmx_AJ, _rj, RJ_DlogMgr, rjOpenDlg, rjHtmlElement, curDir, fmx_ui, fmx_appPath, H5uSetup, upload_winpop, fupQadd2, ctxPrf, URLSearchParams */
 /* exported refreshFilstO, allSelect, selectionAction, fils2up, ctxmenus */
 'use strict';
 function refreshFilst () {
@@ -7,7 +7,7 @@ function refreshFilst () {
 }
 
 function refreshFilstO (so) {
-	var wlp = window.location.href.split('#')[0].split('?');
+	let wlp = window.location.href.split('#')[0].split('?');
 	if (wlp[1]) {
 		window.location = wlp[0] + '?' + wlp[1].split('&')[0] + '&O=' + so;
 	} else {
@@ -138,8 +138,8 @@ var upldAction = {
 	};
 
 function downloadFile (A, cdl, asf) {
-	var dlURL = fmx_appPath+'fildnld.php?fle=' + encodeURI(A) + (cdl ? '&tcdl=1&rad=Y' : '') + (asf ? ('&asf='+asf) : '');
-	var dlframe = document.createElement('iframe');
+	let dlURL = fmx_appPath+'fildnld.php?fle=' + encodeURI(A) + (cdl ? '&tcdl=1&rad=Y' : '') + (asf ? ('&asf='+asf) : '');
+	let dlframe = document.createElement('iframe');
 	// set source to desired file
 	dlframe.src = dlURL;
 	// This makes the IFRAME invisible to the user.
@@ -149,10 +149,10 @@ function downloadFile (A, cdl, asf) {
 }
 
 function makeFileList (fstr, htm) {
-	var sep = htm ? '<br />' : ' ';
-	var rslt = '';
-	var itm, itms = fstr.split('\u0000');
-	var fpts, fdr, fpt, fpa, cdl = encodeURIComponent(curDir).length;
+	let sep = htm ? '<br />' : ' ';
+	let rslt = '';
+	let itm, itms = fstr.split('\u0000');
+	let fpts, fdr, fpt, fpa, cdl = encodeURIComponent(curDir).length;
 	for (itm in itms) {
 		fpts = itms[itm].split('&');
 		fdr = '';
@@ -172,7 +172,7 @@ function doesSupportAjaxUploadWithProgress () {
 	}
 
 	function supportAjaxUploadProgressEvents() {
-		var xhr = new XMLHttpRequest();
+		let xhr = new XMLHttpRequest();
 		return !! (xhr && (('upload' in xhr) && ('onprogress' in xhr.upload)));
 	}
 
@@ -181,9 +181,9 @@ function doesSupportAjaxUploadWithProgress () {
 
 function pop (url, h1, w1) {
 	if (w1>screen.availWidth) w1 = screen.availWidth;
-	var h2 = (screen.height-h1)/2;
-	var w2 = (screen.width-w1)/2;
-	var wcon='toolbar=no,status=no,location=no,menubar=no,resizable=0,scrollbars=1,width='+w1+',height='+h1+',left='+w2+',top='+h2;
+	let h2 = (screen.height-h1)/2;
+	let w2 = (screen.width-w1)/2;
+	let wcon='toolbar=no,status=no,location=no,menubar=no,resizable=0,scrollbars=1,width='+w1+',height='+h1+',left='+w2+',top='+h2;
 	return window.open(url, '', wcon);
 }
 
@@ -193,9 +193,9 @@ function popPost (url, data, name, h1, w1) {
 	for (key in data) { flds += '<input type="hidden" name="'+key+'" value="'+data[key]+'" />'; }
 	let ppf = rjHtmlElement('form', {action: url, method: 'post', target: name}, flds);
 	document.body.appendChild(ppf);
-	var h2 = (screen.height-h1)/2;
-	var w2 = (screen.width-w1)/2;
-	var wcon='toolbar=no,status=no,location=no,menubar=no,resizable=0,scrollbars=1,width='+w1+',height='+h1+',left='+w2+',top='+h2;
+	let h2 = (screen.height-h1)/2;
+	let w2 = (screen.width-w1)/2;
+	let wcon='toolbar=no,status=no,location=no,menubar=no,resizable=0,scrollbars=1,width='+w1+',height='+h1+',left='+w2+',top='+h2;
 	window.open('', name, wcon).focus();
 	ppf.submit();
 }
@@ -267,7 +267,7 @@ function doMenuAction (cmd,evt) {
 		break;
 	case 'mmiz':
 		if (oneItem()) {
-			var fn = curFref;
+			let fn = curFref;
 			RJ_DlogMgr.fetchDlog('jsmini.php?f='+encodeURIComponent(fn), {title:'Minimize javascript file...'});
 		}
 		break;
@@ -313,7 +313,7 @@ function doMenuAction (cmd,evt) {
 		break;
 	case 'srhf':
 	case 'srhc':
-		var strm = sessionStorage.fmx_strmf;
+		let strm = sessionStorage.fmx_strmf;
 		if (cmd=='srhc') {
 			strm = sessionStorage.fmx_strmc;
 			aSchDlg.title = 'Search files for content...';
@@ -376,7 +376,7 @@ function doMenuAction (cmd,evt) {
 			curfn = /*curDir+*/curFref;
 			trmFrm = document.forms.cliterm;
 			if (cmd=='zip') {
-				var zcmd = 'zip ';
+				let zcmd = 'zip ';
 				if (slctd[0].parentElement.nextElementSibling.classList.contains('foldCtxt')) { zcmd += '-r '; }
 				destfn = curfn.replace(/\s/g,'_');
 				trmFrm.cmdlin.value = zcmd+destfn+'.zip "'+curfn+'"';
@@ -399,7 +399,7 @@ function doMenuAction (cmd,evt) {
 	case 'mgzp':
 		if (oneItem()) {
 			curfn = /*curDir+*/curFref;
-			var fileoi = encodeURIComponent(curDir+curfn);
+			let fileoi = encodeURIComponent(curDir+curfn);
 			doManageZip(fileoi);
 		}
 		break;
@@ -411,7 +411,7 @@ function doMenuAction (cmd,evt) {
 				if (xyz) { curfn = xyz; }
 				else break;
 			}
-			var wPath = ctxPrf+curDir.slice(curDir.search('/'));
+			let wPath = ctxPrf+curDir.slice(curDir.search('/'));
 			pop(wPath+curfn,screen.availHeight,0.6*screen.availWidth);
 		}
 		break;
@@ -428,7 +428,7 @@ function doMenuAction (cmd,evt) {
 	case 'jxtr':
 		if (oneItem()) {
 			curfn = curDir+curFref;
-			var m = curfn.match(/([^\/\\]+)\.(\w+)$/);
+			let m = curfn.match(/([^\/\\]+)\.(\w+)$/);
 			if (m && m[2] == 'xml') {
 				parms = {act: 'jxtr', fref: curfn, dir: curDir};
 				postAction(null, parms, (data) => {if (data) alert(data);});
@@ -441,7 +441,7 @@ function doMenuAction (cmd,evt) {
 			if (scnt) {
 				parms = '?dbf='+curDir+curFref;
 			}
-			var fvurl = fmx_appPath+'pla/phpliteadmin.php'+parms;
+			let fvurl = fmx_appPath+'pla/phpliteadmin.php'+parms;
 			pop(fvurl,screen.availHeight,screen.availWidth*0.8);
 		}
 		break;
@@ -507,7 +507,7 @@ function doRenameFile (fpath, evt) {
 	});
 }
 function doViewFile (fpath) {
-	var fvurl = fmx_appPath+'filwin.php?fref='+fpath;
+	let fvurl = fmx_appPath+'filwin.php?fref='+fpath;
 	pop(fvurl,675,900);
 }
 function doEditFile (fpath, intab) {
@@ -563,7 +563,7 @@ function fils2up () {
 		alert('Please enter a command.');
 		return false;
 	} else {
-		var cmd = document.cliterm.cmdlin.value;
+		let cmd = document.cliterm.cmdlin.value;
 		if (cmd.indexOf('$$')>0) {
 			document.cliterm.cmdlin.value = cmd.replace('$$', makeFileList(sessionStorage.fmx_mrkd, false));
 		}
@@ -573,7 +573,7 @@ function fils2up () {
 }
 
 function selectionAction (fedt) {
-	var sel = '';
+	let sel = '';
 	if (window.getSelection !== 'undefined') {
 		sel = window.getSelection();
 	} else if (document.selection !== 'undefined') {
@@ -581,18 +581,18 @@ function selectionAction (fedt) {
 			sel = document.selection.createRange().text;
 		}
 	}
-	var fpth = curDir+sel;
+	let fpth = curDir+sel;
 	if (fedt) { doEditFile(fpth); }
 	else { doViewFile(fpth); }
 }
 
 function display_cmmStorage (stor) {
 	if (!stor) { alert('[ empty ]'); return; }
-	var disp = '';
-	var pecs = stor.split('\u0000');
-	for (var x in pecs) {
-		var prts = decodeURIComponent(pecs[x]).split('&');
-		for (var i=0; i<prts.length; i++) {
+	let disp = '';
+	let pecs = stor.split('\u0000');
+	for (let x in pecs) {
+		let prts = decodeURIComponent(pecs[x]).split('&');
+		for (let i=0; i<prts.length; i++) {
 			if (i>0) disp += '    ';
 			disp += prts[i] + '\n';
 		}
@@ -631,11 +631,11 @@ function bump_mcount (mid, num) {
 
 // context menu actions
 function cm_del (itm, fld) {
-	var fle = itm.closest('[data-fref]').dataset.fref;
-	var ctx = fld ? 'folder and contents' : 'file';
+	let fle = itm.closest('[data-fref]').dataset.fref;
+	let ctx = fld ? 'folder and contents' : 'file';
 	if (confirm('Are you sure you want to delete this '+ctx+': '+fle+' ?')) {
 	//	postAndRefresh('act=delf&dir='+encodeURIComponent(curDir)+'&files[]='+fle);
-		var parms = {
+		let parms = {
 			act: 'delf',
 			dir: curDir,
 			'files[]': fle
@@ -644,7 +644,7 @@ function cm_del (itm, fld) {
 	}
 }
 function cm_dld (itm, fld) {
-	var parms = {
+	let parms = {
 		act: 'dnld',
 		dir: curDir,
 		'files[]': itm.closest('[data-fref]').dataset.fref + (fld?'/':'')
@@ -657,22 +657,22 @@ function cm_dld (itm, fld) {
 		true);
 }
 function cm_dup (itm) {
-	var parms = {
+	let parms = {
 		act: 'dupl',
 		fref: curDir + itm.closest('[data-fref]').dataset.fref
 		};
 	postAndRefresh(parms);
 }
 function cm_ren (itm) {
-	var curfn = itm.closest('[data-fref]').dataset.fref;
+	let curfn = itm.closest('[data-fref]').dataset.fref;
 	doRenameFile(curfn, event);
 }
 function cm_zip (itm, fld) {
-	var curfn = itm.closest('[data-fref]').dataset.fref;
-	var trmFrm = document.forms.cliterm;
-	var zcmd = 'zip ';
+	let curfn = itm.closest('[data-fref]').dataset.fref;
+	let trmFrm = document.forms.cliterm;
+	let zcmd = 'zip ';
 	if (fld) { zcmd += '-r '; }
-	var destfn = curfn.replace(/\s/g,'_');
+	let destfn = curfn.replace(/\s/g,'_');
 	trmFrm.cmdlin.value = zcmd+destfn+'.zip "'+curfn+'"';
 	trmFrm.submit();
 }
@@ -681,19 +681,19 @@ function cm_slnk () {
 		alert('Mark something to link first');
 		return;
 	}
-	var itms = sessionStorage.fmx_mrkd.split('\u0000');
+	let itms = sessionStorage.fmx_mrkd.split('\u0000');
 	if (itms.length != 1) {
 		alert('Can SymLink to only one location at a time');
 		return;
 	}
-	var fpts = itms[0].split('&');
-	var prts = fpts[0].split('=');
-	var dir = prts[1].replace(/%2F/g,'/');
+	let fpts = itms[0].split('&');
+	let prts = fpts[0].split('=');
+	let dir = prts[1].replace(/%2F/g,'/');
 	prts = fpts[1].split('=');
-	var fil = prts[1].replace(/%2F/g,'/');
-	var lnkn = prompt('Link to marked:', '');
+	let fil = prts[1].replace(/%2F/g,'/');
+	let lnkn = prompt('Link to marked:', '');
 	if (lnkn===null) return;
-	var parms = {
+	let parms = {
 		act: 'slnk',
 		fref: dir+'/'+fil,
 		tref: curDir,
@@ -822,13 +822,13 @@ const fmx_init = () => {
 
 	// let's try file drag-n-drop
 	// now defunct, I guess
-//	window.filesDrop = new FileDropper(document.getElementById('filsform'), (fils) => upldAction.H5o(()=>fupQadd2(fils)) );
+	window.filesDrop = new FileDropper(_rj.id('filsform'), (fils) => upldAction.H5o(()=>fupQadd2(fils)) );
 };
 
 // start things up after DOM loaded
 document.addEventListener('DOMContentLoaded', () => fmx_init());
 
-/*
+
 // some reusable classes
 class FileDropper {
 	constructor(elm, cb) {
@@ -858,4 +858,4 @@ class FileDropper {
 		}
 	}
 }
-*/
+

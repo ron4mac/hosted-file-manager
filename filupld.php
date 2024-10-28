@@ -25,7 +25,7 @@ $faccept = empty($fmx_upload_accept) ? '' : (' accept="'.$fmx_upload_accept.'"')
 <input type="hidden" name="w" value="1">
 <?php endif; ?>
 <div id="files" style="display:grid">
-	<input type="file" name="user_file[]" id="upload_field" multiple="multiple"<?=$faccept?> required />
+	<input type="file" name="user_file[]" id="upload_field" multiple<?=$faccept?> required />
 	<br /><label><input type="checkbox" name="ovrok" value="on" style="margin-right:5px;vertical-align:text-top" />Overwrite same-named server files</label>
 </div>
 <hr />
@@ -46,10 +46,7 @@ $faccept = empty($fmx_upload_accept) ? '' : (' accept="'.$fmx_upload_accept.'"')
 
 	function appendFileSel (curelm) {
 		curelm.removeEventListener('change', cgact);
-		let fs = document.createElement('input');
-		fs.type = 'file';
-		fs.name = 'user_file[]';
-		fs.multiple = true;
+		let fs = _rj.element('input', {type:'file', name:'user_file[]', multiple:''});
 		_rj.ae(fs, 'change', cgact);
 		curelm.after(fs);
 	}
