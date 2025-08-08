@@ -189,35 +189,19 @@ fclose($fh_res);
 	case 'jsmm':
 		$ccp = $_POST['CC'];
 		$ccp['js_code'] = file_get_contents($baseDir.$_POST['path'].$_POST['up_fn']);
-		$pdat = http_build_query($ccp).'&output_info=compiled_code&output_info=warnings&output_info=errors&output_info=statistics';
-		$fdat = curld('https://closure-compiler.appspot.com/compile', $pdat);
-		$rdat = json_decode($fdat);		//file_put_contents('RDAT.txt', print_r($rdat, true));
-		if (isset($rdat->errors)) {
-			foreach ($rdat->errors as $cperr) {
-				echo $cperr->type;
-				echo "\n".$cperr->error;
-				echo "\n\nLine: ".$cperr->lineno;
-				echo ' Char: '.$cperr->charno;
-				echo "\n".trim($cperr->line);
-			}
-			return;
-		}
-		if (isset($rdat->warnings)) {
-			foreach ($rdat->warnings as $cpwrn) {
-				echo $cpwrn->type;
-				echo "\n".$cpwrn->warning;
-				echo "\n\nLine: ".$cpwrn->lineno;
-				echo ' Char: '.$cpwrn->charno;
-				echo "\n".trim($cpwrn->line);
-			}
-		}
-		if (isset($rdat->compiledCode) && $rdat->compiledCode) {
+		$pdat = http_build_query($ccp);	//.'&output_info=compiled_code&output_info=warnings&output_info=errors&output_info=statistics';
+		$fdat = curld('https://rjcransdev.com/jsminify/index.php', $pdat);
+	//	file_put_contents('JSMINI.txt',print_r($fdat,true)); break;
+		$rdat = json_decode($fdat);
+		if (isset($rdat->code)) {
 			$rmjsdoc = isset($_POST['rmjsdoc']);
-			if ($rmjsdoc) $rdat->compiledCode = preg_replace('#/\*.+\*/[\s]*#s', '', $rdat->compiledCode);
-			file_put_contents($baseDir.$_POST['path'].$_POST['tofile'], $rdat->compiledCode);
+			if ($rmjsdoc) $rdat->code = preg_replace('#/\*.+\*/[\s]*#s', '', $rdat->code);
+			file_put_contents($baseDir.$_POST['path'].$_POST['tofile'], $rdat->code);
 		} else {
-			$erm = $rdat->serverErrors[0]->error;
-			echo "Minification was not possible.\n" . $erm;
+			echo "Minification was not possible.\n";
+			foreach ($rdat as $k => $v) {
+				echo "$k: $v\n";
+			}
 		}
 		break;
 	case 'mvto':
@@ -363,6 +347,7 @@ function curld ($url, $data='') {
 	curl_setopt($ch, CURLOPT_PORT , 443);
 	curl_setopt($ch, CURLOPT_POST, 1);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
 	if ($data) curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 	$rData = curl_exec($ch);
 	if (curl_errno($ch)) {

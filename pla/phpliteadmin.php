@@ -2,7 +2,7 @@
 //	Project: phpLiteAdmin (https://www.phpliteadmin.org/)
 //	Version: 1.9.9.1-dev
 //	Summary: PHP-based admin tool to manage SQLite2 and SQLite3 databases on the web
-//	Last updated: 2025-02-26
+//	Last updated: 2025-03-10
 //	Developers:
 //	   Dane Iracleous (daneiracleous@gmail.com)
 //	   Ian Aldrighetti (ian.aldrighetti@gmail.com)
@@ -2370,7 +2370,7 @@ if (is_readable($config_filename))
 
 //constants 1
 define("PROJECT", "phpLiteAdmin");
-define("VERSION", "1.9.9.1-dev");
+define("VERSION", "1.9.9.2-dev");
 define("FORCETYPE", false); //force the extension that will be used (set to false in almost all circumstances except debugging, possible values: false, "PDO", "SQLite3", "SQLiteDatabase")
 define("SYSTEMPASSWORD", $password); // Makes things easier.
 define('PROJECT_URL','https://www.phpliteadmin.org/');
@@ -4743,7 +4743,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 						if($target_table_type == 'table' && $db->isWritable() && $db->isDirWritable())
 						{
 							echo $tdWithClass;
-							echo "<input type='checkbox' name='check[]' value='".htmlencode($pk)."' id='check_".htmlencode($i)."'/>";
+							echo "<input type='checkbox' name='check[]' value='".htmlencode($pk)."' id='check_".$i."'/>";
 							echo "</td>";
 							echo $tdWithClass;
 							// -g-> Here, we need to put the PK in as the link for both the edit and delete.
@@ -5833,7 +5833,7 @@ if(!$target_table && !isset($_GET['confirm']) && (!isset($_GET['action']) || (is
 
 				echo "<tr>";
 				echo $tdWithClass;
-				echo "<input type='checkbox' name='check[]' value='".htmlencode($tableName)."' id='check_".htmlencode($tableId)."'/>";
+				echo "<input type='checkbox' name='check[]' value='".htmlencode($tableName)."' id='check_".$tableId."'/>";
 				echo "</td>";
 				echo $tdWithClassLeft;
 				echo $params->getLink(array('table'=>$tableName, 'action'=>'row_view'), htmlencode($tableName));

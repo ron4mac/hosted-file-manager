@@ -377,7 +377,7 @@ function doMenuAction (cmd,evt) {
 			trmFrm = document.forms.cliterm;
 			if (cmd=='zip') {
 				let zcmd = 'zip ';
-				if (slctd[0].parentElement.nextElementSibling.classList.contains('foldCtxt')) { zcmd += '-r '; }
+				if (slctd[0].parentElement.nextElementSibling.dataset.ctx=='fldCtx') { zcmd += '-r '; }
 				destfn = curfn.replace(/\s/g,'_');
 				trmFrm.cmdlin.value = zcmd+destfn+'.zip "'+curfn+'"';
 				if (evt.shiftKey) {

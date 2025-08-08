@@ -45,7 +45,13 @@ $btnttl = 'Submit';
 		fData.append('path', curDir);
 		fetch(fmx_AJ, {method:'POST', body: fData})
 		.then(resp => resp.text())
-		.then(txt => { if (txt) alert(txt); else refreshFilst(); })
+		.then(txt => {
+			if (txt) {
+				let dlg = _rj.id('uplfrm').closest('dialog');
+				dlg.close();
+				alert(txt);
+			} else refreshFilst();
+		})
 		.catch(err => alert(err));
 
 		frm.do_upload.disabled = true;

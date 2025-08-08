@@ -296,7 +296,7 @@ if ($scn !== false) {
 }
 if ($dFiles === false) {
 	$error = error_get_last();
-	echo '<span style="color:red">Could not read directory: '.$dDir.'<br />Error: '.$error['message'].'</span>';	//Error("Could not read directory $rDir: $!");
+	echo '<span style="color:red">Could not read directory: '.$rDir.'<br />Error: '.$error['message'].'</span>';	//Error("Could not read directory $rDir: $!");
 }
 if ($dFiles) {
 	if (strpos('nms', $srtBy[0])) usort($dFiles, 'cmpF'.$srtBy);
