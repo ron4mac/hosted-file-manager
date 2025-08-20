@@ -189,9 +189,10 @@ fclose($fh_res);
 	case 'jsmm':
 		$ccp = $_POST['CC'];
 		$ccp['js_code'] = file_get_contents($baseDir.$_POST['path'].$_POST['up_fn']);
+		$ccp['js_name'] = $_POST['up_fn'];
 		$pdat = http_build_query($ccp);	//.'&output_info=compiled_code&output_info=warnings&output_info=errors&output_info=statistics';
 		$fdat = curld('https://rjcransdev.com/jsminify/index.php', $pdat);
-	//	file_put_contents('JSMINI.txt',print_r($fdat,true)); break;
+	//	file_put_contents('JSMINI.txt',print_r($fdat,true)); //break;
 		$rdat = json_decode($fdat);
 		if (isset($rdat->code)) {
 			$rmjsdoc = isset($_POST['rmjsdoc']);
@@ -199,9 +200,7 @@ fclose($fh_res);
 			file_put_contents($baseDir.$_POST['path'].$_POST['tofile'], $rdat->code);
 		} else {
 			echo "Minification was not possible.\n";
-			foreach ($rdat as $k => $v) {
-				echo "$k: $v\n";
-			}
+			echo $rdat->error;
 		}
 		break;
 	case 'mvto':
