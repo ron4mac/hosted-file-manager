@@ -138,7 +138,7 @@ function commitReveal ()
 	$commits = `git log --branches --not --remotes`;
 	if ($commits) {
 		echo '<details><summary>Unpublished commits</summary>';
-		echo '<xmp>', $commits, '</xmp>';
+		echo '<xmp class="unpub">', $commits, '</xmp>';
 		echo '</details>';
 	}
 }
@@ -228,10 +228,10 @@ header('Cache-Control: no-cache');
 		.cmmsg {width:40em;}
 		.rslt {border:1px solid #CCC; background-color:#FEF; padding:0 6px;}
 		.stat {border:1px solid #CCC; background-color:#FFE; padding:0 6px 10px 6px;}
-		.cnfg {border:1px solid #CCC; background-color:#EFF; padding:0 6px;}
+		details .cnfg {border:1px solid #CCC; background-color:#EFF; padding:0 6px;}
 		.remo {border:1px solid #CCC; background-color:#F0F0F0; padding:0 6px; line-height:1.5em;}
 		xmp {margin:4px 0;}
-		details xmp {
+		details .unpub {
 			padding: 4px 6px 10px 6px;
 			border: 1px solid #CCC;
 			background-color: bisque;
@@ -259,8 +259,8 @@ header('Cache-Control: no-cache');
 	<?php else: ?>
 	<br>
 	<?php endif; ?>
-	<br><?php commitReveal() ?>
-	Status
+	<?php commitReveal() ?>
+	<br>Status
 	<div class="stat">
 		<xmp><?php echo `git fetch origin; git status`; ?></xmp>
 		<?php $sact = statusAction(); echo $sact; ?>
@@ -280,9 +280,11 @@ header('Cache-Control: no-cache');
 		</div>
 	</div>
 	</form>
-	<br>Config
-	<div class="cnfg">
-		<xmp><?php echo `git config -l`; ?></xmp>
-	</div>
+	<br><details>
+		<summary>Config</summary>
+		<div class="cnfg">
+			<xmp><?php echo `git config -l`; ?></xmp>
+		</div>
+	</details>
 </body>
 </html>
