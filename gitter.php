@@ -133,6 +133,16 @@ function ckBox ($v, $n=null)
 	return '<input type="checkbox"'.($n ? (' name="'.$n.'"') : '').' value="'.$v.'"> ';
 }
 
+function commitReveal ()
+{
+	$commits = `git log --branches --not --remotes`;
+	if ($commits) {
+		echo '<details><summary>Unpublished commits</summary>';
+		echo '<xmp>', $commits, '</xmp>';
+		echo '</details>';
+	}
+}
+
 function statusAction ()
 {
 	$stats = explode("\x00", `git status -z` ?: '');
@@ -221,6 +231,11 @@ header('Cache-Control: no-cache');
 		.cnfg {border:1px solid #CCC; background-color:#EFF; padding:0 6px;}
 		.remo {border:1px solid #CCC; background-color:#F0F0F0; padding:0 6px; line-height:1.5em;}
 		xmp {margin:4px 0;}
+		details xmp {
+			padding: 4px 6px 10px 6px;
+			border: 1px solid #CCC;
+			background-color: bisque;
+		}
 	</style>
 </head>
 <body>
@@ -244,7 +259,8 @@ header('Cache-Control: no-cache');
 	<?php else: ?>
 	<br>
 	<?php endif; ?>
-	<br>Status
+	<br><?php commitReveal() ?>
+	Status
 	<div class="stat">
 		<xmp><?php echo `git fetch origin; git status`; ?></xmp>
 		<?php $sact = statusAction(); echo $sact; ?>

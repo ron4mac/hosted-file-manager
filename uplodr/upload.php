@@ -35,7 +35,7 @@ class Up_Load
 				echo 'Stored as: ' . $this->as_file;
 			}
 		}
-		catch (Exception $e) {
+		catch (\Throwable $e) {
 			header('HTTP/1.1 '.(400+$e->getCode()).' Failed to store file');
 			echo 'Error storing file: ' . $e->getMessage();
 		}

@@ -4,6 +4,10 @@ body.fmgt, html {background-color: #E0E0FF}
 .upld-body {background-color:#E7FFFF}
 .upldr {margin:10px}
 
+#filsform {
+	padding-bottom: 1.5em;
+}
+
 span.pathbread {
 	font-size: 1.3em;
 }

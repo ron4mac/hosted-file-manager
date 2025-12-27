@@ -636,7 +636,7 @@ class Database
 			}
 			$this->query("PRAGMA foreign_keys = ON");
 		}
-		catch(Exception $e)
+		catch(\Throwable $e)
 		{
 			$this->showError();
 			exit();

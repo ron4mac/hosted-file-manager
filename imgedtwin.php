@@ -19,7 +19,7 @@ if (!empty($_FILES['croppedImage'])) {
 		} else {
 			throw new Exception($upld_err_txt[$upf['error']], $upf['error']);
 		}
-	} catch (Exception $e) {
+	} catch (\Throwable $e) {
 		header('HTTP/1.0 406 '.$e->getMessage(), true, 406);
 	}
 	exit();
