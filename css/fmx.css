@@ -135,6 +135,9 @@ dialog.rj_dlog {
 dialog.rj_dlog.updlg {
 	min-width: 400px;
 }
+dialog.rj_dlog.inert:focus {
+	outline: none;
+}
 dialog .dlg-fname {
 	width: 18rem;
 }

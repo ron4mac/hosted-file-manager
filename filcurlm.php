@@ -8,7 +8,7 @@ $curl_url = '';
 ?>
 <div id="uplfrm" style="margin:12px">
 	<p><?=$curl_msg?></p>
-	<form id="upform" name="upform" method="post">
+	<form id="upform" name="upform" method="post" autocapitalize="off" spellcheck="false">
 		<input type="hidden" id="up_fpath" name="up_fpath" value="" />
 		<div class="ffld"><label>URL: <input type="text" name="url" id="curlurl" style="width:100%;box-sizing:border-box" value="<?=$curl_url?>" required /></label></div>
 		<div class="ffld">

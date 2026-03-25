@@ -342,12 +342,12 @@ function doMenuAction (cmd,evt) {
 	case 'turl':
 		// curl a file to a URL
 		if (oneItem()) {
-			RJ_DlogMgr.fetchDlog(fmx_appPath+'filcurlm.php?t=1', {title:'Send file to URL ...'});
+			RJ_DlogMgr.fetchDlog(fmx_appPath+'filcurlm.php?t=1', {title:'Send file to URL ...', class: ' inert'});
 		}
 		break;
 	case 'furl':
 		// curl a file from a URL
-		RJ_DlogMgr.fetchDlog(fmx_appPath+'filcurlm.php', {title:'Get file from URL ...'});
+		RJ_DlogMgr.fetchDlog(fmx_appPath+'filcurlm.php', {title:'Get file from URL ...', class: ' inert'});
 		break;
 	case 'mdya':
 		pop(fmx_appPath+'media.php?sd=/'+sessionStorage.fmx_curD,screen.availHeight,1200);
@@ -461,7 +461,8 @@ function doMenuAction (cmd,evt) {
 							parms = {act: 'updt', nver: updt[1]};
 							postAndRefresh(parms);
 						}
-					}
+					},
+					class: ' inert'
 				});
 			};
 		postAction('fmxi', {}, resp, true);

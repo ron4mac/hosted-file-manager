@@ -383,7 +383,7 @@ if ($dFiles) {
 		<form name="cliterm" method="post">
 		<input type="hidden" name="dir" value="<?php echo $pDir ?>" />
 		<input type="hidden" name="mcmdlin" value="" />
-		Command: <input type="text" id="cmdlin" name="cmdlin" size="80" maxlength="512" />
+		Command: <input type="text" id="cmdlin" name="cmdlin" size="80" maxlength="512" autocapitalize="off" spellcheck="false" />
 		<input type="button" name="doCmd" value="Do it" onclick="fils2up()" />
 		<a href="#" data-mnu="cmcs">?</a>
 		</form>
@@ -408,15 +408,15 @@ if ($dFiles) {
 		<span class="ffld aMsg">{msg}</span>
 	</div>
 	<div id="aSchDlog">
-		<input type="text" class="ffld dlgitxt" name="sterm" maxlength="80" required />
+		<input type="text" class="ffld dlgitxt" name="sterm" maxlength="80" autocapitalize="off" spellcheck="false" required />
 		<input type="hidden" name="cmd" />
 	</div>
 	<div id="fRenDlog">
-		<input type="text" name="nunam" class="ffld dlg-fname" maxlength="80" required />
+		<input type="text" name="nunam" class="ffld dlg-fname" maxlength="80" autocapitalize="off" spellcheck="false" required />
 		<input type="hidden" name="oldnm" />
 	</div>
 	<div id="fNamDlog" title="{ttl}">
-		<input type="text" name="fref" class="ffld dlg-fname" maxlength="80" required />
+		<input type="text" name="fref" class="ffld dlg-fname" maxlength="80" autocapitalize="off" spellcheck="false" required />
 		<input type="hidden" name="act" value="{act}" />
 	</div>
 </div>

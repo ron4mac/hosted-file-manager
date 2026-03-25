@@ -41,5 +41,6 @@
 "js/jqContext.min.js",
 "js/jqModal.js",
 "js/jqModal.min.js",
-"htmled/tinymce/"
+"htmled/tinymce/",
+"BBB.txt"
 ]
