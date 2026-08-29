@@ -471,11 +471,13 @@ function doMenuAction (cmd,evt) {
 		postAction('CLIC', {}, (data) => {
 			let fpop = _rj.id('footerPop');
 			let utl = rjHtmlElement('div', {id: 'util-view'}, data);
-			utl.addEventListener('click', (e) => {
-					document.getElementById('cmdlin').value = e.target.closest('[data-cmd]').dataset.cmd;
-					fpop.removeChild(utl);
-				}
-			);
+			utl.addEventListener('pointerup', (e) => {
+				document.getElementById('cmdlin').value = e.target.closest('[data-cmd]').dataset.cmd;
+				fpop.removeChild(utl);
+			});
+			window.addEventListener('pointerup', (evt) => {
+				fpop.removeChild(utl);
+			}, { once: true });
 			utl.style.left = (evt.pageX+8) + 'px';
 			fpop.appendChild(utl);
 			utl.style.top = (-utl.clientHeight+8) + 'px';
