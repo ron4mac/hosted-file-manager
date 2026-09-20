@@ -1,5 +1,14 @@
 <?php
 include 'fmx.ini';
+
+//spl_autoload_register(function ($className) {
+//	$path = str_replace('\\', DIRECTORY_SEPARATOR, $className);
+//	$file = __DIR__ . '/' . $path . '.php';
+//	if (file_exists($file)) {
+//		require_once $file;
+//	}
+//});
+
 if ($fmxInJoomla) {
 	if (isset($this)) {
 		$userN = $this->user->id;
@@ -14,9 +23,9 @@ if ($fmxInJoomla) {
 $cookie = isset($_COOKIE[$cooknam]) ? $_COOKIE[$cooknam] : null;
 if (!$cookie) { exit('Unauthorized'); }
 $baseDir = convert_uudecode($cookie).'/';
-$fmxVersion = '3.6.8 - August 2026';
+$fmxVersion = '3.7.0 - September 2026';
 
-function FileMimeType ($fpath)
+function FileMimeType ($fpath): string|false
 {
 	$mtyp = 'text/plain';
 	if (function_exists('finfo_file')) {
@@ -32,11 +41,11 @@ function FileMimeType ($fpath)
 		if (!$rslt) $mtyp = $sf;
 	}
 	// workaround for php mis-interpretation of svg file
-	if ($mtyp=='image/svg') $mtyp = 'image/svg+xml';
+	if ($mtyp=='image/svg') return 'image/svg+xml';
 	return $mtyp;
 }
 
-function return_bytes ($val)
+function return_bytes ($val): int
 {
 	$val = trim($val);
 	$last = strtolower($val[strlen($val)-1]);
@@ -49,7 +58,7 @@ function return_bytes ($val)
 	return $val;
 }
 
-function int2kmg (int $val)
+function int2kmg (int $val): string|int
 {
 	$sz = $val;
 	if ($sz > 1073741824) {$sz = sprintf('%.1f', ($sz / 1073741824)). 'g';}

@@ -18,60 +18,24 @@ switch ($_POST['act']) {
 		if ($rslt) echo $rslt;
 		break;
 	case 'crlg':
-		$save_path = $_POST['path'];
-		$url = $_POST['url'];
-		$fullfile = $baseDir.$save_path.basename($url);
-		$fexists = file_exists($fullfile);	//remember that the file already existed
-		if ($fexists) {
-			echo basename($fullfile).' already exists here';
-			break;
-		}
-		$fp = fopen($fullfile, 'w');
-		$ch = curl_init($url);
-		curl_setopt($ch, CURLOPT_FILE, $fp);
-		curl_setopt($ch, CURLOPT_FAILONERROR, true);
-		curl_setopt($ch, CURLOPT_FILETIME, true);
-		if (isset($_POST['user']) && isset($_POST['pass'])) curl_setopt($ch, CURLOPT_USERPWD, $_POST['user'].':'.$_POST['pass']);
-		$rslt = curl_exec($ch);
-		$msg = curl_error($ch);
-		$ftime = curl_getinfo($ch, CURLINFO_FILETIME);
-		curl_close($ch);
-		fclose($fp);
-		if ($msg) {
-			if (!$fexists) @unlink($fullfile);	//remove the file
-			echo $msg;
-		} else {
-			if ($ftime > 0) touch($fullfile, $ftime);
-		}
-		break;
 	case 'crlp':
 		$save_path = $_POST['path'];
 		$url = $_POST['url'];
 		$fullfile = $baseDir.$save_path.basename($url);
 		$fexists = file_exists($fullfile);	//remember that the file already existed
-		if ($fexists) {
+
+
+
+
+
+
+
+
+if ($fexists) {
 			echo basename($fullfile).' already exists here';
 			break;
 		}
-/*
-$url_path_str = 'http://my_url';
-$file_path_str = '/my_file_path';
-
-$ch = curl_init();
-
-curl_setopt($ch, CURLOPT_URL, ''.$url_path_str.'');
-curl_setopt($ch, CURLOPT_PUT, 1);
-
-$fh_res = fopen($file_path_str, 'r');
-
-curl_setopt($ch, CURLOPT_INFILE, $fh_res);
-curl_setopt($ch, CURLOPT_INFILESIZE, filesize($file_path_str));
-
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-$curl_response_res = curl_exec ($ch);
-fclose($fh_res);
-*/
-		$fp = fopen($fullfile, 'w');
+$fp = fopen($fullfile, 'w');
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_FILE, $fp);
 		curl_setopt($ch, CURLOPT_FAILONERROR, true);
@@ -83,7 +47,7 @@ fclose($fh_res);
 		curl_close($ch);
 		fclose($fp);
 		if ($msg) {
-			if (!$fexists) @unlink($fullfile);	//remove the file
+			@unlink($fullfile);	//remove the file
 			echo $msg;
 		} else {
 			if ($ftime > 0) touch($fullfile, $ftime);
@@ -117,7 +81,7 @@ fclose($fh_res);
 		$trshs = @scandir($trd);
 		if (!$trshs) break;
 		foreach ($trshs as $trsh) {
-			if ($trsh=='.' || $trsh=='..') continue;
+			if ($trsh === '.' || $trsh === '..') continue;
 			recursiveDelete($trd.$trsh, true);
 		}
 		break;
@@ -131,7 +95,7 @@ fclose($fh_res);
 	case 'dnld':
 		$path = escapeshellcmd($_POST['dir']);
 		$files = $_POST['files'];
-		if (count($files)==1) {
+		if (count($files) === 1) {
 			$sfil = $files[0];
 			if ($sfil[strlen($sfil)-1]!=='/') {
 				echo json_encode(['fpth' => $path."/$sfil"]);
@@ -256,7 +220,7 @@ fclose($fh_res);
 		$bk = 0;
 		$lfr = $droot.urldecode($_POST['fref']);
 		$lat = $lad = $droot.$_POST['tref'];
-		while (substr($lfr, 0, strlen($lat)) != $lat) {
+		while (substr($lfr, 0, strlen($lat)) !== $lat) {
 			$lat = dirname($lat);
 			$bk++;
 		}
@@ -286,13 +250,13 @@ fclose($fh_res);
 		echo $_POST['act'];
 }
 
-function recursiveDelete ($pstr, $dlnk=false) {
+function recursiveDelete ($pstr, $dlnk=false): void {
 	if ($dlnk && is_link($pstr)) { @unlink($pstr); }
 	elseif (is_file($pstr)) { @unlink($pstr); }
 	elseif (is_dir($pstr)) {
 		$dh = opendir($pstr);
 		while ($node = readdir($dh)) {
-			if ($node != '.' && $node != '..') {
+			if ($node !== '.' && $node !== '..') {
 				$path = $pstr.'/'.$node;
 				recursiveDelete($path, $dlnk);
 			}
@@ -302,13 +266,13 @@ function recursiveDelete ($pstr, $dlnk=false) {
 	}
 }
 
-function addDirToAcrhive ($base,$dirn,$zh) {
+function addDirToAcrhive ($base,$dirn,$zh): void {
 	if (!is_dir($base.$dirn)) {
 		throw new Exception('Directory ' . $dirName . ' does not exist');
 	}
 
 	$dirName = realpath($base.$dirn);
-	if (substr($dirName, -1) != '/') {
+	if (substr($dirName, -1) !== '/') {
 		$dirName.= '/';
 	}
 
@@ -316,7 +280,7 @@ function addDirToAcrhive ($base,$dirn,$zh) {
 	//Find the index where the last dir starts
 	$cutFrom = strrpos(substr($dirName, 0, -1), '/')+1;
 
-	while (!empty($dirStack)) { 
+	while ($dirStack !== []) { 
 		$currentDir = array_pop($dirStack);
 		$filesToAdd = [];
 
@@ -324,7 +288,7 @@ function addDirToAcrhive ($base,$dirn,$zh) {
 		while (false !== ($node = $dir->read())) {
 			if (($node == '..') || ($node == '.')) { continue; }
 			if (is_dir($currentDir . $node)) {
-				array_push($dirStack, $currentDir . $node . '/');
+				$dirStack[] = $currentDir . $node . '/';
 			}
 			if (is_file($currentDir . $node)) {
 				$filesToAdd[] = $node;
@@ -341,7 +305,7 @@ function addDirToAcrhive ($base,$dirn,$zh) {
 
 }
 
-function curld ($url, $data='') {
+function curld ($url, $data=''): null|bool|string {
 	$ch = curl_init($url);
 	curl_setopt($ch, CURLOPT_PORT , 443);
 	curl_setopt($ch, CURLOPT_POST, 1);
@@ -351,13 +315,13 @@ function curld ($url, $data='') {
 	$rData = curl_exec($ch);
 	if (curl_errno($ch)) {
 		echo 'Curl error: ' . curl_error($ch);
-		return;
+		return null;
 	}
 	curl_close($ch);
 	return $rData;
 }
 
-function alt_stat ($file) {
+function alt_stat ($file): false|array {
 	clearstatcache();
 	$ss = @stat($file);
 	if (!$ss) return false; //Couldnt stat file
@@ -420,7 +384,7 @@ function alt_stat ($file) {
 			'device_number' => $ss['rdev'], //Device number, if device.
 			'inode' => $ss['ino'], //File serial number
 			'link_count' => $ss['nlink'], //link count
-			'link_to' => (substr($ts[octdec($t)],1)=='link') ? @readlink($file) : ''
+			'link_to' => (substr($ts[octdec($t)],1) === 'link') ? @readlink($file) : ''
 		],
 		'size' => [
 			'size' => $ss['size'], //Size of file, in bytes.

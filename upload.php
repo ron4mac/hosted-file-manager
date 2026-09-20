@@ -2,7 +2,10 @@
 error_reporting(-1);
 require_once 'functions.php';
 
-function rearrange ($arr)
+/**
+ * @return non-empty-array[]
+ */
+function rearrange ($arr): array
 {
 	$new = [];
 	foreach ($arr as $key => $all) {

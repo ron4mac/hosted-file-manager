@@ -1,6 +1,6 @@
 <?php
 
-function curly ($url,$agent) {
+function curly ($url,$agent): bool|string {
 	// create curl resource
 	$ch = curl_init();
 	// set url
@@ -17,7 +17,7 @@ function curly ($url,$agent) {
 	return $output;
 }
 
-function getUrlData ($url) {
+function getUrlData ($url): bool|string {
 	global $github_credential;	// optional and set in 'fmx.ini' file as <username>:<password>
 	if ($github_credential) {
 		$url = str_replace('//','//'.$github_credential.'@',$url);
@@ -28,28 +28,30 @@ function getUrlData ($url) {
 		$rfc = file_get_contents($url);
 		if (!$rfc) return curly($url, $ua);
 		return $rfc;
-	} else {
-		return curly($url, $ua);
 	}
+
+
+
+
+return curly($url, $ua);
 }
 
-function checkForUpdate () {
+function checkForUpdate (): string|false {
 	global $fmxVersion;
 	$fv = substr($fmxVersion, 0, strpos($fmxVersion,' '));
 	// get release list from github (ignore errors in case of refused access)
 	$fmx_releases = json_decode(@getUrlData('https://api.github.com/repos/ron4mac/hosted-file-manager/releases'));
 	if (!$fmx_releases) { echo 'Release of FMX not found at Github'; exit(); }
 	$fmx_ball = $fmx_releases[0]->zipball_url;
-	$fmx_name = $fmx_releases[0]->name;
 	$uver = $fmx_releases[0]->tag_name;
 	if (preg_match('/\d+\.\d+\.\d+/',$uver,$m)) {
-		if (version_compare($m[0], $fv) == 1)
+		if (version_compare($m[0], $fv) === 1)
 		return $uver.'|'.$fmx_ball;
 	}
 	return false;
 }
 
-function performUpdate ($which) {
+function performUpdate ($which): void {
 	global $baseDir;
 	$tmpf = (sys_get_temp_dir()?sys_get_temp_dir():$baseDir.'tmp').'/fmx_upd_'.time().'.zip';
 	$newUpdate = getUrlData($which);
@@ -60,12 +62,12 @@ function performUpdate ($which) {
 	unlink($tmpf);
 }
 
-function logIt ($msg) {
+function logIt ($msg): void {
 	file_put_contents('log.txt', "{$msg}\n", FILE_APPEND);
 }
 
 // recursively delete a directory
-function delTree ($dir) {
+function delTree ($dir): void {
 	if (!file_exists($dir)) return;
 	$files = array_diff(scandir($dir), ['.','..']);
 	foreach ($files as $file) {
@@ -76,9 +78,9 @@ function delTree ($dir) {
 }
 
 // remove defunct files from a given list
-function cleanupFiles ($fray) {
+function cleanupFiles ($fray): void {
 	foreach ($fray as $f) {
-		if (substr($f,-1)=='/') {
+		if (substr($f,-1) === '/') {
 			delTree(substr($f,0,-1));
 		} else {
 			@unlink($f);
@@ -86,7 +88,7 @@ function cleanupFiles ($fray) {
 	}
 }
 
-function installUpdate ($fpath) {	// NEED TO GET PATH TO INSTALL
+function installUpdate ($fpath): void {	// NEED TO GET PATH TO INSTALL
 	$f2p = ['.user.ini','fmx.ini'];	//files to preserve if they already exist
 	$zip = new ZipArchive;
 	$res = $zip->open($fpath);
@@ -96,13 +98,13 @@ function installUpdate ($fpath) {	// NEED TO GET PATH TO INSTALL
 			$stat = $zip->statIndex( $i );
 			//echo $stat['name'] . '<br />';
 			list($bd,$fp) = explode('/', $stat['name'], 2);
-			if (substr($fp, -1) == '/') {
+			if (substr($fp, -1) === '/') {
 				@mkdir($fp);
 				//logIt("DIR: {$fp}");
 			} elseif ($fp) {
 				if (in_array($fp, $f2p) && file_exists($fp)) continue;
 				$fc = $zip->getFromIndex($i);
-				if (basename($fp)=='clean.json') {
+				if (basename($fp) === 'clean.json') {
 					$fils2clean = json_decode($fc, true);
 				} else {
 					file_put_contents($fp, $fc);

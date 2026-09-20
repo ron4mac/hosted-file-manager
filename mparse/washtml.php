@@ -52,6 +52,8 @@
  */
 class rcube_washtml
 {
+	public $max_nesting_level_error;
+
 	/**
 	 * @var array Allowed HTML elements (default)
 	 */
@@ -164,31 +166,31 @@ class rcube_washtml
 	public $extlinks = false;
 
 	/** @var array Current settings */
-	private $config = array();
+	private array $config = array();
 
 	/** @var array Registered callback functions for tags */
 	private $handlers = array();
 
 	/** @var array Allowed HTML elements */
-	private $_html_elements = array();
+	private array $_html_elements;
 
 	/** @var array Ignore these HTML tags but process their content */
-	private $_ignore_elements = array();
+	private array $_ignore_elements;
 
 	/** @var array Elements which could be empty and be returned in short form (<tag />) */
-	private $_void_elements = array();
+	private array $_void_elements;
 
 	/** @var array Allowed HTML attributes */
-	private $_html_attribs = array();
+	private array $_html_attribs;
 
 	/** @var string A prefix to be added to id/class/for attribute values */
-	private $_css_prefix;
+	private ?string $_css_prefix;
 
 	/** @var int Max nesting level */
-	private $max_nesting_level;
+	private ?int $max_nesting_level = null;
 
 	/** @var bool True if current document is XML */
-	private $is_xml = false;
+	private bool $is_xml = false;
 
 
 	/**
@@ -207,7 +209,7 @@ class rcube_washtml
 	 *		html_attribs: Additional allowed HTML attributes
 	 *		void_elements: Elements which could be empty and be returned in short form (<tag />)
 	 */
-	public function __construct($p = array())
+	public function __construct(array $p = array())
 	{
 		$this->_html_elements	= array_flip((array)$p['html_elements']) + array_flip(self::$html_elements);
 		$this->_html_attribs	= array_flip((array)$p['html_attribs']) + array_flip(self::$html_attribs);
@@ -226,7 +228,7 @@ class rcube_washtml
 	 * @param string   $tag		 HTML tag name
 	 * @param callback $callback Callback function
 	 */
-	public function add_callback($tag, $callback)
+	public function add_callback($tag, $callback): void
 	{
 		$this->handlers[$tag] = $callback;
 	}
@@ -238,7 +240,7 @@ class rcube_washtml
 	 *
 	 * @return string Washed CSS style
 	 */
-	private function wash_style($style)
+	private function wash_style($style): string
 	{
 		$result = array();
 
@@ -296,7 +298,7 @@ class rcube_washtml
 	 *
 	 * @return string Washed element attributes
 	 */
-	private function wash_attribs($node)
+	private function wash_attribs($node): string
 	{
 		$result = '';
 		$washed = array();
@@ -310,7 +312,7 @@ class rcube_washtml
 			$key = strtolower($name);
 			$value = $attr->nodeValue;
 
-			if ($key == 'style' && ($style = $this->wash_style($value))) {
+			if ($key === 'style' && ($style = $this->wash_style($value))) {
 				// replace double quotes to prevent syntax error and XSS issues (#1490227)
 				$result .= ' style="' . str_replace('"', '&quot;', $style) . '"';
 			}
@@ -319,7 +321,7 @@ class rcube_washtml
 				$out = null;
 
 				// in SVG to/from attribs may contain anything, including URIs
-				if ($key == 'to' || $key == 'from') {
+				if ($key === 'to' || $key === 'from') {
 					$key = strtolower($node->getAttribute('attributeName'));
 					if ($key && !isset($this->_html_attribs[$key])) {
 						$key = null;
@@ -336,7 +338,7 @@ class rcube_washtml
 						$out = $value;
 					}
 				}
-				else if ($this->is_funciri_attribute($node->nodeName, $key)) {
+				else if ($this->is_funciri_attribute($key)) {
 					if (preg_match('/^[a-z:]*url\(/i', $val)) {
 						if (preg_match('/^([a-z:]*url)\(\s*[\'"]?([^\'"\)]*)[\'"]?\s*\)/iu', $value, $match)) {
 							if ($url = $this->wash_uri($match[2])) {
@@ -373,7 +375,7 @@ class rcube_washtml
 			}
 		}
 
-		if (!empty($washed) && $this->config['show_washed']) {
+		if ($washed !== [] && $this->config['show_washed']) {
 			$result .= ' x-washed="' . implode(' ', $washed) . '"';
 		}
 
@@ -389,7 +391,7 @@ class rcube_washtml
 	 *
 	 * @return string Washed URI
 	 */
-	private function wash_uri($uri, $blocked_source = false, $is_image = true)
+	private function wash_uri($uri, bool $blocked_source = false, bool $is_image = true)
 	{
 		if (($src = $this->config['cid_map'][$uri])
 			|| ($src = $this->config['cid_map'][$this->config['base_url'].$uri])
@@ -425,7 +427,7 @@ class rcube_washtml
 	 *
 	 * @return bool True if attribute may contain an URI, False otherwise
 	 */
-	private function is_link_attribute($tag, $attr)
+	private function is_link_attribute($tag, ?string $attr): bool
 	{
 		return ($tag == 'a' || $tag == 'area') && $attr == 'href';
 	}
@@ -438,7 +440,7 @@ class rcube_washtml
 	 *
 	 * @return bool True if attribute may contain an image URI, False otherwise
 	 */
-	private function is_image_attribute($tag, $attr)
+	private function is_image_attribute($tag, ?string $attr): bool
 	{
 		return $attr == 'background'
 			|| $attr == 'color-profile' // SVG
@@ -450,12 +452,10 @@ class rcube_washtml
 	/**
 	 * Check it the tag/attribute may contain a FUNCIRI value
 	 *
-	 * @param string $tag  Element name
 	 * @param string $attr Attribute name
-	 *
 	 * @return bool True if attribute may contain a FUNCIRI value, False otherwise
 	 */
-	private function is_funciri_attribute($tag, $attr)
+	private function is_funciri_attribute(?string $attr): bool
 	{
 		return in_array($attr, array('fill', 'filter', 'stroke', 'marker-start',
 			'marker-end', 'marker-mid', 'clip-path', 'mask', 'cursor'));
@@ -470,7 +470,7 @@ class rcube_washtml
 	 *
 	 * @return string HTML content
 	 */
-	private function dumpHtml($node, $level = 20)
+	private function dumpHtml($node, int|float $level = 20): string
 	{
 		if (!$node->hasChildNodes()) {
 			return '';
@@ -499,7 +499,7 @@ class rcube_washtml
 			case XML_ELEMENT_NODE: //Check element
 				$tagName = strtolower($node->nodeName);
 
-				if ($tagName == 'link') {
+				if ($tagName === 'link') {
 					$uri = $this->wash_uri($node->getAttribute('href'), false, false);
 					if (!$uri) {
 						$dump .= '<!-- link ignored -->';
@@ -517,7 +517,7 @@ class rcube_washtml
 					$content = $this->dumpHtml($node, $level);
 					$dump .= '<' . $node->nodeName;
 
-					if ($tagName == 'svg') {
+					if ($tagName === 'svg') {
 						$xpath = new DOMXPath($node->ownerDocument);
 						foreach ($xpath->query('namespace::*') as $ns) {
 							if ($ns->nodeName != 'xmlns:xml') {
@@ -525,7 +525,7 @@ class rcube_washtml
 							}
 						}
 					}
-					else if ($tagName == 'textarea' && strpos($content, '<') !== false) {
+					else if ($tagName === 'textarea' && strpos($content, '<') !== false) {
 						$content = htmlspecialchars($content, ENT_QUOTES | ENT_SUBSTITUTE, $this->config['charset']);
 					}
 
@@ -573,7 +573,7 @@ class rcube_washtml
 	 *
 	 * @return string Washed HTML content
 	 */
-	public function wash($html)
+	public function wash($html): string
 	{
 		$this->extlinks = false;
 
@@ -717,10 +717,10 @@ class rcube_washtml
 	 *
 	 * @return string Replacement string
 	 */
-	public static function html_tag_callback($matches)
+	public static function html_tag_callback(array $matches): string
 	{
 		// It might be an ending of a comment, ignore (#6464)
-		if (substr($matches[3], -2) == '--') {
+		if (substr($matches[3], -2) === '--') {
 			$matches[0] = '';
 			return implode('', $matches);
 		}
@@ -762,7 +762,7 @@ class rcube_washtml
 	 *
 	 * @param string &$html HTML content
 	 */
-	public static function fix_broken_lists(&$html)
+	public static function fix_broken_lists(&$html): void
 	{
 		// do two rounds, one for <ol>, one for <ul>
 		foreach (array('ol', 'ul') as $tag) {
@@ -783,22 +783,22 @@ class rcube_washtml
 					$tt = strtolower(substr($html, $p, 4));
 
 					// li open tag
-					if ($tt == '<li>' || $tt == '<li ') {
+					if ($tt === '<li>' || $tt === '<li ') {
 						$in_li = true;
 						$p += 4;
 					}
 					// li close tag
-					else if ($tt == '</li' && in_array($html[$p+4], array(' ', '>'))) {
+					else if ($tt === '</li' && in_array($html[$p+4], array(' ', '>'))) {
 						$li_pos = $p;
 						$in_li	= false;
 						$p += 4;
 					}
 					// ul/ol closing tag
-					else if ($tt == '</' . $tag && in_array($html[$p+4], array(' ', '>'))) {
+					else if ($tt === '</' . $tag && in_array($html[$p+4], array(' ', '>'))) {
 						break;
 					}
 					// nested ol/ul element out of li
-					else if (!$in_li && $li_pos && ($tt == '<ol>' || $tt == '<ol ' || $tt == '<ul>' || $tt == '<ul ')) {
+					else if (!$in_li && $li_pos && (in_array($tt, ['<ol>', '<ol ', '<ul>', '<ul ']))) {
 						// find closing tag of this ul/ol element
 						$element = substr($tt, 1, 2);
 						$cpos	 = $p;
@@ -839,7 +839,7 @@ class rcube_washtml
 	 *
 	 * @return string HTML content
 	 */
-	protected function fix_html5($html)
+	protected function fix_html5($html): string|array
 	{
 		// There might be content before html/body tag, we'll move it to the body
 		// We'll wrap it by a div container, it's an invalid HTML anyway
@@ -876,7 +876,7 @@ class rcube_washtml
 	 *
 	 * @return array List of CSS rules
 	 */
-	protected function explode_style($style)
+	protected function explode_style($style): array
 	{
 		$pos = 0;
 
@@ -913,7 +913,7 @@ class rcube_washtml
 			}
 		}
 
-		$result[] = (string) substr($style, $p);
+		$result[] = substr($style, $p);
 
 		return $result;
 	}

@@ -43,7 +43,7 @@ class rcube_utils
 	 * @param int	 $exp		Expiration time
 	 * @param bool	 $http_only HTTP Only
 	 */
-	public static function setcookie($name, $value, $exp = 0, $http_only = true)
+	public static function setcookie($name, $value, $exp = 0, $http_only = true): void
 	{
 		if (headers_sent()) {
 			return;
@@ -57,13 +57,8 @@ class rcube_utils
 		// session_get_cookie_params() return includes 'lifetime' but setcookie() does not use it, instead it uses 'expires'
 		unset($attrib['lifetime']);
 
-		if (version_compare(PHP_VERSION, '7.3.0', '>=')) {
-			// An alternative signature for setcookie supporting an options array added in PHP 7.3.0
-			setcookie($name, $value, $attrib);
-		}
-		else {
-			setcookie($name, $value, $attrib['expires'], $attrib['path'], $attrib['domain'], $attrib['secure'], $attrib['httponly']);
-		}
+		// An alternative signature for setcookie supporting an options array added in PHP 7.3.0
+		setcookie($name, $value, $attrib);
 	}
 
 	/**
@@ -96,7 +91,7 @@ class rcube_utils
 
 		// quoted-string, make sure all backslashes and quotes are
 		// escaped
-		if (substr($local_part,0,1) == '"') {
+		if (substr($local_part,0,1) === '"') {
 			$local_quoted = preg_replace('/\\\\(\\\\|\")/','', substr($local_part, 1, -1));
 			if (preg_match('/\\\\|"/', $local_quoted)) {
 				return false;
@@ -160,7 +155,7 @@ class rcube_utils
 	 *
 	 * @return bool True if the address is valid
 	 */
-	public static function check_ip($ip)
+	public static function check_ip($ip): bool
 	{
 		return filter_var($ip, FILTER_VALIDATE_IP) !== false;
 	}
@@ -175,7 +170,7 @@ class rcube_utils
 	 *
 	 * @return string The quoted string
 	 */
-	public static function rep_specialchars_output($str, $enctype = '', $mode = '', $newlines = true)
+	public static function rep_specialchars_output($str, $enctype = '', $mode = '', $newlines = true): ?string
 	{
 		static $html_encode_arr = false;
 		static $js_rep_table	= false;
@@ -324,7 +319,7 @@ class rcube_utils
 
 		// convert to internal charset
 		if ($charset && $output_charset) {
-			$value = rcube_charset::convert($value, $output_charset, $charset);
+			return rcube_charset::convert($value, $output_charset, $charset);
 		}
 
 		return $value;
@@ -340,7 +335,7 @@ class rcube_utils
 	 *
 	 * @return array Hash array with all request parameters
 	 */
-	public static function request2param($mode = null, $ignore = 'task|action', $allow_html = false)
+	public static function request2param($mode = null, $ignore = 'task|action', $allow_html = false): array
 	{
 		$out = array();
 		$src = $mode == self::INPUT_GET ? $_GET : ($mode == self::INPUT_POST ? $_POST : $_REQUEST);
@@ -449,7 +444,7 @@ class rcube_utils
 			// from rcube_string_replacer used above, this is needed for
 			// cases like @media { body { position: fixed; } } (#5811)
 			$regexp = '/(^\s*|,\s*|\}\s*|\{\s*)((?!##str):?[a-z0-9\._#\*\[][a-z0-9\._:\(\)#=~ \[\]"\|\>\+\$\^-]*)/im';
-			$callback = function($matches) use ($container_id, $prefix) {
+			$callback = function($matches) use ($container_id, $prefix): string|array {
 				$replace = $matches[2];
 
 				if (stripos($replace, ':root') === 0) {
@@ -493,7 +488,7 @@ class rcube_utils
 	 *
 	 * @return string CSS classes separated by space
 	 */
-	public static function file2class($mimetype, $filename)
+	public static function file2class($mimetype, $filename): string
 	{
 		$mimetype = strtolower($mimetype);
 		$filename = strtolower($filename);
@@ -523,18 +518,17 @@ class rcube_utils
 	 *
 	 * @return string Decoded string
 	 */
-	public static function xss_entity_decode($content)
+	public static function xss_entity_decode($content): string
 	{
-		$callback = function($matches) { return chr(hexdec($matches[1])); };
+		$callback = function($matches): string { return chr(hexdec($matches[1])); };
 
 		$out = html_entity_decode(html_entity_decode($content));
 		$out = trim(preg_replace('/(^<!--|-->$)/', '', trim($out)));
 		$out = preg_replace_callback('/\\\([0-9a-f]{2,6})\s*/i', $callback, $out);
 		$out = preg_replace('/\\\([^0-9a-f])/i', '\\1', $out);
 		$out = preg_replace('#/\*.*\*/#Ums', '', $out);
-		$out = strip_tags($out);
 
-		return $out;
+		return strip_tags($out);
 	}
 
 	/**
@@ -544,7 +538,7 @@ class rcube_utils
 	 *
 	 * @return bool True if memory won't be exceeded, False otherwise
 	 */
-	public static function mem_check($need)
+	public static function mem_check($need): bool
 	{
 		$mem_limit = parse_bytes(ini_get('memory_limit'));
 		$memory = function_exists('memory_get_usage') ? memory_get_usage() : 16*1024*1024; // safe value: 16MB
@@ -562,12 +556,12 @@ class rcube_utils
 	 */
 	public static function https_check($port = null, $use_https = true)
 	{
-		if (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) != 'off') {
+		if (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off') {
 			return true;
 		}
 
 		if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])
-			&& strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == 'https'
+			&& strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https'
 			&& in_array($_SERVER['REMOTE_ADDR'], rcube::get_instance()->config->get('proxy_whitelist', array()))
 		) {
 			return true;
@@ -577,11 +571,7 @@ class rcube_utils
 			return true;
 		}
 
-		if ($use_https && rcube::get_instance()->config->get('use_https')) {
-			return true;
-		}
-
-		return false;
+		return $use_https && rcube::get_instance()->config->get('use_https');
 	}
 
 	/**
@@ -643,7 +633,7 @@ class rcube_utils
 			$name = preg_replace('/:\d+$/', '', $name);
 		}
 
-		if (empty($patterns) || in_array_nocase($name, $patterns)) {
+		if ($patterns === [] || in_array_nocase($name, $patterns)) {
 			return $name;
 		}
 
@@ -738,7 +728,7 @@ class rcube_utils
 			$key	 = 'HTTP_' . strtoupper(strtr($name, '-', '_'));
 		}
 
-		if (!empty($headers)) {
+		if ($headers !== []) {
 			$headers = array_change_key_case($headers, CASE_UPPER);
 
 			return $headers[$key];
@@ -753,14 +743,14 @@ class rcube_utils
 	 *
 	 * @return array String items
 	 */
-	public static function explode_quoted_string($delimiter, $string)
+	public static function explode_quoted_string($delimiter, $string): array
 	{
 		$result = array();
 		$strlen = strlen($string);
 
 		for ($q=$p=$i=0; $i < $strlen; $i++) {
 			if ($string[$i] == "\"" && $string[$i-1] != "\\") {
-				$q = $q ? false : true;
+				$q = !(bool) $q;
 			}
 			else if (!$q && preg_match("/$delimiter/", $string[$i])) {
 				$result[] = substr($string, $p, $i - $p);
@@ -768,7 +758,7 @@ class rcube_utils
 			}
 		}
 
-		$result[] = (string) substr($string, $p);
+		$result[] = substr($string, $p);
 
 		return $result;
 	}
@@ -781,7 +771,7 @@ class rcube_utils
 	 *
 	 * @return int Unix timestamp
 	 */
-	public static function strtotime($date, $timezone = null)
+	public static function strtotime($date, $timezone = null): int
 	{
 		$date	= self::clean_datestr($date);
 		$tzname = $timezone ? ' ' . $timezone->getName() : '';
@@ -817,7 +807,7 @@ class rcube_utils
 	 *
 	 * @return DateTime|false DateTime object or False on failure
 	 */
-	public static function anytodatetime($date, $timezone = null)
+	public static function anytodatetime($date, $timezone = null): \DateTime|false
 	{
 		if ($date instanceof DateTime) {
 			return $date;
@@ -860,7 +850,7 @@ class rcube_utils
 	 *
 	 * @return string Date string
 	 */
-	public static function clean_datestr($date)
+	public static function clean_datestr($date): string
 	{
 		$date = trim($date);
 
@@ -1014,7 +1004,7 @@ class rcube_utils
 	 *
 	 * @return array List of tokens
 	 */
-	public static function tokenize_string($str, $minlen = 2)
+	public static function tokenize_string($str, $minlen = 2): array
 	{
 		$expr = array('/[\s;,"\'\/+-]+/ui', '/(\d)[-.\s]+(\d)/u');
 		$repl = array(' ', '\\1\\2');
@@ -1038,7 +1028,7 @@ class rcube_utils
 	 *
 	 * @return string|array Normalized string or a list of normalized tokens
 	 */
-	public static function normalize_string($str, $as_array = false, $minlen = 2)
+	public static function normalize_string($str, $as_array = false, $minlen = 2): string|array
 	{
 		// replace 4-byte unicode characters with '?' character,
 		// these are not supported in default utf-8 charset on mysql,
@@ -1091,11 +1081,11 @@ class rcube_utils
 	 *
 	 * @return bool True if match, False otherwise
 	 */
-	public static function words_match($haystack, $needle)
+	public static function words_match($haystack, $needle): bool
 	{
 		$a_needle = self::tokenize_string($needle, 1);
 		$_haystack = implode(' ', self::tokenize_string($haystack, 1));
-		$valid = strlen($_haystack) > 0;
+		$valid = $_haystack !== '';
 		$hits = 0;
 
 		foreach ($a_needle as $w) {
@@ -1119,7 +1109,7 @@ class rcube_utils
 	 *
 	 * @return array Argument values hash
 	 */
-	public static function get_opt($aliases = array())
+	public static function get_opt(array $aliases = array()): array
 	{
 		$args = array();
 		$bool = array();
@@ -1133,7 +1123,8 @@ class rcube_utils
 			}
 		}
 
-		for ($i=1; $i < count($_SERVER['argv']); $i++) {
+		$counter = count($_SERVER['argv']);
+		for ($i=1; $i < $counter; $i++) {
 			$arg = $_SERVER['argv'][$i];
 			$value = true;
 			$key = null;
@@ -1175,7 +1166,7 @@ class rcube_utils
 	 *
 	 * @return string Password
 	 */
-	public static function prompt_silent($prompt = "Password:")
+	public static function prompt_silent($prompt = "Password:"): string
 	{
 		if (preg_match('/^win/i', PHP_OS)) {
 			$vbscript = sys_get_temp_dir() . 'prompt_password.vbs';
@@ -1213,7 +1204,7 @@ class rcube_utils
 	 *
 	 * @return bool Boolean value
 	 */
-	public static function get_boolean($str)
+	public static function get_boolean($str): bool
 	{
 		$str = strtolower($str);
 
@@ -1227,9 +1218,9 @@ class rcube_utils
 	 *
 	 * @return bool True if the path is absolute, False otherwise
 	 */
-	public static function is_absolute_path($path)
+	public static function is_absolute_path($path): bool
 	{
-		if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
+		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 			return (bool) preg_match('!^[a-z]:[\\\\/]!i', $path);
 		}
 
@@ -1243,7 +1234,7 @@ class rcube_utils
 	 *
 	 * @return string Absolute URL
 	 */
-	public static function resolve_url($url)
+	public static function resolve_url($url): string
 	{
 		// prepend protocol://hostname:port
 		if (!preg_match('|^https?://|', $url)) {
@@ -1274,7 +1265,7 @@ class rcube_utils
 	 *
 	 * @return string The generated random string
 	 */
-	public static function random_bytes($length, $raw = false)
+	public static function random_bytes($length, $raw = false): string
 	{
 		$hextab	 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		$tabsize = strlen($hextab);
@@ -1316,7 +1307,7 @@ class rcube_utils
 	 * @return string Readable output (Base62)
 	 * @deprecated since 1.3.1
 	 */
-	public static function bin2ascii($input)
+	public static function bin2ascii($input): string
 	{
 		$hextab = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		$result = '';
@@ -1336,7 +1327,7 @@ class rcube_utils
 	 *
 	 * @return string Formatted date
 	 */
-	public static function date_format($format = null)
+	public static function date_format($format = null): string
 	{
 		if (empty($format)) {
 			$format = 'd-M-Y H:i:s O';
@@ -1360,7 +1351,7 @@ class rcube_utils
 	 * @param array	 &$options	Configured socket options
 	 * @param string $host		Hostname
 	 */
-	public static function parse_socket_options(&$options, $host = null)
+	public static function parse_socket_options(&$options, $host = null): void
 	{
 		if (empty($host) || empty($options)) {
 			return;
@@ -1390,7 +1381,7 @@ class rcube_utils
 		$max_postsize = parse_bytes(ini_get('post_max_size'));
 
 		if ($max_postsize && $max_postsize < $max_filesize) {
-			$max_filesize = $max_postsize;
+			return $max_postsize;
 		}
 
 		return $max_filesize;
@@ -1404,15 +1395,15 @@ class rcube_utils
 	 *
 	 * @return bool True on error, False otherwise
 	 */
-	public static function preg_error($error = array(), $terminate = false)
+	public static function preg_error($error = array(), $terminate = false): bool
 	{
-		if (($preg_error = preg_last_error()) != PREG_NO_ERROR) {
+		if ($preg_error = preg_last_error() !== PREG_NO_ERROR) {
 			$errstr = "PCRE Error: $preg_error.";
 
-			if ($preg_error == PREG_BACKTRACK_LIMIT_ERROR) {
+			if ($preg_error === PREG_BACKTRACK_LIMIT_ERROR) {
 				$errstr .= " Consider raising pcre.backtrack_limit!";
 			}
-			if ($preg_error == PREG_RECURSION_LIMIT_ERROR) {
+			if ($preg_error === PREG_RECURSION_LIMIT_ERROR) {
 				$errstr .= " Consider raising pcre.recursion_limit!";
 			}
 

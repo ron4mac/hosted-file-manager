@@ -4,11 +4,11 @@
 class Up_Load
 {
 	protected $target_dir;
-	protected $pvals;
+	protected \stdClass $pvals;
 	protected $file;
 	protected $target_file;
 	protected $as_file = '';
-	protected $filup_cb = null;
+	protected $filup_cb;
 	// for chunking
 	protected $ckid;
 	protected $ckpath;
@@ -21,7 +21,7 @@ class Up_Load
 
 		// pull in the POSTed values
 		$this->pvals = (object)$_POST;
-		$this->upldLog(print_r($this->pvals,true));
+		$this->upldLog();
 
 		// process the incoming data
 		try {
@@ -42,7 +42,7 @@ class Up_Load
 	}
 
 	// check uploaded file data for issues
-	private function vetUpload ($fec=true)
+	private function vetUpload (bool $fec=true): void
 	{
 		$file = $_FILES['Filedata'];
 		if (!$file) throw new Exception('Parameters error', 9);
@@ -70,7 +70,7 @@ class Up_Load
 	}
 
 	// normal receipt of a single uploaded file
-	private function receiveFile ()
+	private function receiveFile (): void
 	{
 		$this->vetUpload($this->pvals->faex ? ($this->pvals->faex=='f') : true);
 		if ($this->pvals->faex=='r') {
@@ -81,7 +81,7 @@ class Up_Load
 	}
 
 	// receive a file from multiple 'chunks'
-	private function processChunk ()
+	private function processChunk (): void
 	{
 		$this->ckid = $this->pvals->ident;
 		$this->tmpath = sys_get_temp_dir() . '/';
@@ -94,7 +94,7 @@ class Up_Load
 				// create the temporary directory, if necessary
 				if ($this->ckid && !is_dir($this->ckpath)) {
 					mkdir($this->ckpath, 0777, true);
-					$this->upldLog('created chunk dir: '.$this->ckpath);
+					$this->upldLog();
 				}
 				break;
 			case 'chnk':
@@ -110,15 +110,15 @@ class Up_Load
 	}
 
 	// receive, process and place a 'chunk' of file data
-	private function addChunk ()
+	private function addChunk (): void
 	{
 		$chnkn = $this->pvals->chnkn;
 		$dest = $this->ckpath.'/part'.$chnkn;
 		if (!move_uploaded_file($this->file['tmp_name'], $dest)) {
-			$this->upldLog('failed to place chunk: '.$dest);
+			$this->upldLog();
 			die('Failed to place chunk #'.$chnkn);
 		}
-		$this->upldLog('placed chunk: '.$dest);
+		$this->upldLog();
 
 		$totalchunks = (int)$this->pvals->tchnk;
 		if ($chnkn == $totalchunks) {
@@ -144,11 +144,11 @@ class Up_Load
 				}
 				fclose($fp);
 			} else {
-				$this->upldLog('failed to open destination file: '.$dest);
+				$this->upldLog();
 				die('failed to open destination file: '.$dest);
 			}
 	
-			$this->upldLog('combined chunks: '.$dest);
+			$this->upldLog();
 			$this->cleanup();
 			if ($this->filup_cb) call_user_func($this->filup_cb, basename($dest));
 		}
@@ -170,17 +170,17 @@ class Up_Load
 	}
 
 	// remove temporary storage that was used for chunks
-	private function cleanup ()
+	private function cleanup (): void
 	{
 		if ($this->ckid) $this->rrmdir($this->ckpath);
-		$this->upldLog('chunks cleared: '.$this->ckpath);
+		$this->upldLog();
 	}
 
-	private function rrmdir ($dir) {
+	private function rrmdir ($dir): void {
 		if (is_dir($dir)) {
 			$objects = scandir($dir);
 			foreach ($objects as $object) {
-				if ($object != '.' && $object != '..') {
+				if ($object !== '.' && $object !== '..') {
 					if (filetype($dir . '/' . $object) == 'dir') {
 						$this->rrmdir($dir . '/' . $object); 
 					} else {
@@ -193,9 +193,8 @@ class Up_Load
 		}
 	}
 	
-	private function upldLog ($ntry)
-	{	return;
-		file_put_contents('UPLOG.txt', $ntry."\n", FILE_APPEND);
+	private function upldLog()
+	{
 	}
 
 }

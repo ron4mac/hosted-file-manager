@@ -1,7 +1,4 @@
 <?php
-// require PHP 7
-if (PHP_VERSION_ID < 70000) die('PHP version 7+ required');
-
 // Developer mode
 $dev_mode = false;
 $jsver = $dev_mode ? '' : '.min';
@@ -17,6 +14,13 @@ $aceBase = '//cdnjs.cloudflare.com/ajax/libs/ace/1.37.1/';
 // If no theme is entered here, the editor will provide a dropdown selection list
 //   - hover over the list name to see the string that should be entered below
 $acetheme = 'sqlserver';
+
+// should file edits be backed up before save?
+// backups are appended with '~'
+// zero count indicates no backup will be done
+// 1 or greater indicates how many backups to accumulate
+// note: multiple saves (without edit close) will only create one new backup
+$backup_edit = 0;
 
 // link to font awesome
 $fontawsm = '//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css';

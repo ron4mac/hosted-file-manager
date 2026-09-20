@@ -50,7 +50,7 @@ if (!empty($_GET['act'])) {
 }
 
 
-function display_entry ($av)
+function display_entry ($av): void
 {
 	global $fref, $aceBase, $acetheme;
 
@@ -107,7 +107,7 @@ if (!empty($_POST['act'])) {
 
 
 
-function display_archive ($av)
+function display_archive ($av): void
 {
 	global $fref, $fpath;
 
@@ -188,7 +188,7 @@ abstract class MyArcView
 	{
 	}
 
-	protected function list_row ($ndx, $size, $name, $isdir=false)
+	protected function list_row ($ndx, int $size, $name, $isdir=false)
 	{
 		$dnam = substr($name, $this->nss);
 		if ($isdir) {
@@ -209,7 +209,7 @@ class MyZipView extends MyArcView
 {
 	protected $za;
 
-	public function list_contents ()
+	public function list_contents (): void
 	{
 		$zip = new ZipArchive();
 		$res = $zip->open($this->fpath);
@@ -219,7 +219,7 @@ class MyZipView extends MyArcView
 				$ntry = $zip->statIndex($ix);
 				if (is_array($ntry)) {
 					$nam = $ntry['name'];
-					if (substr($nam, -1) == '/') {
+					if (substr($nam, -1) === '/') {
 						$this->list_row($ix, 0, $nam, true);
 					} else {
 						$this->list_row($ix, $ntry['size'], $nam);
@@ -236,23 +236,36 @@ class MyZipView extends MyArcView
 
 	public function getFileSize ($idx, $pth)
 	{
-		$this->openArchive($idx, $pth);
+		$this->openArchive();
 		return $this->za->statIndex($idx)['size'];
 	}
 
 	public function getFileContent ($idx, $pth)
 	{
-		$this->openArchive($idx, $pth);
+		$this->openArchive();
 		return $this->za->getFromIndex($idx);
 	}
 
-	private function openArchive ($idx, $pth)
-	{
-		if (empty($this->za)) {
+	private function openArchive(): void
+
+
+
+
+{
+
+
+
+
+
+if (empty($this->za)) {
 			$this->za = new ZipArchive();
 			$this->za->open($this->fpath);
 		}
-	}
+
+
+
+
+}
 
 }
 
@@ -261,7 +274,7 @@ class MyTgzView extends MyArcView
 {
 	protected $pfi;
 
-	public function list_contents ()
+	public function list_contents (): void
 	{
 		$phr = new PharData($this->fpath);
 		if (!$phr) die('ERROR OPENING ARCHIVE: '.$this->fpath.'<br>ERROR: '.$phr);
@@ -282,7 +295,7 @@ class MyTgzView extends MyArcView
 		return $this->pfi->getContent();
 	}
 
-	private function get_pfi ($pth)
+	private function get_pfi ($pth): void
 	{
 		if (empty($this->pfi)) {
 			$phr = new PharData($this->fpath);
@@ -290,7 +303,7 @@ class MyTgzView extends MyArcView
 		}
 	}
 
-	private function doDir ($dir, &$ndx)
+	private function doDir (\PharData $dir, int|float &$ndx): void
 	{
 		foreach ($dir as $child) {
 			$nam = $child->getPathname();
@@ -314,7 +327,7 @@ class MyTgzView extends MyArcView
 abstract class MyDisplay
 {
 	protected $title = '';
-	protected $style = '';
+	protected string $style;
 	protected $script = '';
 	protected $styles = [];
 	protected $scripts = [];
@@ -409,8 +422,4 @@ class MyArchiveView extends MyDisplay
 
 class MyEntryView extends MyDisplay
 {
-	public function __construct ($t)
-	{
-		parent::__construct($t);
-	}
 }

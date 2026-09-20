@@ -63,7 +63,7 @@ switch ($y) {
 		}
 		break;
 	default:
-		if ($x=='image') {
+		if ($x === 'image') {
 			$mtyp = 'text/html';
 			$fcon = '<!DOCTYPE html><html><head>
 <style>
@@ -101,12 +101,13 @@ img { background-image: url(css/transback8.png); }
 			fclose($fhan);
 			$fcon .= '</table>';
 			}
-		elseif (pathinfo($ffref, PATHINFO_EXTENSION) == 'md' && $mtyp_arg !== 'text/plain') {
-			include 'mdview.php';
+		elseif (pathinfo($ffref, PATHINFO_EXTENSION) === 'md' && $mtyp_arg !== 'text/plain') {
+			include 'parsedown.php';
 			$mtyp = 'text/html';
-			$fcon = \Michelf\Markdown::defaultTransform(file_get_contents($ffref));
+			$pd = new Parsedown();
+			$fcon = $pd->text(file_get_contents($ffref));
 		}
-		elseif ($mtyp == 'text/plain' && pathinfo($ffref, PATHINFO_EXTENSION) == 'json') {
+		elseif ($mtyp == 'text/plain' && pathinfo($ffref, PATHINFO_EXTENSION) === 'json') {
 			//$fcon = print_r(json_decode(file_get_contents($ffref), true), true);
 			$fcon = json_encode(json_decode(file_get_contents($ffref), true), JSON_PRETTY_PRINT);
 		}

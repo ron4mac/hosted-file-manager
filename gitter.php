@@ -11,12 +11,12 @@ $cookT = time()+86400*256;		//cookie to expire in 256 days
 $gh_auth = isset($_COOKIE[GH_PAT]) ? $_COOKIE[GH_PAT] : null;
 if ($gh_auth) setcookie(GH_PAT, $gh_auth, $cookT);	//refresh the cookie
 
-function getUrl ($wc=false)
+function getUrl ($wc=false): ?string
 {
 	global $gh_auth, $msg;
 
 	$cfgf = file_get_contents('.git/config');
-	if (!$cfgf) { $msg = 'config file is missing'; return; }
+	if (!$cfgf) { $msg = 'config file is missing'; return null; }
 	$lins = explode("\n", $cfgf);
 	foreach ($lins as $lin) {
 		if (preg_match('#^\surl = (.*)$#', $lin, $mtch)) {
@@ -25,6 +25,11 @@ function getUrl ($wc=false)
 		}
 	}
 	$msg = 'pattern not found';
+
+
+
+
+return null;
 }
 
 $msg = ''; $rslt = '';
@@ -35,8 +40,9 @@ if (isset($_GET['dnld'])) {
 		header($_SERVER["SERVER_PROTOCOL"]." 404 No temporary directory");
 		exit;
 	}
+	$prefix = basename($gitdir);
 	$temp_file = tempnam($std, 'GIT');
-	$rslt = `git archive --format zip -o {$temp_file} {$brch}`;
+	$rslt = `git archive --prefix={$prefix}/ --format zip -o {$temp_file} {$brch}`;
 	if (file_exists($temp_file)) {
 		header('Content-Description: File Transfer');
 		header('Content-Type: application/octet-stream');
@@ -56,7 +62,6 @@ if (isset($_GET['dnld'])) {
 }
 
 if (isset($_POST['setuser'])) {
-	$rslt = `git config --local user.name {$_POST['uname']}`;
 	$rslt = `git config --local user.email {$_POST['uemail']}`;
 }
 
@@ -128,12 +133,12 @@ if ($brch) {
 	$opts = '<option value="master">master</option>';
 }
 
-function ckBox ($v, $n=null)
+function ckBox ($v, $n=null): string
 {
 	return '<input type="checkbox"'.($n ? (' name="'.$n.'"') : '').' value="'.$v.'"> ';
 }
 
-function commitReveal ()
+function commitReveal (): void
 {
 	$commits = `git log --branches --not --remotes`;
 	if ($commits) {
@@ -143,7 +148,7 @@ function commitReveal ()
 	}
 }
 
-function statusAction ()
+function statusAction (): string
 {
 	$stats = explode("\x00", `git status -z` ?: '');
 	$html = '';
@@ -155,7 +160,7 @@ function statusAction ()
 			case ' M':
 				$actdif = ['revert',' <a href="javascript:postAct({act:\'dif\', f: \''.urlencode($f).'\'})">diff</a>'];
 			case ' D':
-				if ($m==' D') $actdif = ['restore',''];
+				if ($m === ' D') $actdif = ['restore',''];
 				$html .= ckBox($f, 'ftc[]').'<a class="fact" href="javascript:postAct({act:\'rev\', f: \''.urlencode($f).'\'})">'.$actdif[0].'</a> '.$f.$actdif[1].'<br>';
 				break;
 			case 'M ':

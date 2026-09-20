@@ -2,12 +2,25 @@
 require_once 'functions.php';
 include 'cfg.php';
 
-$popd = isset($_GET['t']) ? false : true;
+$popd = !isset($_GET['t']);
 
 if (isset($_POST['savef'])) {
 	$fref = $_POST['fref'];
 	if (!$fref) exit(0);
 	$fpath = $baseDir . $fref;
+	if (!empty($backup_edit) && !empty($_POST['bkup'])) {
+		$sp = $fpath.'~';
+		$bc = $backup_edit;
+		while ($backup_edit-- && file_exists($sp)) {
+			$sp .= '~';
+		}
+		if ($backup_edit >= 0) {
+			if (!rename($fpath, $sp)) {
+				echo 'FAILED TO BACKUP ORIGINASL :O(';
+				exit(1);
+			}
+		}
+	}
 	$fcon = $_POST['fcontent'];
 	$rslt = file_put_contents($fpath, str_replace("\r\n","\n",$fcon));
 	if ($rslt === FALSE) {
@@ -65,16 +78,11 @@ header('Cache-Control: no-cache');
 <?php endif; ?>
 <script type="text/javascript">
 var subb;
+var bkup = 1;
 ace.require("ace/ext/language_tools");
-function pop(url, h1, w1) {
-	var h2 = (screen.height-h1)/2;
-	var w2 = (screen.width-w1)/2;
-	var wcon="toolbar=no,status=no,location=no,menubar=no,resizable=0,scrollbars=1,width="+w1+",height="+h1+",left="+w2+",top="+h2;
-	return open(url, "", wcon);
-}
 window.addEventListener("beforeunload", function (e) {
 	if (!editor.session.getUndoManager().hasUndo() || subb == 'saveclose') return;
-	var confirmationMessage = "You have not saved changes to this document.";
+	const confirmationMessage = "You have not saved changes to this document.";
 	(e || window.event).returnValue = confirmationMessage;	//Gecko + IE
 	return confirmationMessage								//Webkit, Safari, Chrome etc.
 });
@@ -93,6 +101,7 @@ function saveFile () {
 	let eForm = document.forms.sform;
 	let pData = new FormData(eForm);
 	pData.append('savef','saveonly');
+	pData.append('bkup',bkup);
 	fetch(eForm.action, {method: 'POST', body: pData})
 	.then(rslt => {if (!rslt.ok) throw new Error(`Failed to save file. ERROR: ${rslt.status}`); return rslt.text()})
 	.then(resp => {
@@ -100,6 +109,7 @@ function saveFile () {
 			if (subb == 'saveclose') {
 				window.close();
 			} else {
+				bkup = 0;
 				editor.session.getUndoManager().reset();
 				document.getElementById('dirty').style.display = 'none';
 			}

@@ -816,8 +816,6 @@ const fmx_init = () => {
 		}
 	})});
 
-
-
 	// attach menu counts
 	show_mcount('cppaMenu', sessionStorage.fmx_cppa);
 	show_mcount('markMenu', sessionStorage.fmx_mrkd);

@@ -75,7 +75,7 @@ foreach ($files as $file) {
 	}
 }
 
-if ($dirsl) {
+if ($dirsl !== []) {
 	$html .= '<div class="folds">';
 	natsort($dirsl);
 	foreach ($dirsl as $adir) {
@@ -84,7 +84,7 @@ if ($dirsl) {
 	}
 	$html .= '</div>';
 }
-if ($imgsl) {
+if ($imgsl !== []) {
 	$html .= '<div class="imgs">';
 	ksort($imgsl, SORT_NATURAL | SORT_FLAG_CASE);
 	foreach ($imgsl as $file=>$aimg) {

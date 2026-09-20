@@ -2,7 +2,7 @@
 include 'fmx.ini';
 include 'cfg.php';
 
-function cmpFm ($a, $b)
+function cmpFm ($a, $b): int
 {
 	if ($a[1] && $b[1]) {
 		$am = $a[1][9];
@@ -12,12 +12,12 @@ function cmpFm ($a, $b)
 	}
 	return 0;
 }
-function cmpFmd ($a, $b)
+function cmpFmd ($a, $b): int
 {
 	return cmpFm ($b, $a);
 }
 
-function cmpFs ($a, $b)
+function cmpFs ($a, $b): int
 {
 	if ($a[1] && $b[1]) {
 		$as = $a[1][7];
@@ -27,7 +27,7 @@ function cmpFs ($a, $b)
 	}
 	return 0;
 }
-function cmpFsd ($a, $b)
+function cmpFsd ($a, $b): int
 {
 	return cmpFs ($b, $a);
 }
@@ -73,7 +73,7 @@ var upload_winpop = {$popW};
 	} else {
 		$basDir = isset($_COOKIE[$cooknam]) ? convert_uudecode($_COOKIE[$cooknam]) : false;
 		if (!$basDir) {
-			$basDir = trim(`cd ~;pwd`);	$basDir = dirname($_SERVER['DOCUMENT_ROOT']);
+			$basDir = dirname($_SERVER['DOCUMENT_ROOT']);
 			$rootcook = setcookie($cooknam,convert_uuencode($basDir));
 			}
 	}
@@ -151,7 +151,7 @@ if ($pDir) {
 	}
 	print "/$curD";
 	$aRef = $_SERVER['PHP_SELF'];	//'index.php';
-	if (dirname($pDir)!='.') {
+	if (dirname($pDir) !== '.') {
 		$aRef .= '?dir=' . urlencode(dirname($pDir));
 	}
 	$parntBut = '<a href="'.$aRef.'" title="Up to parent"><i class="fa fa-chevron-up" style="color:blue;font-size:large"></i></a>';
@@ -309,7 +309,7 @@ if ($dFiles) {
 			continue;
 		}
 		$lok = true;
-		$isLnk = ($fs[2] & 0xA000)==0xA000;
+		$isLnk = ($fs[2] & 0xA000) === 0xA000;
 		$rlnk = '';
 		if ($isLnk) {
 			$fs = @stat($fPth);

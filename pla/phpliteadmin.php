@@ -430,9 +430,9 @@ $lang = array(
 
 class Authorization
 {
-	private $authorized;
-	private $login_failed;
-	private $system_password_encrypted;
+	private bool $authorized;
+	private ?bool $login_failed = null;
+	private string $system_password_encrypted;
 
 	public function __construct()
 	{
@@ -446,7 +446,7 @@ class Authorization
 		if(!isset($_SESSION[COOKIENAME.'_salt']) && !isset($_COOKIE[COOKIENAME.'_salt']))
 		{
 			// create a random salt for this session if a cookie doesn't already exist for it
-			$_SESSION[COOKIENAME.'_salt'] = self::generateSalt(22);
+			$_SESSION[COOKIENAME.'_salt'] = $this->generateSalt(22);
 		}
 		else if(!isset($_SESSION[COOKIENAME.'_salt']) && isset($_COOKIE[COOKIENAME.'_salt']))
 		{
@@ -466,9 +466,9 @@ class Authorization
 			|| isset($_COOKIE[COOKIENAME]) && isset($_COOKIE[COOKIENAME.'_salt']) && hash_equals(md5(SYSTEMPASSWORD."_".$_COOKIE[COOKIENAME.'_salt']), $_COOKIE[COOKIENAME]);
 	}
 
-	public function attemptGrant($password, $remember)
+	public function attemptGrant($password, $remember): bool
 	{
-		$hashed_password = crypt(SYSTEMPASSWORD, '$2a$07$'.self::generateSalt(22).'$');
+		$hashed_password = crypt(SYSTEMPASSWORD, '$2a$07$'.$this->generateSalt(22).'$');
 		if (hash_equals($hashed_password, crypt($password, $hashed_password))) {
 			if ($remember) {
 				// user wants to be remembered, so set a cookie
@@ -492,7 +492,7 @@ class Authorization
 		return false;
 	}
 
-	public function revoke()
+	public function revoke(): void
 	{
 		//destroy everything - cookies and session vars
 		setcookie(COOKIENAME, "", time()-86400, null, null, null, true);
@@ -507,22 +507,22 @@ class Authorization
 		$this->generateToken();
 	}
 
-	public function isAuthorized()
+	public function isAuthorized(): bool
 	{
 		return $this->authorized;      
 	}
 
-	public function isFailedLogin()
+	public function isFailedLogin(): ?bool
 	{
 		return $this->login_failed;
 	}
 
-	public function isPasswordDefault()
+	public function isPasswordDefault(): bool
 	{
 		return SYSTEMPASSWORD == 'admin';
 	}
 
-	private static function generateSalt($saltSize)
+	private function generateSalt(int $saltSize): string
 	{
 		$set = 'ABCDEFGHiJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 		$setLast = strlen($set) - 1;
@@ -533,7 +533,7 @@ class Authorization
 		return $salt;
 	}
 	
-	private function generateToken()
+	private function generateToken(): void
 	{
 		// generate CSRF token 
 		if (empty($_SESSION[COOKIENAME.'token']))
@@ -554,7 +554,7 @@ class Authorization
 		}
 	}
 	
-	private function checkToken()
+	private function checkToken(): void
 	{
 		// checking CSRF token
 		if($_SERVER['REQUEST_METHOD'] === 'POST' || isset($_GET['download'])) // all POST forms need tokens! downloads are protected as well
@@ -563,19 +563,17 @@ class Authorization
 				$check_token=$_POST['token'];
 			elseif($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['token']))
 				$check_token=$_GET['token'];
-			
-			if (!isset($check_token))
-			{
+			if (!isset($check_token)) {
 				die("CSRF token missing");
 			}
-			elseif(!hash_equals($_SESSION[COOKIENAME.'token'], $check_token))
-			{
+			if (!hash_equals($_SESSION[COOKIENAME.'token'], $check_token)) {
 				die("CSRF token is wrong - please try to login again");
 			}
 		}
 	}
 
 }
+
 // Database class
 // Generic database abstraction class to manage interaction with database without worrying about SQLite vs. PHP versions
 //
@@ -583,12 +581,12 @@ class Database
 {
 	protected $db; //reference to the DB object
 	protected $type; //the extension for PHP that handles SQLite
-	protected $data;
+	protected array $data;
 	protected $lastResult;
 	protected $alterError;
 	protected $debugOutput ='';
 
-	public function __construct($data)
+	public function __construct(array $data)
 	{
 		global $lang, $params;
 		$this->data = $data;
@@ -609,21 +607,21 @@ class Database
 
 			switch(true)
 			{
-				case ((!isset($data['type']) || $data['type']!=2) && (FORCETYPE=="PDO" || (FORCETYPE==false && class_exists("PDO") && in_array("sqlite", PDO::getAvailableDrivers()) && ($ver==-1 || $ver==3)))):
+				case ((!isset($data['type']) || $data['type']!=2) && (FORCETYPE=="PDO" || (FORCETYPE === false && class_exists("PDO") && in_array("sqlite", PDO::getAvailableDrivers()) && ($ver === -1 || $ver === 3)))):
 					$this->db = new PDO("sqlite:".$this->data['path']);
 					if($this->db!=NULL)
 					{
 						$this->type = "PDO";
 						break;
 					}
-				case ((!isset($data['type']) || $data['type']!=2) && (FORCETYPE=="SQLite3" || (FORCETYPE==false && class_exists("SQLite3") && ($ver==-1 || $ver==3)))):
+				case ((!isset($data['type']) || $data['type']!=2) && (FORCETYPE=="SQLite3" || (FORCETYPE === false && class_exists("SQLite3") && ($ver === -1 || $ver === 3)))):
 					$this->db = new SQLite3($this->data['path']);
 					if($this->db!=NULL)
 					{
 						$this->type = "SQLite3";
 						break;
 					}
-				case (FORCETYPE=="SQLiteDatabase" || (FORCETYPE==false && class_exists("SQLiteDatabase") && ($ver==-1 || $ver==2))):
+				case (FORCETYPE=="SQLiteDatabase" || (FORCETYPE === false && class_exists("SQLiteDatabase") && ($ver === -1 || $ver === 2))):
 					$this->db = new SQLiteDatabase($this->data['path']);
 					if($this->db!=NULL)
 					{
@@ -643,7 +641,7 @@ class Database
 		}
 	}
 
-	public function registerUserFunction($ids)
+	public function registerUserFunction($ids): void
 	{
 		// in case a single function id was passed
 		if (is_string($ids))
@@ -698,12 +696,12 @@ class Database
 		return $error;
 	}
 
-	function getDebugOutput()
+	function getDebugOutput(): string|null|false|int|float
 	{
 		return ($this->debugOutput != "" ? "<hr /><strong>DEBUG:</strong><br />".$this->debugOutput : $this->debugOutput);
 	}
 	
-	public function showError()
+	public function showError(): void
 	{
 		global $lang;
 		$classPDO = class_exists("PDO");
@@ -725,9 +723,9 @@ class Database
 			printf($lang['sqlite_ext_support'], PROJECT);
 		else
 		{
-			if(!$PDOSqliteDriver && !$classSQLite3 && $this->getVersion()==3)
+			if(!$PDOSqliteDriver && !$classSQLite3 && $this->getVersion() === 3)
 				printf($lang['sqlite_v_error'], 3, PROJECT, 2);
-			else if(!$classSQLiteDatabase && $this->getVersion()==2)
+			else if(!$classSQLiteDatabase && $this->getVersion() === 2)
 				printf($lang['sqlite_v_error'], 2, PROJECT, 3);
 			else
 			{
@@ -752,11 +750,11 @@ class Database
 	}
 	
 	// print the list of databases
-	public function print_db_list()
+	public function print_db_list(): void
 	{
 		global $databases, $lang, $params, $currentDB;
 		echo "<fieldset style='margin:15px;' class='databaseList'><legend><b>".$lang['db_ch']."</b></legend>";
-		if(sizeof($databases)<10) //if there aren't a lot of databases, just show them as a list of links instead of drop down menu
+		if(count($databases)<10) //if there aren't a lot of databases, just show them as a list of links instead of drop down menu
 		{
 			$i=0;
 			foreach($databases as $database)
@@ -771,7 +769,7 @@ class Database
 				echo "&nbsp;&nbsp;";
 				echo $params->getLink(array('download'=>$database['path'], 'table'=>null, 'token'=>$_SESSION[COOKIENAME.'token']), '[&darr;]', '', $lang['backup']);
 				
-				if($i<sizeof($databases))
+				if($i<count($databases))
 					echo "<br/>";
 			}
 		}
@@ -838,7 +836,7 @@ class Database
 	}
 
 	//get the version of the database
-	public function getVersion()
+	public function getVersion(): int
 	{
 		if(file_exists($this->data['path'])) //make sure file exists before getting its contents
 		{
@@ -846,23 +844,19 @@ class Database
 			$p = strpos($content, "** this file contains an sqlite 2"); //this text is at the beginning of every SQLite2 database
 			if($p!==false) //the text is found - this is version 2
 				return 2;
-			else
-				return 3;
+			return 3;
 		}
-		else //return -1 to indicate that it does not exist and needs to be created
-		{
-			return -1;
-		}
+		return -1;
 	}
 
 	//get the size of the database (in KiB)
-	public function getSize()
+	public function getSize(): float
 	{
 		return round(filesize($this->data["path"])*0.0009765625, 1);
 	}
 
 	//get the last modified time of database
-	public function getDate()
+	public function getDate(): string
 	{
 		global $lang;
 		return date($lang['date_format'], filemtime($this->data['path']));
@@ -871,15 +865,17 @@ class Database
 	//get number of affected rows from last query
 	public function getAffectedRows()
 	{
-		if($this->type=="PDO")
+		if ($this->type=="PDO") {
 			if(!is_object($this->lastResult))
 				// in case it was an alter table statement, there is no lastResult object
 				return 0;
-			else
-				return $this->lastResult->rowCount();
-		else if($this->type=="SQLite3")
+			return $this->lastResult->rowCount();
+		}
+
+		if($this->type=="SQLite3")
 			return $this->db->changes();
-		else if($this->type=="SQLiteDatabase")
+
+		if($this->type=="SQLiteDatabase")
 			return $this->db->changes();
 	}
 
@@ -896,7 +892,10 @@ class Database
 	
 	// returns the list of tables (opt. incl. views) as
 	// array( Tablename => tableType ) with tableType being 'view' or 'table'
-	public function getTables($alsoViews=true, $alsoInternal=false, $orderBy='name', $orderDirection='ASC')
+	/**
+	 * @return mixed[]
+	 */
+	public function getTables($alsoViews=true, $alsoInternal=false, $orderBy='name', $orderDirection='ASC'): array
 	{
 		$query = "SELECT name, type FROM sqlite_master " 
 			. "WHERE (type='table'".($alsoViews?" OR type='view'":"").") "
@@ -904,7 +903,7 @@ class Database
 			. "ORDER BY ".$this->quote_id($orderBy)." ".$orderDirection;
 		$result = $this->selectArray($query);
 		$list = array();
-		for($i=0; $i<sizeof($result); $i++)
+		for($i=0; $i<count($result); $i++)
 		{
 			$list[$result[$i]['name']] = $result[$i]['type'];
 		}
@@ -913,7 +912,10 @@ class Database
 	
 	// returns an array of all tables and their columns as
 	// array( tablename => array(columName) )
-	public function getTableDefinitions()
+	/**
+	 * @return list[]
+	 */
+	public function getTableDefinitions(): array
 	{
 		$tables = $this->getTables(true, true);
 		$result = array();
@@ -928,7 +930,7 @@ class Database
 		return $result;
 	}
 	
-	public function close()
+	public function close(): void
 	{
 		if($this->type=="PDO")
 			$this->db = NULL;
@@ -938,17 +940,17 @@ class Database
 			$this->db = NULL;
 	}
 
-	public function beginTransaction()
+	public function beginTransaction(): void
 	{
 		$this->query("BEGIN");
 	}
 
-	public function commitTransaction()
+	public function commitTransaction(): void
 	{
 		$this->query("COMMIT");
 	}
 
-	public function rollbackTransaction()
+	public function rollbackTransaction(): void
 	{
 		$this->query("ROLLBACK");
 	}
@@ -958,7 +960,7 @@ class Database
 	public function query($query, $ignoreAlterCase=false)
 	{
 		global $debug;
-		if(strtolower(substr(ltrim($query),0,5))=='alter' && $ignoreAlterCase==false) //this query is an ALTER query - call the necessary function
+		if(strtolower(substr(ltrim($query),0,5)) === 'alter' && $ignoreAlterCase==false) //this query is an ALTER query - call the necessary function
 		{
 			preg_match("/^\s*ALTER\s+TABLE\s+(".$this->sqlite_surroundings_preg("+",false,",' \"\[`").")\s+(.*)$/i",$query,$matches);
 			if(!isset($matches[1]) || !isset($matches[2]))
@@ -985,12 +987,14 @@ class Database
 	//wrapper for an INSERT and returns the ID of the inserted row
 	public function insert($query)
 	{
-		$result = $this->query($query);
+		$this->query($query);
 		if($this->type=="PDO")
 			return $this->db->lastInsertId();
-		else if($this->type=="SQLite3")
+
+		if($this->type=="SQLite3")
 			return $this->db->lastInsertRowID();
-		else if($this->type=="SQLiteDatabase")
+
+		if($this->type=="SQLiteDatabase")
 			return $this->db->lastInsertRowid();
 	}
 
@@ -1012,7 +1016,8 @@ class Database
 			$result->closeCursor();
 			return $ret;
 		}
-		else if($this->type=="SQLite3")
+
+		if($this->type=="SQLite3")
 		{
 			if($mode=="assoc")
 				$mode = SQLITE3_ASSOC;
@@ -1024,7 +1029,8 @@ class Database
 			$result->finalize();
 			return $ret;
 		}
-		else if($this->type=="SQLiteDatabase")
+
+		if($this->type=="SQLiteDatabase")
 		{
 			if($mode=="assoc")
 				$mode = SQLITE_ASSOC;
@@ -1057,7 +1063,8 @@ class Database
 			$result->closeCursor();
 			return $ret;
 		}
-		else if($this->type=="SQLite3")
+
+		if($this->type=="SQLite3")
 		{
 			if($mode=="assoc")
 				$mode = SQLITE3_ASSOC;
@@ -1075,7 +1082,8 @@ class Database
 			$result->finalize();
 			return $arr;
 		}
-		else if($this->type=="SQLiteDatabase")
+
+		if($this->type=="SQLiteDatabase")
 		{
 			if($mode=="assoc")
 				$mode = SQLITE_ASSOC;
@@ -1105,7 +1113,7 @@ class Database
 				$mode = PDO::FETCH_BOTH;
 			return $result->fetch($mode);
 		}
-		else if($this->type=="SQLite3")
+		if($this->type=="SQLite3")
 		{
 			if($result->numColumns() === 0) {
 				return array();
@@ -1118,7 +1126,7 @@ class Database
 				$mode = SQLITE3_BOTH;
 			return $result->fetchArray($mode);
 		}
-		else if($this->type=="SQLiteDatabase")
+		if($this->type=="SQLiteDatabase")
 		{
 			if($mode=="assoc")
 				$mode = SQLITE_ASSOC;
@@ -1140,11 +1148,11 @@ class Database
 			$meta = $result->getColumnMeta($colNum);
 			return $meta['name'];
 		}
-		else if($this->type=="SQLite3")
+		if($this->type=="SQLite3")
 		{
 			return $result->columnName($colNum);
 		}
-		else if($this->type=="SQLiteDatabase")
+		if($this->type=="SQLiteDatabase")
 		{
 			return $result->fieldName($colNum);
 		}
@@ -1155,7 +1163,7 @@ class Database
 	// single-quotes, double-quotes, backticks, square brackets.
 	// As sqlite does not keep this strict, we also need to be flexible here.
 	// This function generates a regex that matches any of the possibilities.
-	private function sqlite_surroundings_preg($name,$preg_quote=true,$notAllowedCharsIfNone="'\"",$notAllowedName=false)
+	private function sqlite_surroundings_preg($name,bool $preg_quote=true,string $notAllowedCharsIfNone="'\"",$notAllowedName=false): string
 	{
 		if($name=="*" || $name=="+")
 		{
@@ -1185,17 +1193,15 @@ class Database
 			$nameBacktick = str_replace('`','``',$name);
 			$nameSquare = str_replace(']',']]',$name);
 			$nameNo = $name;
-		}
-		
-		$preg =	"(?:'".$nameSingle."'|".   // single-quote surrounded or not in quotes (correct SQL for values/new names)
+		}    // square-bracket surrounded (MS Access/SQL server-Style)
+		return "(?:'".$nameSingle."'|".   // single-quote surrounded or not in quotes (correct SQL for values/new names)
 				$nameNo."|".               // not surrounded (correct SQL if not containing reserved words, spaces or some special chars)
 				"\"".$nameDouble."\"|".    // double-quote surrounded (correct SQL for identifiers)
 				"`".$nameBacktick."`|".    // backtick surrounded (MySQL-Style)
-				"\[".$nameSquare."\])";    // square-bracket surrounded (MS Access/SQL server-Style)
-		return $preg;
+				"\[".$nameSquare."\])";
 	}
 
-	private function sqliteUnquote($quotedName)
+	private function sqliteUnquote(string $quotedName): string|array
 	{
 		$firstChar = $quotedName[0];
 		$withoutFirstAndLastChar = substr($quotedName,1,-1);
@@ -1216,7 +1222,7 @@ class Database
 	}
 	
 	// Returns the last PREG error as a string, '' if no error occured
-	private function getPregError()
+	private function getPregError(): string
 	{
 		$error = preg_last_error();
 		switch ($error)
@@ -1245,13 +1251,13 @@ class Database
 		{
 			$recreateQueries = array();
 			$resultArr = $this->selectArray("SELECT sql,name,type FROM sqlite_master WHERE tbl_name = ".$this->quote($table));
-			if(sizeof($resultArr)<1)
+			if(count($resultArr)<1)
 			{
 				$this->alterError = $errormsg . sprintf($lang['tbl_inexistent'], htmlencode($table));
 				if($debug) $this->debugOutput .= "ERROR: unknown table<hr /><br />";
 				return false;
 			}
-			for($i=0; $i<sizeof($resultArr); $i++)
+			for($i=0; $i<count($resultArr); $i++)
 			{
 				$row = $resultArr[$i];
 				if($row['type'] != 'table' && $row['type'] != 'view')
@@ -1524,7 +1530,7 @@ class Database
 							case 'drop primary key':
 								// we want to drop the primary key
 								if($debug) $this->debugOutput .= "DROP";
-								if(sizeof($primarykey)==1)
+								if(count($primarykey) === 1)
 								{
 									// if not compound primary key, might be a column constraint -> try removal
 									$column = $primarykey[0];
@@ -1683,10 +1689,10 @@ class Database
 
 	
 	// checks whether a table has a primary key
-	public function hasPrimaryKey($table)
+	public function hasPrimaryKey($table): bool
 	{
 		$table_info = $this->getTableInfo($table);
-		foreach($table_info as $row_id => $row_data)
+		foreach($table_info as $row_data)
 		{
 			if($row_data['pk'])
 			{
@@ -1700,7 +1706,10 @@ class Database
 	// Returns an array of columns by which rows can be uniquely adressed.
 	// For tables with a rowid column, this is always array('rowid')
 	// for tables without rowid, this is an array of the primary key columns. 
-	public function getPrimaryKey($table)
+	/**
+	 * @return mixed[]
+	 */
+	public function getPrimaryKey($table): array
 	{
 		$primary_key = array();
 		// check if this table has a rowid
@@ -1708,17 +1717,14 @@ class Database
 		if(isset($getRowID[0]))
 			// it has, so we prefer addressing rows by rowid			
 			return array('rowid');
-		else
+		// the table is without rowid, so use the primary key
+		$table_info = $this->getTableInfo($table);
+		if(is_array($table_info))
 		{
-			// the table is without rowid, so use the primary key
-			$table_info = $this->getTableInfo($table);
-			if(is_array($table_info))
+			foreach($table_info as $row_data)
 			{
-				foreach($table_info as $row_id => $row_data)
-				{
-					if($row_data['pk'])
-						$primary_key[] = $row_data['name'];
-				}
+				if($row_data['pk'])
+					$primary_key[] = $row_data['name'];
 			}
 		}
 		return $primary_key;
@@ -1726,13 +1732,13 @@ class Database
 	
 	// selects a row by a given key $pk, which is an array of values
 	// for the columns by which a row can be adressed (rowid or primary key)
-	public function wherePK($table, $pk)
+	public function wherePK($table, array $pk): string
 	{
 		$where = "";
 		$primary_key = $this->getPrimaryKey($table);
 		foreach($primary_key as $pk_index => $column)
 		{
-			if($where!="")
+			if($where !== "")
 				$where .= " AND ";
 			$where .= $this->quote_id($column) . ' = ';
 			if(is_int($pk[$pk_index]) || is_float($pk[$pk_index]))
@@ -1752,10 +1758,8 @@ class Database
 		{
 			$result = $this->select("SELECT Count(*) FROM ".$this->quote_id($table));
 			return $result[0];
-		} else
-		{
-			return '?';
 		}
+		return '?';
 	}
 
 	//correctly escape a string to be injected into an SQL query
@@ -1766,18 +1770,15 @@ class Database
 			// PDO quote() escapes and adds quotes
 			return $this->db->quote($value);
 		}
-		else if($this->type=="SQLite3")
+		if($this->type=="SQLite3")
 		{
 			return "'".$this->db->escapeString($value)."'";
 		}
-		else
-		{
-			return "'".sqlite_escape_string($value)."'";
-		}
+		return "'".sqlite_escape_string($value)."'";
 	}
 
 	//correctly escape an identifier (column / table / trigger / index name) to be injected into an SQL query
-	public function quote_id($value)
+	public function quote_id($value): string
 	{
 		// double-quotes need to be escaped by doubling them
 		$value = str_replace('"','""',$value);
@@ -1792,21 +1793,17 @@ class Database
 		$import = $this->multiQuery($query);
 		if(!$import)
 			return $this->getError();
-		else
-			return true;
+		return true;
 	}
 	
 	public function prepareQuery($query)
 	{
 		if($this->type=='PDO' || $this->type=='SQLite3')
 			return $this->db->prepare($query);
-		else
-		{
-			// here we are in trouble, SQLiteDatabase cannot prepare statements.
-			// we need to emulate prepare as best as we can
-			# todo: implement this
-			return null;
-		}
+		// here we are in trouble, SQLiteDatabase cannot prepare statements.
+		// we need to emulate prepare as best as we can
+		# todo: implement this
+		return null;
 	}
 	
 	public function bindValue($handle, $parameter, $value, $type)
@@ -1823,7 +1820,7 @@ class Database
 			if(!isset($types[$type]))
 				$type = 'text';
 			// there is no SQLITE_BOOL, so check value and make sure it is 0/1
-			if($type=='bool')
+			if($type === 'bool')
 			{
 				if($value===1 || $value===true)
 					$value=1;
@@ -1846,7 +1843,7 @@ class Database
 			if(!isset($types[$type]))
 				$type = 'text';
 			// there is no PDO::PARAM_FLOAT, so we check it ourself
-			if($type=='float')
+			if($type === 'float')
 			{
 				if(is_numeric($value))
 					$value = (float) $value;
@@ -1855,32 +1852,25 @@ class Database
 			}
 			return $handle->bindValue($parameter, $value, $types[$type]);
 		}
-		else
-			# todo: workaround
-			return false;
-
+		# todo: workaround
+		return false;
 	}
 	
 	public function executePrepared($handle, $fetchResult=false)
 	{
-		if($this->type=='PDO')
-		{
+		if ($this->type=='PDO') {
 			$ok=$handle->execute();
 			if($fetchResult && $ok)
-			{
-				$res = $handle->fetchAll();
-				$handle->closeCursor();
-				return $res;
-			}
-			else
-			{
-				if($ok)
+				{
+					$res = $handle->fetchAll();
 					$handle->closeCursor();
-				return $ok;
-			}
+					return $res;
+				}
+			if($ok)
+				$handle->closeCursor();
+			return $ok;
 		}
-		elseif($this->type=='SQLite3')
-		{
+		if ($this->type=='SQLite3') {
 			$resultset=$handle->execute();
 			if($fetchResult && $resultset!==false)
 			{
@@ -1888,21 +1878,11 @@ class Database
 				$resultset->finalize();
 				return $res;
 			}
-			else
-			{
-				if($resultset!==false)
-					$resultset->finalize();
-				if($resultset===false)
-					return false;
-				else
-					return true;
-			}
+			if($resultset!==false)
+				$resultset->finalize();
+			return $resultset !== false;
 		}
-		else
-		{
-			#todo.
-			return false;
-		}
+		return false;
 	}
 	
 	//import csv
@@ -1925,7 +1905,7 @@ class Database
 			if(is_array($csv_data) && ($csv_data[0] != NULL || count($csv_data)>1))
 			{
 				$csv_number_of_rows++;
-				if($csv_number_of_rows==1)
+				if($csv_number_of_rows === 1)
 				{
 					if($this->getTypeOfTable($table)!="table")
 					{
@@ -1965,28 +1945,22 @@ class Database
 				}
 				$csv_insert .= ");\n";
 				
-				if($csv_number_of_rows % 5000 == 0)
+				if($csv_number_of_rows % 5000 === 0)
 				{
 					$csv_insert .= "COMMIT;\nBEGIN;\n";
 				}
 			}
 		}
-		if($csv_handle === false)
-			return "Error reading CSV file";
-		else
-		{
-			$csv_insert .= "COMMIT;";
-			fclose($csv_handle);
-			$import = $this->multiQuery($csv_insert);
-			if(!$import)
-				return $this->getError();
-			else
-				return true;
-		}
+		if($csv_handle === false) return "Error reading CSV file";
+		$csv_insert .= "COMMIT;";
+		fclose($csv_handle);
+		$import = $this->multiQuery($csv_insert);
+		if(!$import) return $this->getError();
+		return true;
 	}
 	
 	//export csv
-	public function export_csv($tables, $field_terminate, $field_enclosed, $field_escaped, $null, $crlf, $fields_in_first_row)
+	public function export_csv($tables, $field_terminate, $field_enclosed, $field_escaped, $null, $crlf, $fields_in_first_row): void
 	{
 		@set_time_limit(-1);
 		// we use \r\n if the _client_ OS is windows (as the exported file is downloaded to the client), \n otherwise
@@ -1994,10 +1968,10 @@ class Database
 
 		$query = "SELECT * FROM sqlite_master WHERE type='table' or type='view' ORDER BY type DESC";
 		$result = $this->selectArray($query);
-		for($i=0; $i<sizeof($result); $i++)
+		for($i=0; $i<count($result); $i++)
 		{
 			$valid = false;
-			for($j=0; $j<sizeof($tables); $j++)
+			for($j=0; $j<count($tables); $j++)
 			{
 				if($result[$i]['tbl_name']==$tables[$j])
 					$valid = true;
@@ -2006,15 +1980,15 @@ class Database
 			{
 				$temp = $this->getTableInfo($result[$i]['tbl_name']);
 				$cols = array();
-				for($z=0; $z<sizeof($temp); $z++)
+				for($z=0; $z<count($temp); $z++)
 					$cols[$z] = $temp[$z][1];
 				if($fields_in_first_row)
 				{
-					for($z=0; $z<sizeof($cols); $z++)
+					for($z=0; $z<count($cols); $z++)
 					{
 						echo $field_enclosed.$cols[$z].$field_enclosed;
 						// do not terminate the last column!
-						if($z < sizeof($cols)-1)
+						if($z < count($cols)-1)
 							echo $field_terminate;
 					}
 					echo $crlf;
@@ -2029,7 +2003,7 @@ class Database
 					else
 						$firstRow=false;
 
-					for($y=0; $y<sizeof($cols); $y++)
+					for($y=0; $y<count($cols); $y++)
 					{
 						$cell = $row[$cols[$y]];
 						if($crlf)
@@ -2045,18 +2019,18 @@ class Database
 						else
 							echo $field_enclosed.$cell.$field_enclosed;
 						// do not terminate the last column!
-						if($y < sizeof($cols)-1)
+						if($y < count($cols)-1)
 							echo $field_terminate;
 					}
 				}
-				if($i<sizeof($result)-1)
+				if($i<count($result)-1)
 					echo $crlf;
 			}
 		}
 	}
 	
 	//export sql
-	public function export_sql($tables, $drop, $structure, $data, $transaction, $comments, $echo=true)
+	public function export_sql($tables, $drop, $structure, $data, $transaction, $comments, $echo=true): string|false|null
 	{
 		global $lang;
 		@set_time_limit(-1);
@@ -2082,10 +2056,10 @@ class Database
 			echo "BEGIN TRANSACTION;".$crlf;
 
 		//iterate through each table
-		for($i=0; $i<sizeof($result); $i++)
+		for($i=0; $i<count($result); $i++)
 		{
 			$valid = false;
-			for($j=0; $j<sizeof($tables); $j++)
+			for($j=0; $j<count($tables); $j++)
 			{
 				if($result[$i]['tbl_name']==$tables[$j])
 					$valid = true;
@@ -2130,7 +2104,7 @@ class Database
 					$temp = $this->getTableInfo($result[$i]['tbl_name']);
 					$cols = array();
 					$cols_quoted = array();
-					for($z=0; $z<sizeof($temp); $z++)
+					for($z=0; $z<count($temp); $z++)
 					{
 						$cols[$z] = $temp[$z][1];
 						$cols_quoted[$z] = $this->quote_id($temp[$z][1]);
@@ -2138,7 +2112,7 @@ class Database
 					while($row = $this->fetch($table_result))
 					{
 						$vals = array();
-						for($y=0; $y<sizeof($cols); $y++)
+						for($y=0; $y<count($cols); $y++)
 						{
 							if($row[$cols[$y]] === NULL)
 								$vals[$cols[$y]] = 'NULL';
@@ -2158,45 +2132,46 @@ class Database
 			ob_end_clean();
 			return $o;
 		}
-
+		return null;
 	}
 }
+
 class GetParameters
 {
-	private $_fields;
+	private array $_fields;
 
 	public function __construct(array $defaults = array())
 	{
 		$this->_fields = $defaults;
 	}
 
-	public function __set($key, $value)
+	public function __set(string $key, mixed $value)
 	{
 		$this->_fields[$key] = $value;
 	}
 
-	public function __isset($key)
+	public function __isset(string $key)
 	{
 		return isset($this->_fields[$key]);
 	}
 
-	public function __unset($key)
+	public function __unset(string $key)
 	{
 		unset($this->_fields[$key]);
 	}
 
-	public function __get($key)
+	public function __get(string $key): mixed
 	{
 		return $this->_fields[$key];
 	}
 
-	public function getURL(array $assoc = array(), $html = true, $prefix='?')
+	public function getURL(array $assoc = array(), $html = true, $prefix='?'): string
 	{
 		$arg_sep = ($html?'&amp;':'&');
 		return $prefix . http_build_query(array_merge($this->_fields, $assoc), '', $arg_sep);
 	}
 
-	public function getLink(array $assoc = array(), $content = '[ link ]', $class = '', $title = '', $target='')
+	public function getLink(array $assoc = array(), $content = '[ link ]', $class = '', $title = '', $target=''): string
 	{
 		return '<a href="' . $this->getURL($assoc) . '"'
 			. ($class  != '' ? ' class="'  . $class .  '"' : '')
@@ -2205,7 +2180,7 @@ class GetParameters
 			. '>' . $content . '</a>';
 	}
 
-	public function getForm(array $assoc = array(), $method = 'post', $upload = false, $name = '', $csrf = true)
+	public function getForm(array $assoc = array(), $method = 'post', $upload = false, $name = '', $csrf = true): string
 	{
 		$hidden = '';
 		if($method == 'get')
@@ -2229,7 +2204,7 @@ class GetParameters
 			$hidden;
 	}
 	
-	public function redirect(array $assoc = array(), $message="")
+	public function redirect(array $assoc = array(), $message=""): void
 	{
 		if($message!="")
 		{
@@ -2244,7 +2219,9 @@ class GetParameters
 		header("Location: ".$protocol."://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'].$url, true, 302);
 		exit;
 	}
-}//	class MicroTimer (issue #146)
+}
+
+//	class MicroTimer (issue #146)
 //	wraps calls to microtime(), calculating the elapsed time and rounding output
 //
 class MicroTimer {
@@ -2258,14 +2235,14 @@ class MicroTimer {
 	}
 
 	// stops a timer
-	public function stop()
+	public function stop(): void
 	{
 		$this->stopTime = microtime(true);
 	}
 
 	// returns the number of seconds from the timer's creation, or elapsed
 	// between creation and call to ->stop()
-	public function elapsed()
+	public function elapsed(): float
 	{
 		if ($this->stopTime)
 			return round($this->stopTime - $this->startTime, 4);
@@ -2274,7 +2251,7 @@ class MicroTimer {
 	}
 
 	// called when using a MicroTimer object as a string
-	public function __toString()
+	public function __toString(): string
 	{
 		return (string) $this->elapsed();
 	}
@@ -2290,7 +2267,7 @@ class Resources {
 	// currently unused in split mode; set to __FILE__ for built PLA.
 	public static $embedding_file = __FILE__;
 
-	private static $_resources = array(
+	private static array $_resources = array(
 		'css' => array(
 			'mime' => 'text/css',
 			'data' => 'resources/phpliteadmin.css',
@@ -2308,7 +2285,7 @@ class Resources {
 
 	// outputs the specified resource, if defined in this class.
 	// the main script should do no further output after calling this function.
-	public static function output($resource)
+	public static function output($resource): void
 	{
 		if (isset(self::$_resources[$resource])) {
 			$res =& self::$_resources[$resource];
@@ -2349,6 +2326,7 @@ class Resources {
 	}
 
 }
+
 
 if (version_compare(phpversion(), '5.2.4', '<')) {
 	die('Your PHP version is PHP '.phpversion().', which is too old. You need at least PHP 5.2.4.');
@@ -2403,7 +2381,7 @@ define("COOKIENAME", preg_replace('/[^a-zA-Z0-9_]/', '_', $cookie_name . '_' . V
 
 $params = new GetParameters();
 
-if($debug==true)
+if($debug)
 {
 	ini_set("display_errors", 1);
 	error_reporting(E_STRICT | E_ALL);
@@ -2416,7 +2394,7 @@ if($debug==true)
 $pageTimer = new MicroTimer();
 
 // load language file
-if($language != 'en') {
+if($language !== 'en') {
  	$temp_lang=$lang;
 	if(is_file('languages/lang_'.$language.'.php'))
 		include('languages/lang_'.$language.'.php');
@@ -2459,37 +2437,36 @@ if(!function_exists('hash_equals'))
 {
 	function hash_equals($str1, $str2)
 	{
-		if(strlen($str1) != strlen($str2))
+		if(strlen($str1) !== strlen($str2))
 			return false;
-		else {
-			$res = $str1 ^ $str2;
-			$ret = 0;
-			for($i = strlen($res) - 1; $i >= 0; $i--)
-				$ret |= ord($res[$i]);
+		$res = $str1 ^ $str2;
+		$ret = 0;
+		for($i = strlen($res) - 1; $i >= 0; $i--)
 			return !$ret;
-		}
 	}
 }
 
 // workaround if mbsting extension is missing. Sure this means no multibyte support.
 if(!function_exists('mb_strlen'))
 {
-	function mb_strlen($s)
+	function mb_strlen($s): int
 	{
 		return strlen($s);
 	}
 }
 if(!function_exists('mb_substr'))
 {
-	function mb_substr($s, $start, $length=null, $encoding=null)
+	function mb_substr($s, $start, $length=null, $encoding=null): string
 	{
 		return substr($s, $start, null === $length ? 2147483647 : $length);
 	}
 }
 // no other mbstring functions used so far
-
 //function that allows SQL delimiter to be ignored inside comments or strings
-function explode_sql($delimiter, $sql)
+/**
+ * @return string[]
+ */
+function explode_sql($delimiter, $sql): array
 {
 	$ign = array('"' => '"', "'" => "'", "/*" => "*/", "--" => "\n"); // Ignore sequences.
 	$out = array();
@@ -2502,7 +2479,7 @@ function explode_sql($delimiter, $sql)
 		// Split on delimiter
 		if($slen - $i >= $dlen && substr($sql, $i, $dlen) == $delimiter)
 		{
-			array_push($out, substr($sql, $last, $i - $last));
+			$out[] = substr($sql, $last, $i - $last);
 			$last = $i + $dlen;
 			$i += $dlen;
 			continue;
@@ -2511,25 +2488,22 @@ function explode_sql($delimiter, $sql)
 		foreach($ign as $start => $end)
 		{
 			$ilen = strlen($start);
-			if($slen - $i >= $ilen && substr($sql, $i, $ilen) == $start)
+			if($slen - $i >= $ilen && substr($sql, $i, $ilen) === $start)
 			{
 				$i+=strlen($start);
 				$elen = strlen($end);
 				while($i < $slen)
 				{
-					if($slen - $i >= $elen && substr($sql, $i, $elen) == $end)
+					if($slen - $i >= $elen && substr($sql, $i, $elen) === $end)
 					{
 						// SQL comment characters can be escaped by doubling the character. This recognizes and skips those.
-						if($start == $end && $slen - $i >= $elen*2 && substr($sql, $i, $elen*2) == $end.$end)
+						if($start === $end && $slen - $i >= $elen*2 && substr($sql, $i, $elen*2) === $end . $end)
 						{
 							$i += $elen * 2;
 							continue;
 						}
-						else
-						{
-							$i += $elen;
-							continue 3;
-						}
+						$i += $elen;
+						continue 3;
 					}
 					$i++;
 				}
@@ -2539,12 +2513,15 @@ function explode_sql($delimiter, $sql)
 		$i++;
 	}
 	if($last < $slen)
-		array_push($out, substr($sql, $last, $slen - $last));
+		$out[] = substr($sql, $last, $slen - $last);
 	return $out;
 }
 
 //function to scan entire directory tree and subdirectories
-function dir_tree($dir)
+/**
+ * @return non-falsy-string[]
+ */
+function dir_tree($dir): array
 {
 	$path = array();
 	$stack = array($dir);
@@ -2577,14 +2554,14 @@ function dir_tree($dir)
 }
 
 //the function echo the help [?] links to the documentation
-function helpLink($name)
+function helpLink($name): string
 {
 	global $lang;
 	return "<a href='?help=1' onclick='openHelp(\"".$name."\"); return false;' class='helpq' title='".$lang['help'].": ".$name."' target='_blank'><span>[?]</span></a>";
 }
 
 // function to encode value into HTML just like htmlentities, but with adjusted default settings
-function htmlencode($value, $flags=ENT_QUOTES, $encoding ="UTF-8")
+function htmlencode($value, $flags=ENT_QUOTES, $encoding ="UTF-8"): string
 {
 	if (empty($value)) return '';
 	return htmlentities($value, $flags, $encoding);
@@ -2596,13 +2573,13 @@ function subString($str)
 	global $charsNum, $params;
 	if($charsNum > 10 && (!isset($params->fulltexts) || !$params->fulltexts) && mb_strlen($str)>$charsNum)
 	{
-		$str = mb_substr($str, 0, $charsNum).'...';
+		return mb_substr($str, 0, $charsNum).'...';
 	}
 	return $str;
 }
 
 // marks searchwords and htmlencodes correctly
-function markSearchWords($input, $field, $search)
+function markSearchWords($input, $field, array $search): string
 {
 	$output = htmlencode($input);
 	if(isset($search['values'][$field]) && is_array($search['values'][$field]))
@@ -2616,7 +2593,7 @@ function markSearchWords($input, $field, $search)
 				$regex .= '(?:'.($searchValue[0]=='%'?'':'^'); // does the searchvalue have to occur at the start?
 			$regex .= preg_quote(trim($searchValue,'%'),'/');  // the search value
 			if($search['operators'][$field] =='LIKE' || $search['operators'][$field] == 'LIKE%')
-				$regex .= (substr($searchValue,-1)=='%'?'':'$').')';  // does the searchvalue have to occur at the end?
+				$regex .= (substr($searchValue,-1) === '%'?'':'$').')';  // does the searchvalue have to occur at the end?
 			if($vali++<count($search['values'][$field]))
 				$regex .= '|';    // there is another search value, so we add a |
 		}
@@ -2651,11 +2628,8 @@ function checkDbName($name)
 	if(isset($info['extension']) && !in_array($info['extension'], $allowed_extensions))
 	{
 		return false;
-	} else
-	{
-		return (!is_file($name) && !is_dir($name));
 	}
-
+	return (!is_file($name) && !is_dir($name));
 }
 
 // check whether a path is a db managed by this tool
@@ -2679,41 +2653,42 @@ function isManagedDB($path)
 
 // from a typename of a colun, get the type of the column's affinty
 // see https://www.sqlite.org/datatype3.html section 2.1 for rules
-function get_type_affinity($type)
+function get_type_affinity($type): string
 {
 	if (preg_match("/INT/i", $type))
 		return "INTEGER";
-	else if (preg_match("/(?:CHAR|CLOB|TEXT)/i", $type))
+	if (preg_match("/(?:CHAR|CLOB|TEXT)/i", $type))
 		return "TEXT";
-	else if (preg_match("/BLOB/i", $type) || $type=="")
+	if (preg_match("/BLOB/i", $type) || $type=="")
 		return "NONE";
-	else if (preg_match("/(?:REAL|FLOA|DOUB)/i", $type))
+	if (preg_match("/(?:REAL|FLOA|DOUB)/i", $type))
 		return "REAL";
-	else
-		return "NUMERIC";
+	return "NUMERIC";
 }
 
 
 // Returns a file size limit in bytes based on the PHP upload_max_filesize
 // post_max_size and memory_limit. Returns -1 in case of no limit.
-function fileUploadMaxSize()
+function fileUploadMaxSize(): float|int
 {
 	$max1 = parseSize(ini_get('post_max_size'));
 	$max2 = parseSize(ini_get('upload_max_filesize'));
 	$max3 = parseSize(ini_get('memory_limit'));
-	if($max1>0 && ($max1<=$max2 || $max2==0) && ($max1<=$max3 || $max3==-1))
+	if ($max1>0 && ($max1<=$max2 || $max2==0) && ($max1<=$max3 || $max3==-1)) {
 		return $max1;
-	elseif($max2>0 && ($max2<=$max1 || $max1==0) && ($max2<=$max3 || $max3==-1))
+	}
+	if ($max2>0 && ($max2<=$max1 || $max1==0) && ($max2<=$max3 || $max3==-1)) {
 		return $max2;
-	elseif($max3>-1 && ($max3<=$max1 || $max1==0) && ($max3<=$max2 || $max2==0))
+	}
+	if ($max3>-1 && ($max3<=$max1 || $max1==0) && ($max3<=$max2 || $max2==0)) {
 		return $max3;
-	else
-		return -1; // no limit
+	}
+	return -1; // no limit
 }
 
 // Parses given size string like "12M" into number of bytes
 // based on https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Component%21Utility%21Bytes.php/function/Bytes%3A%3AtoInt/8.2.x
-function parseSize($size)
+function parseSize($size): float
 {
 	// Remove the non-unit characters from the size.
 	$unit = preg_replace('/[^bkmgtpezy]/i', '', $size);
@@ -2725,9 +2700,7 @@ function parseSize($size)
 		// of magnitude to multiply a kilobyte by.
 		return round($size * pow(1024, stripos('bkmgtpezy', $unit[0])));
 	}
-	else {
-		return round($size);
-	}
+	return round($size);
 }
 
 
@@ -2787,16 +2760,15 @@ if ($auth->isAuthorized())
 
 		if(is_dir($directory)) //make sure the directory is valid
 		{
-			if($subdirectories===true)
+			if($subdirectories)
 				$arr = dir_tree($directory);
 			else
 				$arr = scandir($directory);
 			$databases = array();
 			$j = 0;
-			for($i=0; $i<sizeof($arr); $i++) //iterate through all the files in the databases
+			for($i=0; $i<count($arr); $i++) //iterate through all the files in the databases
 			{
-				if($subdirectories===false)
-					$arr[$i] = $directory.DIRECTORY_SEPARATOR.$arr[$i];
+				$arr[$i] = $directory.DIRECTORY_SEPARATOR.$arr[$i];
 
 				if(@!is_file($arr[$i])) continue;
 				$con = file_get_contents($arr[$i], false, NULL, 0, 60);
@@ -2817,7 +2789,7 @@ if ($auth->isAuthorized())
 			sort($databases);
 			if(isset($tdata))
 			{
-				foreach($databases as $db_id => $database)
+				foreach($databases as $database)
 				{
 					if($database['path'] === $tdata['path'])
 					{
@@ -2836,7 +2808,7 @@ if ($auth->isAuthorized())
 	}
 	else
 	{
-		for($i=0; $i<sizeof($databases); $i++)
+		for($i=0; $i<count($databases); $i++)
 		{
 			if(!file_exists($databases[$i]['path']))
 			{
@@ -2926,7 +2898,6 @@ if ($auth->isAuthorized())
 		}
 	}
 
-
 	//- Export (download a dump) an existing database
 	if(isset($_POST['export']))
 	{
@@ -3006,7 +2977,7 @@ if ($auth->isAuthorized())
 					else
 						$i++;
 				}
-				$table = $table.$i;
+				$table .= $i;
 			}
 			$importSuccess = $db->import_csv($_FILES["file"]["tmp_name"], $table, $field_terminate, $field_enclosed, $field_escaped, $null, $fields_in_first_row);
 		}
@@ -3085,7 +3056,7 @@ if ($auth->isAuthorized())
 						$query .= $_POST[$i.'_type']." ";
 						if(isset($_POST[$i.'_primarykey']))
 						{
-							if(count($primary_keys)==1)
+							if(count($primary_keys) === 1)
 							{
 								$query .= "PRIMARY KEY ";
 								if(isset($_POST[$i.'_autoincrement']) && $db->getType() != "SQLiteDatabase")
@@ -3095,14 +3066,14 @@ if ($auth->isAuthorized())
 						}
 						if(!isset($_POST[$i.'_primarykey']) && isset($_POST[$i.'_notnull']))
 							$query .= "NOT NULL ";
-						if($_POST[$i.'_defaultoption']!='defined' && $_POST[$i.'_defaultoption']!='none' && $_POST[$i.'_defaultoption']!='expr')
+						if(!in_array($_POST[$i.'_defaultoption'], ['defined', 'none', 'expr']))
 							$query .= "DEFAULT ".$_POST[$i.'_defaultoption']." ";
 						elseif($_POST[$i.'_defaultoption']=='expr')
 							$query .= "DEFAULT (".$_POST[$i.'_defaultvalue'].") ";
 						elseif(isset($_POST[$i.'_defaultvalue']) && $_POST[$i.'_defaultoption']=='defined')
 						{
 							$typeAffinity = get_type_affinity($_POST[$i.'_type']);
-							if(($typeAffinity=="INTEGER" || $typeAffinity=="REAL" || $typeAffinity=="NUMERIC") && is_numeric($_POST[$i.'_defaultvalue']))
+							if((in_array($typeAffinity, ["INTEGER", "REAL", "NUMERIC"])) && is_numeric($_POST[$i.'_defaultvalue']))
 								$query .= "DEFAULT ".$_POST[$i.'_defaultvalue']."  ";
 							else
 								$query .= "DEFAULT ".$db->quote($_POST[$i.'_defaultvalue'])." ";
@@ -3116,7 +3087,7 @@ if ($auth->isAuthorized())
 					$compound_key = "";
 					foreach ($primary_keys as $primary_key)
 					{
-						$compound_key .= ($compound_key=="" ? "" : ", ") . $db->quote($primary_key);
+						$compound_key .= ($compound_key === "" ? "" : ", ") . $db->quote($primary_key);
 					}
 					$query .= "PRIMARY KEY (".$compound_key."), ";
 				}
@@ -3155,7 +3126,7 @@ if ($auth->isAuthorized())
 					$query2 = "";
 				if($result1 !== false)
 					$completed = $lang['tbl']." '".htmlencode(implode(', ',$tables))."' ".$lang['emptied'].".<br/><span style='font-size:11px;'>".htmlencode($query1)."<br />".htmlencode($query2)."</span>";
-				if(count($tables)==1)
+				if(count($tables) === 1)
 					$action = array('action'=>'row_view');
 				else
 					$action = array();
@@ -3213,7 +3184,7 @@ if ($auth->isAuthorized())
 				if($db->getVersion()==3 && $type=='table' // SQLite 3 can rename tables, not views 
 					// In SQL(ite) table names are case-insensitve, so changing is not supported by SQLite.
 					// But table names are stored and displayed case sensitive, so we use the workaround for case sensitive renaming.
-					&& !($_GET['table'] !== $_POST['newname'] && strtolower($_GET['table']) === strtolower($_POST['newname']))
+					&& ($_GET['table'] === $_POST['newname'] || strtolower($_GET['table']) !== strtolower($_POST['newname']))
 					)
 					$result = $db->query($query, true);
 				else
@@ -3237,7 +3208,7 @@ if ($auth->isAuthorized())
 				$tableInfo = $db->getTableInfo($target_table);
 				$j = 0;
 				$whereExpr = array();
-				for($i=0; $i<sizeof($tableInfo); $i++)
+				for($i=0; $i<count($tableInfo); $i++)
 				{
 					$field = $tableInfo[$i][1];
 					$operator = $_POST['field_'.$i.'_operator'];
@@ -3245,7 +3216,7 @@ if ($auth->isAuthorized())
 					$value = $_POST['field_'.$i.'_value'];
 					if($value!="" || $operator=="!= ''" || $operator=="= ''" || $operator == 'IS NULL' || $operator == 'IS NOT NULL')
 					{
-						if($operator=="= ''" || $operator=="!= ''" || $operator == 'IS NULL' || $operator == 'IS NOT NULL')
+						if(in_array($operator, ["= ''", "!= ''", 'IS NULL', 'IS NOT NULL']))
 							$whereExpr[$j] = $db->quote_id($field)." ".$operator;
 						else{
 							if($operator == "LIKE%"){
@@ -3275,10 +3246,10 @@ if ($auth->isAuthorized())
 					}
 				}
 				$searchWhere = '';
-				if(sizeof($whereExpr)>0)
+				if(count($whereExpr)>0)
 				{
 					$searchWhere .= " WHERE ".$whereExpr[0];
-					for($i=1; $i<sizeof($whereExpr); $i++)
+					for($i=1; $i<count($whereExpr); $i++)
 					{
 						$searchWhere .= " AND ".$whereExpr[$i];
 					}
@@ -3310,7 +3281,7 @@ if ($auth->isAuthorized())
 						$query_cols = "";
 						$query_vals = "";
 						$all_default = true;
-						for($j=0; $j<sizeof($tableInfo); $j++)
+						for($j=0; $j<count($tableInfo); $j++)
 						{
 							$null = isset($_POST[$j."_null"][$i]);
 							$type = strtoupper($tableInfo[$j]['type']);
@@ -3341,9 +3312,9 @@ if ($auth->isAuthorized())
 								$query_vals .= ':blobval'.$j;
 							elseif(preg_match('/^BLOB/', $type) &&  $hexblobs)
 								$query_vals .= 'X'.$db->quote($value);
-							elseif(($typeAffinity=="TEXT" || $typeAffinity=="NONE") && !$null)
+							elseif(($typeAffinity === "TEXT" || $typeAffinity === "NONE") && !$null)
 								$query_vals .= $db->quote($value);
-							elseif(($typeAffinity=="INTEGER" || $typeAffinity=="REAL"|| $typeAffinity=="NUMERIC") && $value=="")
+							elseif((in_array($typeAffinity, ["INTEGER", "REAL", "NUMERIC"])) && $value=="")
 								$query_vals .= "NULL";
 							elseif($null)
 								$query_vals .= "NULL";
@@ -3392,7 +3363,7 @@ if ($auth->isAuthorized())
 				$pks = json_decode($_GET['pk']);
 
 				$query = "DELETE FROM ".$db->quote_id($target_table)." WHERE (".$db->wherePK($target_table,json_decode($pks[0])).")";
-				for($i=1; $i<sizeof($pks); $i++)
+				for($i=1; $i<count($pks); $i++)
 				{
 					$query .= " OR (".$db->wherePK($target_table,json_decode($pks[$i])).")";
 				}
@@ -3400,7 +3371,7 @@ if ($auth->isAuthorized())
 				if($result === false)
 					$completed = $db->getError(true);
 				else
-					$completed = sizeof($pks)." ".$lang['rows']." ".$lang['deleted'].".<br/><span style='font-size:11px;'>".htmlencode($query)."</span>";
+					$completed = count($pks)." ".$lang['rows']." ".$lang['deleted'].".<br/><span style='font-size:11px;'>".htmlencode($query)."</span>";
 				$params->redirect(array('action'=>'row_view'), $completed);
 				break;
 
@@ -3414,16 +3385,16 @@ if ($auth->isAuthorized())
 				if(isset($_POST['new_row']))
 					$completed = "";
 				else
-					$completed = sizeof($pks)." ".$lang['rows']." ".$lang['affected'].".<br/><br/>";
+					$completed = count($pks)." ".$lang['rows']." ".$lang['affected'].".<br/><br/>";
 
-				for($i=0; $i<sizeof($pks); $i++)
+				for($i=0; $i<count($pks); $i++)
 				{
 					if(isset($_POST['new_row']))
 					{
 						$query_cols = "";
 						$query_vals = "";
 						$all_default = true;
-						for($j=0; $j<sizeof($tableInfo); $j++)
+						for($j=0; $j<count($tableInfo); $j++)
 						{
 							$null = isset($_POST[$j."_null"][$i]);
 							$type = strtoupper($tableInfo[$j]['type']);
@@ -3467,9 +3438,9 @@ if ($auth->isAuthorized())
 								$query_vals .= ':blobval'.$j;
 							elseif(preg_match('/^BLOB/', $type) && $hexblobs)
 								$query_vals .= 'X'.$db->quote($value);
-							elseif(($typeAffinity=="TEXT" || $typeAffinity=="NONE") && !$null)
+							elseif(($typeAffinity === "TEXT" || $typeAffinity === "NONE") && !$null)
 								$query_vals .= $db->quote($value);
-							elseif(($typeAffinity=="INTEGER" || $typeAffinity=="REAL"|| $typeAffinity=="NUMERIC") && $value=="")
+							elseif((in_array($typeAffinity, ["INTEGER", "REAL", "NUMERIC"])) && $value=="")
 								$query_vals .= "NULL";
 							elseif($null)
 								$query_vals .= "NULL";
@@ -3508,7 +3479,7 @@ if ($auth->isAuthorized())
 					else
 					{
 						$query = "UPDATE ".$db->quote_id($target_table)." SET ";
-						for($j=0; $j<sizeof($tableInfo); $j++)
+						for($j=0; $j<count($tableInfo); $j++)
 						{
 							$type = strtoupper($tableInfo[$j]['type']);
 							$function = $_POST["function_".$j][$i];
@@ -3598,8 +3569,6 @@ if ($auth->isAuthorized())
 				header("Expires: 0");
 				echo $blobVal['blob'];
 				exit;
-				break;
-
 
 		//- Column actions
 
@@ -3616,20 +3585,20 @@ if ($auth->isAuthorized())
 							$query .= "PRIMARY KEY ";
 						if(isset($_POST[$i.'_notnull']))
 							$query .= "NOT NULL ";
-						if($_POST[$i.'_defaultoption']!='defined' && $_POST[$i.'_defaultoption']!='none' && $_POST[$i.'_defaultoption']!='expr')
+						if(!in_array($_POST[$i.'_defaultoption'], ['defined', 'none', 'expr']))
 							$query .= "DEFAULT ".$_POST[$i.'_defaultoption']." ";
 						elseif($_POST[$i.'_defaultoption']=='expr')
 							$query .= "DEFAULT (".$_POST[$i.'_defaultvalue'].") ";
 						elseif(isset($_POST[$i.'_defaultvalue']) && $_POST[$i.'_defaultoption']=='defined')
 						{
 							$typeAffinity = get_type_affinity($_POST[$i.'_type']);
-							if(($typeAffinity=="INTEGER" || $typeAffinity=="REAL" || $typeAffinity=="NUMERIC") && is_numeric($_POST[$i.'_defaultvalue']))
+							if((in_array($typeAffinity, ["INTEGER", "REAL", "NUMERIC"])) && is_numeric($_POST[$i.'_defaultvalue']))
 								$query .= "DEFAULT ".$_POST[$i.'_defaultvalue']."  ";
 							else
 								$query .= "DEFAULT ".$db->quote($_POST[$i.'_defaultvalue'])." ";
 						}
 						if($db->getVersion()==3 &&
-							($_POST[$i.'_defaultoption']=='defined' || $_POST[$i.'_defaultoption']=='none' || $_POST[$i.'_defaultoption']=='NULL')
+							(in_array($_POST[$i.'_defaultoption'], ['defined', 'none', 'NULL']))
 							// Sqlite3 cannot add columns with default values that are not constant
 							&& !isset($_POST[$i.'_primarykey'])
 							// sqlite3 cannot add primary key columns
@@ -3656,7 +3625,7 @@ if ($auth->isAuthorized())
 			case "column_delete":
 				$pks = explode(":", $_GET['pk']);
 				$query = "ALTER TABLE ".$db->quote_id($target_table).' DROP '.$db->quote_id($pks[0]);
-				for($i=1; $i<sizeof($pks); $i++)
+				for($i=1; $i<count($pks); $i++)
 				{
 					$query .= ", DROP ".$db->quote_id($pks[$i]);
 				}
@@ -3672,7 +3641,7 @@ if ($auth->isAuthorized())
 			case "primarykey_add":
 				$pks = explode(":", $_GET['pk']);
 				$query = "ALTER TABLE ".$db->quote_id($target_table).' ADD PRIMARY KEY ('.$db->quote_id($pks[0]);
-				for($i=1; $i<sizeof($pks); $i++)
+				for($i=1; $i<count($pks); $i++)
 				{
 					$query .= ", ".$db->quote_id($pks[$i]);
 				}
@@ -3823,13 +3792,13 @@ if(isset($_GET['help']))
 	<?php
 	echo "<div class='help_list'>";
 	echo "<span style='font-size:18px;'>".PROJECT." v".VERSION." ".$lang['help_doc']."</span><br/><br/>";
-	foreach((array)$help as $key => $val)
+	foreach($help as $key => $val)
 	{
 		echo "<a href='#".$key."'>".$key."</a><br/>";
 	}
 	echo "</div>";
 	echo "<br/><br/>";
-	foreach((array)$help as $key => $val)
+	foreach($help as $key => $val)
 	{
 		echo "<div class='help_outer'>";
 		echo "<a class='headd' name='".$key."'>".$key."</a>";
@@ -3909,7 +3878,7 @@ if(!$auth->isAuthorized())
 
 //- User is authorized, display the main application
 
-if(count($databases)==0) // the database array is empty, offer to create a new database
+if(count($databases) === 0) // the database array is empty, offer to create a new database
 {
 	//- HTML: form to create a new database, exit
 	if($directory!==false && is_writable($directory) && (is_executable($directory) || DIRECTORY_SEPARATOR === '\\'))
@@ -3989,12 +3958,12 @@ foreach($tables as $tableName => $tableType)
 		($target_table == $tableName ? 'active_table' : '') );
 	echo "<br/>";
 }
-if(count($tables)==0)
+if(count($tables) === 0)
 	echo $lang['no_tbl'];
 echo "</fieldset>";
 
 //- HTML: form to create a new database
-if($directory!==false && is_writable($directory))
+if(is_writable($directory))
 {
 	echo "<fieldset style='margin:15px;'><legend><b>".$lang['db_create']."</b> ".helpLink($lang['help2'])."</legend>";
 	echo $params->getForm(array('table'=>null), 'post', false, 'create_database');
@@ -4087,7 +4056,7 @@ else
 	if($db->isWritable() && $db->isDirWritable())
 		echo $params->getLink(array('view'=>'vacuum'), $lang['vac'], ($view=="vacuum" ? 'tab_pressed': 'tab')  );
 
-	if($directory!==false && is_writable($directory))
+	if(is_writable($directory))
 	{
 
 		echo $params->getLink(array('view'=>'rename'), $lang['db_rename'], ($view=="rename" ? 'tab_pressed': 'tab')  );
@@ -4125,7 +4094,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 				$pks = array($_GET['table']);
 			else $pks = array();
 
-			if(sizeof($pks)==0) //nothing was selected so show an error
+			if(count($pks) === 0) //nothing was selected so show an error
 			{
 				echo "<div class='confirm'>";
 				echo $lang['err'].": ".$lang['no_sel'];
@@ -4141,7 +4110,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 				echo "<br/><br/>";
 				echo "<input type='checkbox' name='vacuum' checked='checked'/> ".$lang['vac_on_empty']."<br/><br/>";
 				echo "<input type='submit' value='".$lang['confirm']."' class='btn'/> ";
-				if(count($pks)==1)
+				if(count($pks) === 1)
 					$action = array('action'=>'row_view');
 				else
 					$action = array('table'=>null);
@@ -4154,7 +4123,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 		case "table_create":
 			$query = "SELECT name FROM sqlite_master WHERE type='table' AND name=".$db->quote($_GET['tablename']);
 			$results = $db->selectArray($query);
-			if(sizeof($results)>0)
+			if(count($results)>0)
 				$exists = true;
 			else
 				$exists = false;
@@ -4235,19 +4204,16 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 				$delimiter = $_POST['delimiter'];
 				$queryStr = $_POST['queryval'];
 				//save the queries in history if necessary
-				if($maxSavedQueries!=0 && $maxSavedQueries!=false)
-				{
-					if(!isset($_SESSION[COOKIENAME.'query_history']))
-						$_SESSION[COOKIENAME.'query_history'] = array();
-					$_SESSION[COOKIENAME.'query_history'][md5(strtolower($queryStr))] = $queryStr;
-					if(sizeof($_SESSION[COOKIENAME.'query_history']) > $maxSavedQueries)
-						array_shift($_SESSION[COOKIENAME.'query_history']);
-				}
+				if(!isset($_SESSION[COOKIENAME.'query_history']))
+					$_SESSION[COOKIENAME.'query_history'] = array();
+				$_SESSION[COOKIENAME.'query_history'][md5(strtolower($queryStr))] = $queryStr;
+				if(count($_SESSION[COOKIENAME.'query_history']) > $maxSavedQueries)
+					array_shift($_SESSION[COOKIENAME.'query_history']);
 				$query = explode_sql($delimiter, $queryStr); //explode the query string into individual queries based on the delimiter
 
-				for($i=0; $i<sizeof($query); $i++) //iterate through the queries exploded by the delimiter
+				for($i=0; $i<count($query); $i++) //iterate through the queries exploded by the delimiter
 				{
-					if(str_replace(" ", "", str_replace("\n", "", str_replace("\r", "", $query[$i])))!="") //make sure this query is not an empty string
+					if(str_replace(" ", "", str_replace("\n", "", str_replace("\r", "", $query[$i]))) !== "") //make sure this query is not an empty string
 					{
 						$queryTimer = new MicroTimer();
 						$table_result = $db->query($query[$i]);
@@ -4261,11 +4227,11 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 						echo "</div><br/>";
 						if($row = $db->fetch($table_result, 'num'))
 						{
-							for($j=0; $j<sizeof($row);$j++)
+							for($j=0; $j<count($row);$j++)
 								$headers[$j] = $db->getColumnName($table_result,$j);
 							echo "<table border='0' cellpadding='2' cellspacing='1' class='viewTable'>";
 							echo "<tr>";
-							for($j=0; $j<sizeof($headers); $j++)
+							for($j=0; $j<count($headers); $j++)
 							{
 								echo "<td class='tdheader'>";
 								echo htmlencode($headers[$j]);
@@ -4273,11 +4239,11 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 							}
 							echo "</tr>";
 							$rowCount = 0;
-							for(; $rowCount==0 || $row = $db->fetch($table_result, 'num'); $rowCount++)
+							for(; $rowCount === 0 || $row = $db->fetch($table_result, 'num'); $rowCount++)
 							{
 								$tdWithClass = "<td class='td".($rowCount%2 ? "1" : "2")."'>";
 								echo "<tr>";
-								for($z=0; $z<sizeof($headers); $z++)
+								for($z=0; $z<count($headers); $z++)
 								{
 									echo $tdWithClass;
 									if($row[$z]==="")
@@ -4301,15 +4267,13 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 								{
 									printf($lang['show_rows'], $rowCount);
 								}
-								if($db->getAffectedRows()>0 || $rowCount==0)
+								if($db->getAffectedRows()>0 || $rowCount === 0)
 								{
 									echo $db->getAffectedRows()." ".$lang['rows_aff']." ";
 								}
 								printf($lang['query_time'], $queryTimer);
 								echo "</div>";
 							}
-
-
 						}
 					}
 				}
@@ -4323,10 +4287,10 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 			echo "<fieldset>";
 			echo "<legend><b>".sprintf($lang['run_sql'],htmlencode($db->getName()))."</b></legend>";
 			echo $params->getForm(array('action'=>'table_sql'));
-			if(isset($_SESSION[COOKIENAME.'query_history']) && sizeof($_SESSION[COOKIENAME.'query_history'])>0)
+			if(isset($_SESSION[COOKIENAME.'query_history']) && count($_SESSION[COOKIENAME.'query_history'])>0)
 			{
 				echo "<b>".$lang['recent_queries']."</b><ul>";
-				foreach($_SESSION[COOKIENAME.'query_history'] as $key => $value)
+				foreach($_SESSION[COOKIENAME.'query_history'] as $value)
 					echo "<li><a onclick='sqleditorSetValue(this.textContent); return false;' href='#'>".htmlencode($value)."</a></li>";
 				echo "</ul><br/><br/>";
 			}
@@ -4338,7 +4302,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 			echo $lang['fields']."<br/>";
 			echo "<select multiple='multiple' style='width:100%;' id='fieldcontainer'>";
 			$tableInfo = $db->getTableInfo($target_table);
-			for($i=0; $i<sizeof($tableInfo); $i++)
+			for($i=0; $i<count($tableInfo); $i++)
 			{
 				echo "<option value='".htmlencode($tableInfo[$i][1])."'>".htmlencode($tableInfo[$i][1])."</option>";
 			}
@@ -4470,7 +4434,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 				echo "<td class='tdheader'>".$lang['val']."</td>";
 				echo "</tr>";
 
-				for($i=0; $i<sizeof($tableInfo); $i++)
+				for($i=0; $i<count($tableInfo); $i++)
 				{
 					$field = $tableInfo[$i][1];
 					$type = $tableInfo[$i]['type'];
@@ -4483,7 +4447,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 						$value = '';
 					if(isset($_GET['oldSearch']) && isset($_SESSION[COOKIENAME.'search'][$_GET['oldSearch']]['operators'][$field]))
 						$operator = $_SESSION[COOKIENAME.'search'][$_GET['oldSearch']]['operators'][$field];
-					elseif($typeAffinity=="TEXT" || $typeAffinity=="NONE")
+					elseif($typeAffinity === "TEXT" || $typeAffinity === "NONE")
 						$operator = 'LIKE';
 					else
 						$operator = '=';
@@ -4504,9 +4468,9 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 					$operatorsTextOnly = array("= ''", "!= ''");
 					foreach($operators as $op)
 					{
-						if($typeAffinity!="INTEGER" && $typeAffinity!="REAL" && $typeAffinity!="NUMERIC" && in_array($op, $operatorsNumbersOnly))
+						if(!in_array($typeAffinity, ["INTEGER", "REAL", "NUMERIC"]) && in_array($op, $operatorsNumbersOnly))
 							continue;
-						if($typeAffinity!="TEXT" && $typeAffinity!="NONE" && in_array($op, $operatorsTextOnly))
+						if($typeAffinity !== "TEXT" && $typeAffinity !== "NONE" && in_array($op, $operatorsTextOnly))
 							continue;
 						$display = (isset($operatorsDisplay[$op]) ? $operatorsDisplay[$op] : $op);
 						echo "<option value='".htmlencode($op)."'".($operator==$op?" selected='selected'":'').">".htmlencode($display)."</option>";
@@ -4514,7 +4478,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 					echo "</select>";
 					echo "</td>";
 					echo $tdWithClassLeft;
-					if($typeAffinity=="INTEGER" || $typeAffinity=="REAL" || $typeAffinity=="NUMERIC")
+					if(in_array($typeAffinity, ["INTEGER", "REAL", "NUMERIC"]))
 						echo "<input type='text' id='field_".$i."_value' name='field_".$i."_value' value='".htmlencode($value)."'/>";
 					else
 						echo "<textarea id='field_".$i."_value' name='field_".$i."_value' rows='1' cols='60'>".htmlencode($value)."</textarea>";
@@ -4606,7 +4570,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 			//- HTML: pagination buttons
 			$lastPage = intval($totalRows / $params->numRows);
 			$remainder = intval($totalRows % $params->numRows);
-			if($remainder==0)
+			if($remainder === 0)
 				$remainder = $params->numRows;
 
 			echo "<div style=''>";
@@ -4696,7 +4660,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 				}
 
 				$tableInfo = $db->getTableInfo($target_table);
-				$pkFirstCol = sizeof($tableInfo)+1;
+				$pkFirstCol = count($tableInfo)+1;
 				//- Table view
 				if(!isset($_SESSION[COOKIENAME.'viewtype']) || $_SESSION[COOKIENAME.'viewtype']=="table")
 				{
@@ -4708,7 +4672,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 					echo "<b>&".($params->fulltexts?'r':'l')."arr;</b>&nbsp;T&nbsp;<b>&".($params->fulltexts?'l':'r')."arr;</b></a>";
 					echo "</td>";
 
-					for($i=0; $i<sizeof($tableInfo); $i++)
+					for($i=0; $i<count($tableInfo); $i++)
 					{
 						echo "<td class='tdheader'>";
 						if(isset($_SESSION[COOKIENAME.'sortRows']))
@@ -4726,7 +4690,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 					{
 						// -g-> $pk will always be the last columns in each row of the array because we are doing "SELECT *, PK_1, typeof(PK_1), PK2, typeof(PK_2), ... FROM ..."
 						$pk_arr = array();
-						for($col = $pkFirstCol; array_key_exists($col, $row); $col=$col+2)
+						for($col = $pkFirstCol; array_key_exists($col, $row); $col += 2)
 						{
 							// in $col we have the type and in $col-1 the value
 							if($row[$col]=='integer' || $row[$col]=='real')
@@ -4755,10 +4719,10 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 						} else {
 							echo "<td class='td".($i%2 ? "1" : "2")."' colspan='3'></td>";
 						}
-						for($j=0; $j<sizeof($tableInfo); $j++)
+						for($j=0; $j<count($tableInfo); $j++)
 						{
 							$typeAffinity = get_type_affinity($tableInfo[$j]['type']);
-							if($typeAffinity=="INTEGER" || $typeAffinity=="REAL" || $typeAffinity=="NUMERIC")
+							if(in_array($typeAffinity, ["INTEGER", "REAL", "NUMERIC"]))
 								echo $tdWithClass;
 							else
 								echo $tdWithClassLeft;
@@ -4805,9 +4769,9 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 					if(!isset($_SESSION[COOKIENAME.$target_table.'chartlabels']))
 					{
 						// No label-column set. Try to pick a text-column as label-column.
-						for($i=0; $i<sizeof($tableInfo); $i++)
+						for($i=0; $i<count($tableInfo); $i++)
 						{
-							if(get_type_affinity($tableInfo[$i]['type'])=='TEXT')
+							if(get_type_affinity($tableInfo[$i]['type']) === 'TEXT')
 							{
 								$_SESSION[COOKIENAME.$target_table.'chartlabels'] = $i;
 								break;
@@ -4824,14 +4788,14 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 						// If not possible, pick the first column that is not the label-column.
 
 						$potential_value_column = null;
-						for($i=0; $i<sizeof($tableInfo); $i++)
+						for($i=0; $i<count($tableInfo); $i++)
 						{
 							if($potential_value_column===null && $i != $_SESSION[COOKIENAME.$target_table.'chartlabels'])
 								// the first column (of any type) that is not the label-column
 								$potential_value_column = $i;
 							// check if the col is numeric
 							$typeAffinity = get_type_affinity($tableInfo[$i]['type']);
-							if($typeAffinity=='INTEGER' || $typeAffinity=='REAL' || $typeAffinity=='NUMERIC')
+							if(in_array($typeAffinity, ['INTEGER', 'REAL', 'NUMERIC']))
 							{
 								// this is defined as a numeric column, so prefer this as a value column over $potential_value_column
 								$_SESSION[COOKIENAME.$target_table.'chartvalues'] = $i;
@@ -4877,7 +4841,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 							$label = str_replace("'", "", htmlencode($row[$_SESSION[COOKIENAME.$target_table.'chartlabels']]));
 							$value = htmlencode($row[$_SESSION[COOKIENAME.$target_table.'chartvalues']]);
 
-							if($value==NULL || $value=="")
+							if($value==NULL || $value === "")
 								$value = 0;
 
 							echo "['".$label."', ".$value."]";
@@ -4934,7 +4898,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 					echo "</select>";
 					echo "<br/><br/>";
 					echo $lang['lbl'].": <select name='chartlabels'>";
-					for($i=0; $i<sizeof($tableInfo); $i++)
+					for($i=0; $i<count($tableInfo); $i++)
 					{
 						if(isset($_SESSION[COOKIENAME.$target_table.'chartlabels']) && $_SESSION[COOKIENAME.$target_table.'chartlabels']==$i)
 							echo "<option value='".$i."' selected='selected'>".htmlencode($tableInfo[$i]['name'])."</option>";
@@ -4944,7 +4908,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 					echo "</select>";
 					echo "<br/><br/>";
 					echo $lang['val'].": <select name='chartvalues'>";
-					for($i=0; $i<sizeof($tableInfo); $i++)
+					for($i=0; $i<count($tableInfo); $i++)
 					{
 						if(isset($_SESSION[COOKIENAME.$target_table.'chartvalues']) && $_SESSION[COOKIENAME.$target_table.'chartvalues']==$i)
 							echo "<option value='".$i."' selected='selected'>".htmlencode($tableInfo[$i]['name'])."</option>";
@@ -5013,7 +4977,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 				echo "<td class='tdheader'>".$lang['val']."</td>";
 				echo "</tr>";
 
-				for($i=0; $i<sizeof($tableInfo); $i++)
+				for($i=0; $i<count($tableInfo); $i++)
 				{
 					$field = $tableInfo[$i]['name'];
 					$type = strtoupper($tableInfo[$i]['type']);
@@ -5051,7 +5015,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 					echo "</td>";
 					echo $tdWithClassLeft;
 
-					if($typeAffinity=="INTEGER" || $typeAffinity=="REAL" || $typeAffinity=="NUMERIC")
+					if(in_array($typeAffinity, ["INTEGER", "REAL", "NUMERIC"]))
 						echo "<input type='text' id='row_".$j."_field_".$i."_value' name='".$j.":".$i."' value='".$value."' onblur='changeIgnore(this, \"row_".$j."_ignore\");' onclick='notNull(\"row_".$j."_field_".$i."_null\");'/>";
 					elseif(preg_match('/^BLOB/', $type) && !$hexblobs)
 						echo "<input type='file' id='row_".$j."_field_".$i."_value' name='".$j.":".$i."' onblur='changeIgnore(this, \"row_".$j."_ignore\");' onclick='notNull(\"row_".$j."_field_".$i."_null\");'/>";
@@ -5078,7 +5042,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 				$pks = array($_GET['pk']);
 			else $pks[0] = "";
 			$str = implode(', ', $pks);
-			if($str=="") //nothing was selected so show an error
+			if($str === "") //nothing was selected so show an error
 			{
 				echo "<div class='confirm'>";
 				echo $lang['err'].": ".$lang['no_sel'];
@@ -5093,7 +5057,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 					$tableInfo = $db->getTableInfo($target_table);
 					$primary_key = $db->getPrimaryKey($target_table);
 
-					for($j=0; $j<sizeof($pks); $j++)
+					for($j=0; $j<count($pks); $j++)
 					{
 						$query = "SELECT * FROM ".$db->quote_id($target_table)." WHERE " . $db->wherePK($target_table, json_decode($pks[$j]));
 						$result1 = $db->select($query, 'num');
@@ -5107,7 +5071,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 						echo "<td class='tdheader'>".$lang['val']."</td>";
 						echo "</tr>";
 
-						for($i=0; $i<sizeof($tableInfo); $i++)
+						for($i=0; $i<count($tableInfo); $i++)
 						{
 							$field = $tableInfo[$i]['name'];
 							$type = strtoupper($tableInfo[$i]['type']);
@@ -5141,7 +5105,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 							}
 							echo "</td>";
 							echo $tdWithClassLeft;
-							if($typeAffinity=="INTEGER" || $typeAffinity=="REAL" || $typeAffinity=="NUMERIC")
+							if(in_array($typeAffinity, ["INTEGER", "REAL", "NUMERIC"]))
 								echo "<input type='text' id='row_".$j."_field_".$i."_value' name='".$i."[]' value='".htmlencode($value)."' onblur='changeIgnore(this, \"".$j."\", \"row_".$j."_field_".$i."_null\")' />";
 							elseif(preg_match('/^BLOB/', $type) && !$hexblobs)
 							{
@@ -5210,7 +5174,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 
 			$noPrimaryKey = true;
 
-			for($i=0; $i<sizeof($tableInfo); $i++)
+			for($i=0; $i<count($tableInfo); $i++)
 			{
 				$colVal = $tableInfo[$i][0];
 				$fieldVal = $tableInfo[$i][1];
@@ -5219,11 +5183,11 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 				$defaultVal = $tableInfo[$i][4];
 				$primarykeyVal = $tableInfo[$i][5];
 
-				if(intval($notnullVal)!=0)
+				if(intval($notnullVal) !== 0)
 					$notnullVal = $lang['yes'];
 				else
 					$notnullVal = $lang['no'];
-				if(intval($primarykeyVal)!=0)
+				if(intval($primarykeyVal) !== 0)
 				{
 					$primarykeyVal = $lang['yes'];
 					$noPrimaryKey = false;
@@ -5307,7 +5271,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 				echo "<br/><hr/><br/>";
 				$query = "PRAGMA index_list(".$db->quote_id($target_table).")";
 				$result = $db->selectArray($query);
-				if(sizeof($result)>0)
+				if(count($result)>0)
 				{
 					echo "<h2>".$lang['indexes'].":</h2>";
 					echo "<table border='0' cellpadding='2' cellspacing='1' class='viewTable'>";
@@ -5320,7 +5284,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 					echo "<td class='tdheader'>".$lang['col']." #</td>";
 					echo "<td class='tdheader'>".$lang['fld']."</td>";
 					echo "</tr>";
-					for($i=0; $i<sizeof($result); $i++)
+					for($i=0; $i<count($result); $i++)
 					{
 						if($result[$i]['unique']==0)
 							$unique = $lang['no'];
@@ -5329,7 +5293,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 
 						$query = "PRAGMA index_info(".$db->quote_id($result[$i]['name']).")";
 						$info = $db->selectArray($query);
-						$span = sizeof($info);
+						$span = count($info);
 
 						$tdWithClass = "<td class='td".($i%2 ? "1" : "2")."'>";
 						$tdWithClassLeft = "<td class='td".($i%2 ? "1" : "2")."' style='text-align:left;'>";
@@ -5347,7 +5311,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 						echo "</td>";
 						for($j=0; $j<$span; $j++)
 						{
-							if($j!=0)
+							if($j !== 0)
 								echo "<tr>";
 							echo $tdWithClassLeft;
 							echo htmlencode($info[$j]['seqno']);
@@ -5367,7 +5331,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 				$query = "SELECT * FROM sqlite_master WHERE type='trigger' AND tbl_name=".$db->quote($target_table)." ORDER BY name";
 				$result = $db->selectArray($query);
 				//print_r($result);
-				if(sizeof($result)>0)
+				if(count($result)>0)
 				{
 					echo "<h2>".$lang['triggers'].":</h2>";
 					echo "<table border='0' cellpadding='2' cellspacing='1' class='viewTable'>";
@@ -5377,7 +5341,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 					echo "<td class='tdheader'>".$lang['name']."</td>";
 					echo "<td class='tdheader'>".$lang['sql']."</td>";
 					echo "</tr>";
-					for($i=0; $i<sizeof($result); $i++)
+					for($i=0; $i<count($result); $i++)
 					{
 						$tdWithClass = "<td class='td".($i%2 ? "1" : "2")."'>";
 						echo "<tr>";
@@ -5488,7 +5452,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 				$pks = array($_GET['pk']);
 			else $pks = array();
 
-			if(sizeof($pks)==0) //nothing was selected so show an error
+			if(count($pks) === 0) //nothing was selected so show an error
 			{
 				echo "<div class='confirm'>";
 				echo $lang['err'].": ".$lang['no_sel'];
@@ -5500,7 +5464,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 			{
 				$str = $pks[0];
 				$pkVal = $pks[0];
-				for($i=1; $i<sizeof($pks); $i++)
+				for($i=1; $i<count($pks); $i++)
 				{
 					$str .= ", ".$pks[$i];
 					$pkVal .= ":".$pks[$i];
@@ -5527,7 +5491,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 			{
 				$tableInfo = $db->getTableInfo($target_table);
 
-				for($i=0; $i<sizeof($tableInfo); $i++)
+				for($i=0; $i<count($tableInfo); $i++)
 				{
 					if($tableInfo[$i][1]==$_GET['pk'])
 					{
@@ -5702,7 +5666,7 @@ if(isset($_GET['action']) && !isset($_GET['confirm']))
 				{
 					echo "<select name='".$i."_field'>";
 					echo "<option value=''>--".$lang['ignore']."--</option>";
-					for($j=0; $j<sizeof($tableInfo); $j++)
+					for($j=0; $j<count($tableInfo); $j++)
 						echo "<option value='".htmlencode($tableInfo[$j][1])."'>".htmlencode($tableInfo[$j][1])."</option>";
 					echo "</select> ";
 					echo "<select name='".$i."_order'>";
@@ -5782,7 +5746,7 @@ if(!$target_table && !isset($_GET['confirm']) && (!isset($_GET['action']) || (is
 
 		$tables = $db->getTables(true, false, $_SESSION[COOKIENAME.'sortTables'], $_SESSION[COOKIENAME.'orderTables']);
 
-		if(sizeof($tables)==0)
+		if(count($tables) === 0)
 			echo $lang['no_tbl']."<br/><br/>";
 		else
 		{
@@ -5893,7 +5857,7 @@ if(!$target_table && !isset($_GET['confirm']) && (!isset($_GET['action']) || (is
 				$tableId++;
 			}
 			echo "<tr>";
-			echo "<td class='tdheader' colspan='13'>".sizeof($tables)." ".$lang['total']."</td>";
+			echo "<td class='tdheader' colspan='13'>".count($tables)." ".$lang['total']."</td>";
 			echo "<td class='tdheader' colspan='1' style='text-align:right;'>".$totalRecords.($skippedTables?" ".$params->getLink(array('forceCount'=>'1'),'+ ?'):"")."</td>";
 			echo "</tr>";
 			echo "</table>";
@@ -5940,19 +5904,16 @@ if(!$target_table && !isset($_GET['confirm']) && (!isset($_GET['action']) || (is
 			$delimiter = $_POST['delimiter'];
 			$queryStr = $_POST['queryval'];
 			//save the queries in history if necessary
-			if($maxSavedQueries!=0 && $maxSavedQueries!=false)
-			{
-				if(!isset($_SESSION[COOKIENAME.'query_history']))
-					$_SESSION[COOKIENAME.'query_history'] = array();
-				$_SESSION[COOKIENAME.'query_history'][md5(strtolower($queryStr))] = $queryStr;
-				if(sizeof($_SESSION[COOKIENAME.'query_history']) > $maxSavedQueries)
-					array_shift($_SESSION[COOKIENAME.'query_history']);
-			}
+			if(!isset($_SESSION[COOKIENAME.'query_history']))
+				$_SESSION[COOKIENAME.'query_history'] = array();
+			$_SESSION[COOKIENAME.'query_history'][md5(strtolower($queryStr))] = $queryStr;
+			if(count($_SESSION[COOKIENAME.'query_history']) > $maxSavedQueries)
+				array_shift($_SESSION[COOKIENAME.'query_history']);
 			$query = explode_sql($delimiter, $queryStr); //explode the query string into individual queries based on the delimiter
 
-			for($i=0; $i<sizeof($query); $i++) //iterate through the queries exploded by the delimiter
+			for($i=0; $i<count($query); $i++) //iterate through the queries exploded by the delimiter
 			{
-				if(str_replace(" ", "", str_replace("\n", "", str_replace("\r", "", $query[$i])))!="") //make sure this query is not an empty string
+				if(str_replace(" ", "", str_replace("\n", "", str_replace("\r", "", $query[$i]))) !== "") //make sure this query is not an empty string
 				{
 					$queryTimer = new MicroTimer();
 					$table_result = $db->query($query[$i]);
@@ -5966,11 +5927,11 @@ if(!$target_table && !isset($_GET['confirm']) && (!isset($_GET['action']) || (is
 					echo "</div><br/>";
 					if($row = $db->fetch($table_result, 'num'))
 					{
-						for($j=0; $j<sizeof($row);$j++)
+						for($j=0; $j<count($row);$j++)
 							$headers[$j] = $db->getColumnName($table_result,$j);
 						echo "<table border='0' cellpadding='2' cellspacing='1' class='viewTable'>";
 						echo "<tr>";
-						for($j=0; $j<sizeof($headers); $j++)
+						for($j=0; $j<count($headers); $j++)
 						{
 							echo "<td class='tdheader'>";
 							echo htmlencode($headers[$j]);
@@ -5978,11 +5939,11 @@ if(!$target_table && !isset($_GET['confirm']) && (!isset($_GET['action']) || (is
 						}
 						echo "</tr>";
 						$rowCount = 0;
-						for(; $rowCount==0 || $row = $db->fetch($table_result, 'num'); $rowCount++)
+						for(; $rowCount === 0 || $row = $db->fetch($table_result, 'num'); $rowCount++)
 						{
 							$tdWithClass = "<td class='td".($rowCount%2 ? "1" : "2")."'>";
 							echo "<tr>";
-							for($z=0; $z<sizeof($headers); $z++)
+							for($z=0; $z<count($headers); $z++)
 							{
 								echo $tdWithClass;
 								if($row[$z]==="")
@@ -6006,15 +5967,13 @@ if(!$target_table && !isset($_GET['confirm']) && (!isset($_GET['action']) || (is
 							{
 								printf($lang['show_rows'], $rowCount);
 							}
-							if($db->getAffectedRows()>0 || $rowCount==0)
+							if($db->getAffectedRows()>0 || $rowCount === 0)
 							{
 								echo $db->getAffectedRows()." ".$lang['rows_aff']." ";
 							}
 							printf($lang['query_time'], $queryTimer);
 							echo "</div>";
 						}
-
-
 					}
 				}
 			}
@@ -6028,10 +5987,10 @@ if(!$target_table && !isset($_GET['confirm']) && (!isset($_GET['action']) || (is
 		echo "<fieldset>";
 		echo "<legend><b>".sprintf($lang['run_sql'],htmlencode($db->getName()))."</b></legend>";
 		echo $params->getForm(array('view'=>'sql'));
-		if(isset($_SESSION[COOKIENAME.'query_history']) && sizeof($_SESSION[COOKIENAME.'query_history'])>0)
+		if(isset($_SESSION[COOKIENAME.'query_history']) && count($_SESSION[COOKIENAME.'query_history'])>0)
 		{
 			echo "<b>".$lang['recent_queries']."</b><ul>";
-			foreach($_SESSION[COOKIENAME.'query_history'] as $key => $value)
+			foreach($_SESSION[COOKIENAME.'query_history'] as $value)
 			{
 				echo "<li><a onclick='sqleditorSetValue(this.textContent); return false;' href='#'>".htmlencode($value)."</a></li>";
 			}
@@ -6213,7 +6172,7 @@ echo "</html>";
 
 
 // returns data from internal resources, available in single-file mode
-function getInternalResource($res) {
+function getInternalResource($res): string|false {
 	$resources = array('resources/phpliteadmin.css'=>array(0=>0,1=>4059,),'resources/phpliteadmin.js'=>array(0=>4059,1=>4454,),'resources/favicon.ico'=>array(0=>8513,1=>1448,),);
 
 	if (isset($resources[$res]) && $f = fopen(__FILE__, 'r')) {

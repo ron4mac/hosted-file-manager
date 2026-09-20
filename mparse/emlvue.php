@@ -17,11 +17,11 @@ class MySimpleMailParse
 		$s = end($this->sections);
 		if (empty($s['headers'][$header])) return null;
 		$h = $s['headers'][$header];
-		if (substr(ltrim($h,'" '),0,2)=='=?') $h = iconv_mime_decode($h);
+		if (substr(ltrim($h,'" '),0,2) === '=?') return iconv_mime_decode($h);
 		return $h;
 	}
 
-	public function getBody (&$ishtml, $part=0)
+	public function getBody (&$ishtml, $part=0): string
 	{
 		$secn = 0;
 		foreach ($this->sections as $i => $s)
@@ -51,10 +51,10 @@ class MySimpleMailParse
 		}
 	}
 
-	public function getAttachment (&$type, &$name, $part=0, $noc=true)
+	public function getAttachment (&$type, &$name, $part=0, $noc=true): string|bool
 	{
 		$attn = 0;
-		foreach ($this->sections as $i => $s)
+		foreach ($this->sections as $s)
 		{
 			if (empty($s['headers']['content-type'])) continue;
 			$ct = $s['headers']['content-type'];
@@ -78,7 +78,6 @@ class MySimpleMailParse
 						default:
 							return implode($cis,$s['content']);
 					}
-					break;
 				}
 				$attn++;
 			}
@@ -86,7 +85,7 @@ class MySimpleMailParse
 		return false;
 	}
 
-	private function parse ($bound=false)
+	private function parse (bool $bound=false): void
 	{
 		$section = ['headers'=>[],'boundary'=>'','content'=>''];
 		$headone = false;
@@ -117,20 +116,20 @@ class MySimpleMailParse
 							$this->boundaries[] = '--'.substr($section['boundary'],0,8);
 						}
 						// flag quoted-printable
-						$qp = !empty($section['headers']['content-transfer-encoding']) && strtolower($section['headers']['content-transfer-encoding'])=='quoted-printable';
+						$qp = !empty($section['headers']['content-transfer-encoding']) && strtolower($section['headers']['content-transfer-encoding']) === 'quoted-printable';
 					} else {
 						$headstr = $line;
 					}
 				}
 			} else {
 				// scan the body
-				if ($bound || !!$section['boundary']) {
-					if ((substr($line,0,2)=='--') && in_array(substr($line,0,10), $this->boundaries)) {
-						$this->parse($bound || !!$section['boundary']);
+				if ($bound || (bool) $section['boundary']) {
+					if ((substr($line,0,2) === '--') && in_array(substr($line,0,10), $this->boundaries)) {
+						$this->parse($bound || (bool) $section['boundary']);
 					}
 				}
 				if (!in_array(substr($line,0,10), $this->boundaries)) {
-					if ($qp && substr($line,-1)=='=') {
+					if ($qp && substr($line,-1) === '=') {
 						$line = substr($line,0,-1);
 					}
 					$lines[] = $line;
@@ -144,7 +143,7 @@ class MySimpleMailParse
 
 }
 
-function my_mail_parse ($fref)
+function my_mail_parse ($fref): string
 {
 	$msmp = new MySimpleMailParse($fref);		//file_put_contents('MSMP.log',print_r($msmp,true));
 
@@ -178,7 +177,7 @@ function my_mail_parse ($fref)
 		$head .= '<div><span class="msmh_">CC:</span> '.htmlspecialchars($cc).'</div>';
 	}
 	$head .= '<div><span class="msmh_">Subject:</span> '.htmlspecialchars($msmp->getHeaderValue('subject')).'</div>';
-	if ($attachments) {
+	if ($attachments !== []) {
 		$attlnks = '';
 		foreach ($attachments as $k=>$v) {
 			$attlnks .= '<a href="javascript:dnld_att('.$k.', \''.$v['name'].'\')" data-atype="'.$v['type'].'" data-aname="'.$v['name'].'">'.$v['name'].'</a> ';
