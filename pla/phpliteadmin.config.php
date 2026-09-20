@@ -31,7 +31,6 @@ $databases = array(
 	),
 );
 
-
 /* ---- Interface settings ---- */
 
 // Theme! If you want to change theme, save the CSS file in same folder of phpliteadmin or in folder "themes"
@@ -68,7 +67,6 @@ function leet_text($value)
 }
 */
 
-
 /* ---- Advanced options ---- */
 
 //changing the following variable allows multiple phpLiteAdmin installs to work under the same domain.
@@ -82,7 +80,6 @@ $allowed_extensions = array('db','db3','sqlite','sqlite3');
 
 // BLOBs are displayed and edited as hex string
 $hexblobs = false;
-
 
 /*====== below here added for FMX ======*/
 

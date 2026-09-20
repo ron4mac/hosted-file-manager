@@ -829,7 +829,6 @@ const fmx_init = () => {
 // start things up after DOM loaded
 document.addEventListener('DOMContentLoaded', () => fmx_init());
 
-
 // some reusable classes
 class FileDropper {
 	constructor(elm, cb) {

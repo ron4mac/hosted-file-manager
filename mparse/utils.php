@@ -34,7 +34,6 @@ class rcube_utils
 	const INPUT_GP = 3; // GET + POST
 	const INPUT_GPC = 7; // GET + POST + COOKIE
 
-
 	/**
 	 * Helper method to set a cookie with the current path and host settings
 	 *

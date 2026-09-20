@@ -29,11 +29,7 @@ function getUrlData ($url): bool|string {
 		if (!$rfc) return curly($url, $ua);
 		return $rfc;
 	}
-
-
-
-
-return curly($url, $ua);
+	return curly($url, $ua);
 }
 
 function checkForUpdate (): string|false {

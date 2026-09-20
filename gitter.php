@@ -25,11 +25,7 @@ function getUrl ($wc=false): ?string
 		}
 	}
 	$msg = 'pattern not found';
-
-
-
-
-return null;
+	return null;
 }
 
 $msg = ''; $rslt = '';

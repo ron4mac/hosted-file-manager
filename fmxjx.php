@@ -23,19 +23,11 @@ switch ($_POST['act']) {
 		$url = $_POST['url'];
 		$fullfile = $baseDir.$save_path.basename($url);
 		$fexists = file_exists($fullfile);	//remember that the file already existed
-
-
-
-
-
-
-
-
-if ($fexists) {
+		if ($fexists) {
 			echo basename($fullfile).' already exists here';
 			break;
 		}
-$fp = fopen($fullfile, 'w');
+		$fp = fopen($fullfile, 'w');
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_FILE, $fp);
 		curl_setopt($ch, CURLOPT_FAILONERROR, true);

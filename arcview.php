@@ -21,7 +21,6 @@ switch ($fInfo) {
 		exit('NOT AN ACCEPTABLE ARCHIVE TYPE: '.$fInfo);
 }
 
-
 if (!empty($_GET['act'])) {
 	$idx = $_GET['idx'];
 	$pth = $_GET['pth'];
@@ -48,7 +47,6 @@ if (!empty($_GET['act'])) {
 	echo $arcvue->getFileContent($idx, $pth);
 	exit();
 }
-
 
 function display_entry ($av): void
 {
@@ -104,8 +102,6 @@ if (!empty($_POST['act'])) {
 	display_entry($arcvue);
 	exit();
 }
-
-
 
 function display_archive ($av): void
 {
@@ -173,7 +169,6 @@ function display_archive ($av): void
 display_archive($arcvue);
 
 
-
 abstract class MyArcView
 {
 	protected $fpath;
@@ -204,6 +199,7 @@ abstract class MyArcView
 		echo '</div>'."\n";
 	}
 }
+
 
 class MyZipView extends MyArcView
 {
@@ -247,25 +243,12 @@ class MyZipView extends MyArcView
 	}
 
 	private function openArchive(): void
-
-
-
-
-{
-
-
-
-
-
-if (empty($this->za)) {
+	{
+		if (empty($this->za)) {
 			$this->za = new ZipArchive();
 			$this->za->open($this->fpath);
 		}
-
-
-
-
-}
+	}
 
 }
 

@@ -43,22 +43,7 @@ class DirCheck
 		}
 	}
 
-	/**
-
-
-
-
- * @return mixed[]
-
-
-
-
- */
-
-
-
-
-private function getDirTree ($dir): array {
+	private function getDirTree ($dir): array {
 		$d = dir($dir);
 		$x = [];
 		while (false !== ($r = $d->read())) {
@@ -134,23 +119,7 @@ class Joomext
 				case 'library':
 					$jb = array_slice($dirs,0,-3);
 					break;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-case 'module':
+				case 'module':
 					$jb = array_slice($dirs,0,-2);
 					break;
 				default:
