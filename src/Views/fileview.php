@@ -1,0 +1,67 @@
+<?php
+/**
+* @package		hosted-file-manager
+* @copyright	Copyright (C) 2022-2026 RJCreations. All rights reserved.
+* @license		GNU General Public License version 3 or later; see LICENSE.txt
+* @since		4.0.0
+*/
+defined('EXEC_HFM') or die('Access denied');
+
+use Rjc\Hfm\Helpers\HfmHelper;
+
+$mtyp = HfmHelper::FileMimeType(BASE_DIR.$fref);
+$fvurl = 'index.php/file/view?C=1&fref=' . urlencode($fref);
+header('Cache-Control: no-cache');
+?>
+<!DOCTYPE html>
+<html>
+<head>
+<title><?=$fref?></title>
+<base href="<?=BASE_URL?>/">
+<script type="text/javascript">
+var resizeTime = null;
+function viewFile () {
+	document.getElementById('fvue').src='<?=$fvurl?>';
+}
+function viewAs (mTyp) {
+	document.getElementById('fvue').src='<?=$fvurl?>'+'&mtyp='+mTyp;
+}
+function resizeFrame (get=false) {
+	if (resizeTime) {
+		clearTimeout(resizeTime);
+		resizeTime = null;
+	}
+	let fv = document.getElementById('fvue');
+	if (fv) {
+		fv.height = window.innerHeight - fv.offsetTop - 12 + "px";
+	}
+	if (get) viewFile();
+}
+function expWin () {
+	window.moveTo(0, 0);
+	window.resizeTo(screen.availWidth, screen.availHeight);
+}
+function winResized () {
+	if (resizeTime) clearTimeout(resizeTime);
+	resizeTime=setTimeout(resizeFrame,100);
+}
+window.onresize = winResized;
+</script>
+<style>
+iframe#fvue {clear:both;overflow:hidden;width:100%;margin-top:6px;border:1px solid #E0E0E0;box-sizing:border-box}
+div.mtsel {float:right;}
+img.wacti {float:right;margin-top:2px;margin-right:10px;}
+</style>
+</head>
+<body style="overflow:hidden;height:100%" onload="resizeFrame(true)">
+<b><?=$fref?></b> (<?=$mtyp?>)
+<div class="mtsel">view as: <select onChange="viewAs(this.value);">
+<option value ="">default</option>
+<option value ="image/png">png</option>
+<option value ="text/plain">text</option>
+<option value ="0x">hex</option>
+</select></div>
+<img class="wacti" src="static/img/expwin.png" title="Expand window" alt="" onclick="expWin()" />
+<div><div></div><iframe id="fvue" src=""></iframe></div>
+</body>
+</html>

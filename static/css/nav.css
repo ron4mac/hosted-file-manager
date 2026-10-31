@@ -1,0 +1,24 @@
+/**
+* @package		hosted-file-manager
+* @copyright	Copyright (C) 2022-2026 RJCreations. All rights reserved.
+* @license		GNU General Public License version 3 or later; see LICENSE.txt
+* @since		4.0.0
+*/
+
+/* HTML5 and jQuery Super Simple Nav by Todd Motto @toddmotto - toddmotto.com */
+
+/* =============================================================================
+   Navigation Core Styles
+   ========================================================================== */
+   
+nav ul {padding:0;display:inline;list-style-type:none;}
+nav ul li {float:left;margin-bottom:0.9em;}
+nav ul li:hover {color:magenta;}
+nav ul li a {display:block;}
+nav ul li ul {position:absolute;width:auto;background:#CCF;border:1px solid #999;padding:4px 0 4px 0;}
+nav ul li ul li {margin:0;padding:0;width:auto;float:none;line-height:1.4em;}
+nav ul li ul .mnusep {display:block;border-bottom:1px solid #999;margin:3px 0 2px 0;}
+nav ul li ul li a {display:block;margin-right:6px;}
+nav ul li ul li a:hover {color:magenta;}
+nav ul li ul.fallback {display:none;}
+nav ul li:hover ul.fallback {display:block;}
