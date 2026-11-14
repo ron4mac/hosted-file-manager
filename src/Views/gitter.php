@@ -18,17 +18,15 @@ $cookT = time()+86400*256;		//cookie to expire in 256 days
 $gh_auth = $input->cookie(GH_PAT);
 if ($gh_auth) $input->setCookie(GH_PAT, $gh_auth, $cookT);	//refresh the cookie
 
-function getUrl (Rjc\Hfm\Core\Input $input, $wc=false): ?string
+function getUrl (Rjc\Hfm\Core\Input $input, $wc, &$msg): ?string
 {
-	global $gh_auth, $msg;
-
 	$cfgf = file_get_contents('.git/config');
 	if (!$cfgf) { $msg = 'config file is missing'; return null; }
 	$lins = explode("\n", $cfgf);
 	foreach ($lins as $lin) {
 		if (preg_match('#^\surl = (.*)$#', $lin, $mtch)) {
 			if (!$wc) return $mtch[1];
-			return str_replace('://', '://'.urlencode(trim($input->post('user'))).':'.urlencode(trim($gh_auth)).'@', $mtch[1]);
+			return str_replace('://', '://'.urlencode(trim($input->post('user'))).':'.urlencode(trim($input->cookie(GH_PAT))).'@', $mtch[1]);
 		}
 	}
 	$msg = 'pattern not found';
@@ -106,12 +104,12 @@ if ($input->post('commit')) {
 }
 
 if ($input->post('pull')) {
-	$remote = getUrl($input, !empty($input->post('user')));
+	$remote = getUrl($input, !empty($input->post('user')), $msg);
 	if ($remote) $rslt .= `git pull --rebase {$remote}`;
 }
 
 if ($input->post('push')) {
-	$remote = getUrl($input, true);
+	$remote = getUrl($input, true, $msg);
 	$brchsel = trim($input->post('brchsel'));
 	if ($remote && $brchsel) {
 		if ($input->post('force')) {
