@@ -18,7 +18,7 @@ $cookT = time()+86400*256;		//cookie to expire in 256 days
 $gh_auth = $input->cookie(GH_PAT);
 if ($gh_auth) $input->setCookie(GH_PAT, $gh_auth, $cookT);	//refresh the cookie
 
-function getUrl (Input $input, $wc=false): ?string
+function getUrl (Rjc\Hfm\Core\Input $input, $wc=false): ?string
 {
 	global $gh_auth, $msg;
 
