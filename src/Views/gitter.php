@@ -3,7 +3,7 @@
 * @package		hosted-file-manager
 * @copyright	Copyright (C) 2022-2026 RJCreations. All rights reserved.
 * @license		GNU General Public License version 3 or later; see LICENSE.txt
-* @since		4.0.0
+* @since		4.0.5
 */
 defined('EXEC_HFM') or die('Access denied');
 
@@ -18,7 +18,7 @@ $cookT = time()+86400*256;		//cookie to expire in 256 days
 $gh_auth = $input->cookie(GH_PAT);
 if ($gh_auth) $input->setCookie(GH_PAT, $gh_auth, $cookT);	//refresh the cookie
 
-function getUrl ($wc=false): ?string
+function getUrl (Input $input, $wc=false): ?string
 {
 	global $gh_auth, $msg;
 
@@ -106,12 +106,12 @@ if ($input->post('commit')) {
 }
 
 if ($input->post('pull')) {
-	$remote = getUrl(!empty($input->post('user')));
+	$remote = getUrl($input, !empty($input->post('user')));
 	if ($remote) $rslt .= `git pull --rebase {$remote}`;
 }
 
 if ($input->post('push')) {
-	$remote = getUrl(true);
+	$remote = getUrl($input, true);
 	$brchsel = trim($input->post('brchsel'));
 	if ($remote && $brchsel) {
 		if ($input->post('force')) {
