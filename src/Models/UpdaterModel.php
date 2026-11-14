@@ -3,7 +3,7 @@
 * @package		hosted-file-manager
 * @copyright	Copyright (C) 2022-2026 RJCreations. All rights reserved.
 * @license		GNU General Public License version 3 or later; see LICENSE.txt
-* @since		4.0.0
+* @since		4.0.5
 */
 namespace Rjc\Hfm\Models;
 
@@ -75,7 +75,7 @@ class UpdaterModel
 				}
 			}
 			$zip->close();
-		//	self::cleanupFiles($fils2clean);
+			self::cleanupFiles($fils2clean);
 		} else {
 			echo 'failed, code:' . $res;
 		}
