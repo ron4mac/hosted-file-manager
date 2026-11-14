@@ -3,7 +3,7 @@
 * @package		hosted-file-manager
 * @copyright	Copyright (C) 2022-2026 RJCreations. All rights reserved.
 * @license		GNU General Public License version 3 or later; see LICENSE.txt
-* @since		4.0.0
+* @since		4.0.5
 */
 defined('EXEC_HFM') or die('Access denied');
 
@@ -137,9 +137,10 @@ if ($pDir) {
 	</tbody>
 	</table>
 </form>
-<?php if ($cfg->val('fmx_ui_cli')) : ?>
 <div id="footerPop">
+<?php if ($cfg->val('fmx_ui_cli')) : ?>
 	<i id="footerPopButton" class="fa fa-bars fa-2x" aria-hidden="true"></i>
+<?php endif; ?>
 	<div id="footerPopContent">
 		<form name="cliterm" method="post">
 		<input type="hidden" name="dir" value="<?=$pDir?>" />
@@ -160,7 +161,6 @@ if ($pDir) {
 <script type="text/javascript">window.location.hash="cmdRsp";</script>
 <?php endif; ?>
 </div>
-<?php endif; ?>
 <div id="upload"><div class="upldr"></div></div>
 <div style="display:none">
 	<div id="aMsgDlog">

@@ -3,7 +3,7 @@
 * @package		hosted-file-manager
 * @copyright	Copyright (C) 2022-2026 RJCreations. All rights reserved.
 * @license		GNU General Public License version 3 or later; see LICENSE.txt
-* @since		4.0.0
+* @since		4.0.5
 */
 namespace Rjc\Hfm\Controllers;
 
@@ -34,7 +34,7 @@ class HomeController
 		} else {
 			$basDir = $input->cookieHas($cooknam) ? convert_uudecode($input->cookie($cooknam)) : false;
 			if (!$basDir) {
-				$basDir = dirname($input->server('DOCUMENT_ROOT'));
+				$basDir = dirname($input->server('DOCUMENT_ROOT')) . $cfg->val('jail','');
 				$input->setCookie($cooknam,convert_uuencode($basDir));
 			}
 		}
@@ -56,9 +56,9 @@ class HomeController
 			chdir($this->rDir);
 			$rsptxt = `$cmd 2>&1`;
 			// get rid of backspaced characters (found in man pages)
-			$rsptxt && $rsptxt = trim(preg_replace('/.\x08/','',$rsptxt));
+			if ($rsptxt && strpos($rsptxt, chr(0x08)) !== false) $rsptxt = trim(preg_replace('/.\x08/','',$rsptxt));
 			// mostly because of a possible </textarea>, escape tags
-			$rsptxt && $rsptxt = trim(preg_replace(['/<xmp/','/<\/xmp/'], ['<x m p','</x m p'], $rsptxt));		//removed since using <xmp> to wrap output
+			if ($rsptxt && strpos($rsptxt, '<xmp') !== false) $rsptxt = trim(preg_replace(['/<xmp/','/<\/xmp/'], ['<x m p','</x m p'], $rsptxt));		//removed since using <xmp> to wrap output
 		}
 //$this->msg = '<xmp>'.print_r((new Cfg())->all_val(), true).'</xmp>';
 		$m = new HomeModel($cfg);

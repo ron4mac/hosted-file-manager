@@ -3,7 +3,7 @@
 * @package		hosted-file-manager
 * @copyright	Copyright (C) 2022-2026 RJCreations. All rights reserved.
 * @license		GNU General Public License version 3 or later; see LICENSE.txt
-* @since		4.0.0
+* @since		4.0.5
 */
 namespace Rjc\Hfm\Core;
 
@@ -22,7 +22,7 @@ class App
 		$input = new Input();
 		$this->input = $input;
 		$this->request = new Request();
-		$cooknam = (new Cfg())->val('cooknam');
+		$cooknam = $this->cfg->val('cooknam');
 		// establish (or get) a base directory path
 		if ($input->getHas('bgn')) {
 			$basDir = $input->get('bgn');
@@ -30,7 +30,7 @@ class App
 		} else {
 			$basDir = $input->cookieHas($cooknam) ? convert_uudecode($input->cookie($cooknam)) : false;
 			if (!$basDir) {
-				$basDir = dirname($input->server('DOCUMENT_ROOT'));
+				$basDir = dirname($input->server('DOCUMENT_ROOT')) . $this->cfg->val('jail','');
 				$input->setCookie($cooknam,convert_uuencode($basDir));
 			}
 		}
