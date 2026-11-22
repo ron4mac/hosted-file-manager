@@ -2,7 +2,7 @@
 * @package		hosted-file-manager
 * @copyright	Copyright (C) 2022-2026 RJCreations. All rights reserved.
 * @license		GNU General Public License version 3 or later; see LICENSE.txt
-* @since		4.0.0
+* @since		4.0.7
 */
 /* jshint unused: true, esnext:false, esversion: 11 */
 /* globals fmx_AJ, _rj, RJ_DlogMgr, rjOpenDlg, rjHtmlElement, curDir, fmx_ui, fmx_appPath, H5uSetup, upload_winpop, fupQadd2, ctxPrf, URLSearchParams */
@@ -489,6 +489,13 @@ function doMenuAction (cmd,evt) {
 			fpop.appendChild(utl);
 			utl.style.top = (-utl.clientHeight+8) + 'px';
 		});
+		break;
+	case 'tool':
+		const tooln = evt.target.dataset.tool;
+		parms = '?dir='+curDir+'&tool='+tooln;
+		pop(fmx_appPath+'index.php/other/tool'+parms,screen.availHeight,1200);
+	//	let fvurl = fmx_appPath+'src/Etc/tools/'+tooln+'.php'+parms;
+	//	pop(fvurl,screen.availHeight,screen.availWidth*0.8);
 		break;
 	case 'mnu':
 		break;

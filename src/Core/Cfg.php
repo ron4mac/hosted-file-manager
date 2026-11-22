@@ -3,7 +3,7 @@
 * @package		hosted-file-manager
 * @copyright	Copyright (C) 2022-2026 RJCreations. All rights reserved.
 * @license		GNU General Public License version 3 or later; see LICENSE.txt
-* @since		4.0.5
+* @since		4.0.7
 */
 namespace Rjc\Hfm\Core;
 
@@ -31,11 +31,10 @@ class Cfg extends CfgLoader
 	}
 }
 
-//include_once __DIR__.'/../../cfg.php';
-
-abstract class CfgLoader {
+abstract class CfgLoader
+{
 	protected array $cfg = [
-		'fmxVersion' => '4.0.5 - November 2026',
+		'fmxVersion' => '4.0.7 - November 2026',
 		// Developer mode
 		'dev_mode' => false,
 		'jsver' => '',

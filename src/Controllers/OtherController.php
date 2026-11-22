@@ -3,7 +3,7 @@
 * @package		hosted-file-manager
 * @copyright	Copyright (C) 2022-2026 RJCreations. All rights reserved.
 * @license		GNU General Public License version 3 or later; see LICENSE.txt
-* @since		4.0.0
+* @since		4.0.7
 */
 namespace Rjc\Hfm\Controllers;
 
@@ -32,6 +32,13 @@ class OtherController
 	public function medya (Input $input): void
 	{
 		App::render('media', [
+			'input' => $input
+		]);
+	}
+
+	public function tool (Input $input): void
+	{
+		App::render('tool', [
 			'input' => $input
 		]);
 	}

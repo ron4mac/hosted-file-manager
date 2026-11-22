@@ -3,7 +3,7 @@
 * @package		hosted-file-manager
 * @copyright	Copyright (C) 2022-2026 RJCreations. All rights reserved.
 * @license		GNU General Public License version 3 or later; see LICENSE.txt
-* @since		4.0.5
+* @since		4.0.7
 */
 defined('EXEC_HFM') or die('Access denied');
 
@@ -121,6 +121,18 @@ if ($pDir) {
 				<li><a href="#" data-mnu="jxtr">jextract</a></li>
 				<li><a href="#" data-mnu="mmiz">minify(.js)</a></li>
 				<li><a href="#" data-mnu="sql3">sqlite3</a></li>
+<?php
+	if ($cfg->val('dev_mode')) {
+		$toofiles = glob('src/Etc/tools/*.php');
+		if ($toofiles) {
+			echo '<li class="mnusep"></li>';
+			foreach ($toofiles as $tool) {
+				$tooln = pathinfo($tool, PATHINFO_FILENAME);
+				echo '<li><a href="#" data-mnu="tool" data-tool="'.$tooln.'">'.$tooln.'</a></li>';
+			}
+		}
+	}
+?>
 			</ul>
 		</li>
 		<li><a href="#" data-mnu="fmxi">?</a></li>
